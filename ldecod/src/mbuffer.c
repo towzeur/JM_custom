@@ -1957,6 +1957,9 @@ static void insert_picture_in_dpb(VideoParameters *p_Vid, FrameStore *fs, Storab
         fs->long_term_frame_idx = p->long_term_frame_idx;
       }
     }
+    /***** XML_TRACE_BEGIN *****/
+    fs->top_field->frame_id = p->frame_id;
+    /*****  XML_TRACE_END  *****/
     if (fs->is_used == 3)
     {
       // generate frame view
@@ -1987,6 +1990,9 @@ static void insert_picture_in_dpb(VideoParameters *p_Vid, FrameStore *fs, Storab
         fs->long_term_frame_idx = p->long_term_frame_idx;
       }
     }
+    /***** XML_TRACE_BEGIN *****/
+    fs->bottom_field->frame_id = p->frame_id;
+    /*****  XML_TRACE_END  *****/
     if (fs->is_used == 3)
     {
       // generate frame view
@@ -2572,6 +2578,14 @@ void dpb_combine_field(VideoParameters *p_Vid, FrameStore *fs)
       fs->frame->mv_info[jj4][i].ref_pic[LIST_1] = k >= 0 ? fs->bottom_field->listX[l][LIST_1][k] : NULL;
     }
   }
+  /***** XML_TRACE_BEGIN *****/
+  if (fs->top_field != NULL)
+    fs->frame->frame_id = fs->top_field->frame_id;
+  else if (fs->bottom_field != NULL)
+    fs->frame->frame_id = fs->bottom_field->frame_id;
+  else
+    fs->frame->frame_id = -1;
+  /*****  XML_TRACE_END  *****/
 }
 
 /*!

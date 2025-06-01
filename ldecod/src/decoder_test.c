@@ -4,7 +4,8 @@
  *  \file
  *     decoder_test.c
  *  \brief
- *     H.264/AVC decoder test
+ *     H.264/
+ decoder test
  *  \author
  *     Main contributors (see contributors.h for copyright, address and affiliation details)
  *     - Yuwen He       <yhe@dolby.com>
@@ -19,6 +20,10 @@
 #include "win32.h"
 #include "h264decoder.h"
 #include "configfile.h"
+
+/***** XML_TRACE_BEGIN *****/
+#include "xmltracefile.h"
+/****** XML_TRACE_END ******/
 
 #define DECOUTPUT_TEST 0
 
@@ -64,6 +69,16 @@ static void Configure(InputParameters *p_Inp, int ac, char *av[])
     calc_buffer(p_Inp);
     fprintf(stdout, "--------------------------------------------------------------------------\n");
 #endif
+    /***** XML_TRACE_BEGIN *****/
+
+    /*xml_set_trace_filename(p_Inp->xmlfile);
+    xml_set_log_level(p_Inp->xml_log_level);*/
+    char xmlfile[7] = {'o', 'u', 't', '.', 'x', 'm', 'l'};
+    xml_set_trace_filename(p_Inp->xmlfile);
+    xml_set_log_level(4);
+    fprintf(stdout, " XML trace file                         : %s \n", xml_get_trace_filename());
+    fprintf(stdout, " XML log level                          : %d \n", xml_get_log_level());
+    /****** XML_TRACE_END *****/
   }
 }
 

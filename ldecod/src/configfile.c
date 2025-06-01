@@ -11,7 +11,8 @@
  * \note
  *    In the future this module should hide the Parameters and offer only
  *    Functions for their access.  Modules which make frequent use of some parameters
- *    (e.g. picture size in macroblocks) are free to buffer them on local variables.
+ *    (e.g.
+ size in macroblocks) are free to buffer them on local variables.
  *    This will not only avoid global variable and make the code more readable, but also
  *    speed it up.  It will also greatly facilitate future enhancements such as the
  *    handling of different picture sizes in the same sequence.                         \n
@@ -68,6 +69,8 @@
 
 static void PatchInp(InputParameters *p_Inp);
 
+InputParameters cfgparams;
+
 /*!
  ***********************************************************************
  * \brief
@@ -76,7 +79,16 @@ static void PatchInp(InputParameters *p_Inp);
  */
 void JMDecHelpExit(void)
 {
-  fprintf(stderr, "\n   ldecod [-h] [-d defdec.cfg] {[-f curenc1.cfg]...[-f curencN.cfg]}"
+  fprintf(stderr, "\nEdited version of JM to extract dct histogram from intraframes. Usage:\n\n"
+                  "   ldecod -i filename.h264 [-d defdec.cfg]\n\n"
+                  "With this version no cfg are required by command line but the xml_trace is disabled by default\n"
+                  "To enable it change the line 23 of xmltracefile.c in: int stopTrace = 1;\nYou need also to enable the trace inside the provided decoder.cfg file (log level must be equal to 4 for dct coeff) \n"
+                  "\nPlace ALWAYS the provided decoder.cfg file inside the same folder of ldecod otherwise you may encounter issues while extracting features on some files"
+                  "\nTo specify another .cfg file use the following command:  -d decoder_file_name.cfg"
+                  "\nThe output yuv file is also disabled: we don't need it for our purposes.\nTo enable it again, comment the line 1410 of ldecod.c\n"
+                  "This software, by default, will trace only intraframe. To trace every frame you have to change\nthe line 25 of xmltracefile.c in: int everyFrame = 0;\n"
+                  "You can also set a limit to the frames to be traced: set the variable maxFramesToTrace at line 21 of xmltracefile.c to the desired value.\n "
+                  "\n\n---------- PREVIOUS HELP FILE, not valid anymore ----------\n\n   ldecod [-h] [-d defdec.cfg] {[-f curenc1.cfg]...[-f curencN.cfg]}"
                   " {[-p EncParam1=EncValue1]..[-p EncParamM=EncValueM]}\n\n"
                   "## Parameters\n\n"
 
@@ -95,7 +107,26 @@ void JMDecHelpExit(void)
                   "   ldecod  -d default.cfg\n"
                   "   ldecod  -f curenc1.cfg\n"
                   "   ldecod  -f curenc1.cfg -p InputFile=\"e:\\data\\container_qcif_30.264\" -p OutputFile=\"dec.yuv\" -p RefFile=\"Rec.yuv\"\n");
+  /*fprintf( stderr, "\n   ldecod [-h] [-d defdec.cfg] {[-f curenc1.cfg]...[-f curencN.cfg]}"
+    " {[-p EncParam1=EncValue1]..[-p EncParamM=EncValueM]}\n\n"
+    "## Parameters\n\n"
 
+    "## Options\n"
+    "   -h :  prints function usage\n"
+    "   -d :  use <defdec.cfg> as default file for parameter initializations.\n"
+    "         If not used then file defaults to encoder.cfg in local directory.\n"
+    "   -f :  read <curencM.cfg> for reseting selected encoder parameters.\n"
+    "         Multiple files could be used that set different parameters\n"
+    "   -p :  Set parameter <DecParamM> to <DecValueM>.\n"
+    "         See default decoder.cfg file for description of all parameters.\n\n"
+
+    "## Examples of usage:\n"
+    "   ldecod\n"
+    "   ldecod  -h\n"
+    "   ldecod  -d default.cfg\n"
+    "   ldecod  -f curenc1.cfg\n"
+    "   ldecod  -f curenc1.cfg -p InputFile=\"e:\\data\\container_qcif_30.264\" -p OutputFile=\"dec.yuv\" -p RefFile=\"Rec.yuv\"\n");
+*/
   exit(-1);
 }
 
