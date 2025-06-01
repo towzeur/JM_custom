@@ -22,36 +22,35 @@
 *    Read one Text Field
 ************************************************************************
 */
-static int ReadTextField(FILE *expSeqFile, char* keyword)
+static int ReadTextField(FILE *expSeqFile, char *keyword)
 {
-  char readline [100];
-  char word[64];  
+  char readline[100];
+  char word[64];
   int err = -1;
   int read_line = 0; // read up to 5 lines to detect data
-  do 
-  {    
+  do
+  {
     read_line++;
     // let us read a full line of data
     if (NULL == fgets(readline, 100, expSeqFile))
-      error ("error parsing explicit sequence file", 500);
-    err = sscanf(readline,"%s",word);
+      error("error parsing explicit sequence file", 500);
+    err = sscanf(readline, "%s", word);
     if (err == -1)
       break;
     if (strcasecmp(word, keyword) != 0)
-      err = - 1;
+      err = -1;
 
     if (feof(expSeqFile)) // move to the end of the line
       break;
-  }
-  while (err == - 1 && read_line < 6);
-  // Lets keep err disabled. This allows us to continue encoding even 
+  } while (err == -1 && read_line < 6);
+  // Lets keep err disabled. This allows us to continue encoding even
   // when input file is empty or reaches end.
   /*
   if (err != 1)
-  {   
+  {
   printf("Error while reading text \"%s\" from input file.\n", keyword);
   report_stats_on_error();
-  }  
+  }
   */
   return err;
 }
@@ -62,23 +61,22 @@ static int ReadTextField(FILE *expSeqFile, char* keyword)
 *    Read one Field of Integer type
 ************************************************************************
 */
-void ReadIntField(FILE *expSeqFile, char* format, char* keyword, int* value)
+void ReadIntField(FILE *expSeqFile, char *format, char *keyword, int *value)
 {
-  char readline [100];
+  char readline[100];
   char word[64];
   int err = -1;
   int read_line = 0; // read up to 5 lines to detect data
 
   do
   {
-    read_line++;    
+    read_line++;
     if (NULL == fgets(readline, 100, expSeqFile))
-      error ("error parsing explicit sequence file", 500);
+      error("error parsing explicit sequence file", 500);
     err = sscanf(readline, format, word, value);
     if (feof(expSeqFile))
-      break;      
-  }
-  while (strcasecmp(word, keyword) != 0 && read_line < 6);
+      break;
+  } while (strcasecmp(word, keyword) != 0 && read_line < 6);
 
   if (err != 2 || strcasecmp(word, keyword) != 0)
   {
@@ -93,9 +91,9 @@ void ReadIntField(FILE *expSeqFile, char* format, char* keyword, int* value)
 *    Read one Field of String type
 ************************************************************************
 */
-void ReadCharField(FILE *expSeqFile, char* format, char* keyword, char* value)
+void ReadCharField(FILE *expSeqFile, char *format, char *keyword, char *value)
 {
-  char readline [100];
+  char readline[100];
   char word[64];
   int err = -1;
   int read_line = 0; // read up to 5 lines to detect data
@@ -104,13 +102,12 @@ void ReadCharField(FILE *expSeqFile, char* format, char* keyword, char* value)
   {
     read_line++;
     if (NULL == fgets(readline, 100, expSeqFile))
-      error ("error parsing explicit sequence file", 500);
+      error("error parsing explicit sequence file", 500);
     err = sscanf(readline, format, word, value);
 
     while (!feof(expSeqFile)) // move to the end of the line
-      break;      
-  }
-  while (strcasecmp(word, keyword) != 0 && read_line < 6);
+      break;
+  } while (strcasecmp(word, keyword) != 0 && read_line < 6);
 
   if (err != 2 || strcasecmp(word, keyword) != 0)
   {
@@ -119,26 +116,25 @@ void ReadCharField(FILE *expSeqFile, char* format, char* keyword, char* value)
   }
 }
 
-
 static void ParseSliceType(char *slice_type, ExpFrameInfo *info, int coding_index)
 {
-  if ( strcasecmp(slice_type, "P") == 0 )
-  {   
+  if (strcasecmp(slice_type, "P") == 0)
+  {
     info->slice_type = P_SLICE;
   }
-  else if ( strcasecmp(slice_type, "B")  == 0 )
+  else if (strcasecmp(slice_type, "B") == 0)
   {
     info->slice_type = B_SLICE;
   }
-  else if ( strcasecmp(slice_type, "I") == 0 )
+  else if (strcasecmp(slice_type, "I") == 0)
   {
     info->slice_type = I_SLICE;
   }
-  else if ( strcasecmp(slice_type, "SP") == 0 )
+  else if (strcasecmp(slice_type, "SP") == 0)
   {
     info->slice_type = SP_SLICE;
   }
-  else if ( strcasecmp(slice_type, "SI") == 0 )
+  else if (strcasecmp(slice_type, "SI") == 0)
   {
     info->slice_type = SI_SLICE;
   }
@@ -157,7 +153,7 @@ static void ParseSliceType(char *slice_type, ExpFrameInfo *info, int coding_inde
 
 static void ParseReferenceIDC(int reference_idc, int coding_index)
 {
-  if ( reference_idc < NALU_PRIORITY_DISPOSABLE || reference_idc > NALU_PRIORITY_HIGHEST)
+  if (reference_idc < NALU_PRIORITY_DISPOSABLE || reference_idc > NALU_PRIORITY_HIGHEST)
   {
     printf("ReadExplicitSeqFile : Invalid reference indicator \n");
     report_stats_on_error();
@@ -169,7 +165,6 @@ static void ParseReferenceIDC(int reference_idc, int coding_index)
     report_stats_on_error();
   }
 }
-
 
 static void ParseSeqNumber(int seq_number, ExpSeqInfo *seq_info, int coding_index)
 {
@@ -194,21 +189,21 @@ void ReadFrameData(FILE *expSeqFile, ExpSeqInfo *seq_info, int coding_index)
 {
   Boolean slice_type_present = FALSE;
   Boolean seq_number_present = FALSE;
-  char readline [100];
-  char word[64], value[64];  
+  char readline[100];
+  char word[64], value[64];
   int err = -1;
   ExpFrameInfo *info = &seq_info->info[coding_index % seq_info->no_frames];
   // Set some defaults
-  info->reference_idc = NALU_PRIORITY_HIGHEST;  
+  info->reference_idc = NALU_PRIORITY_HIGHEST;
 
-  ReadTextField (expSeqFile, "{");  // Start bracket
+  ReadTextField(expSeqFile, "{"); // Start bracket
   do
   {
     // read one line of data
     if (NULL == fgets(readline, 100, expSeqFile))
-      error ("error parsing explicit sequence file", 500);
+      error("error parsing explicit sequence file", 500);
     // let us check if ending character reached or error
-    err = sscanf(readline, "%s : %s", word, value);    
+    err = sscanf(readline, "%s : %s", word, value);
     if (err == 1) // Check ending characters
     {
       if (strcasecmp(word, "}") == 0)
@@ -238,10 +233,9 @@ void ReadFrameData(FILE *expSeqFile, ExpSeqInfo *seq_info, int coding_index)
       {
         info->reference_idc = atoi(value);
         ParseReferenceIDC(info->reference_idc, coding_index);
-      }      
+      }
     }
-  }
-  while (!feof(expSeqFile));
+  } while (!feof(expSeqFile));
 
   if (slice_type_present == FALSE || seq_number_present == FALSE)
   {
@@ -258,11 +252,11 @@ void ReadFrameData(FILE *expSeqFile, ExpSeqInfo *seq_info, int coding_index)
  */
 void ReadExplicitSeqFile(ExpSeqInfo *seq_info, FILE *expSFile, int coding_index)
 {
-  int  frm_header = ReadTextField(expSFile, "Frame");
+  int frm_header = ReadTextField(expSFile, "Frame");
 
   if (frm_header != -1)
   {
-    ReadFrameData (expSFile, seq_info, coding_index);
+    ReadFrameData(expSFile, seq_info, coding_index);
   }
   else
   {
@@ -285,8 +279,8 @@ void OpenExplicitSeqFile(VideoParameters *p_Vid, InputParameters *p_Inp)
   {
     printf("ERROR while opening the explicit sequence information file.\n");
     report_stats_on_error();
-  }  
-  
+  }
+
   if (ReadTextField(p_Vid->expSFile, "Sequence") == -1)
   {
     printf("Sequence info file is of invalid format. Terminating\n");
@@ -294,12 +288,12 @@ void OpenExplicitSeqFile(VideoParameters *p_Vid, InputParameters *p_Inp)
   }
   else
   {
-    ReadIntField  (p_Vid->expSFile, "%s : %d", "FrameCount", &frm_count);
+    ReadIntField(p_Vid->expSFile, "%s : %d", "FrameCount", &frm_count);
     if (frm_count > 0)
     {
-      p_Vid->expSeq = (ExpSeqInfo *) malloc(sizeof(ExpSeqInfo));
+      p_Vid->expSeq = (ExpSeqInfo *)malloc(sizeof(ExpSeqInfo));
       p_Vid->expSeq->no_frames = frm_count;
-      p_Vid->expSeq->info = (ExpFrameInfo *) calloc(frm_count, sizeof(ExpFrameInfo));
+      p_Vid->expSeq->info = (ExpFrameInfo *)calloc(frm_count, sizeof(ExpFrameInfo));
     }
     else
     {
@@ -325,5 +319,3 @@ void CloseExplicitSeqFile(VideoParameters *p_Vid)
     free(p_Vid->expSeq);
   }
 }
-
-

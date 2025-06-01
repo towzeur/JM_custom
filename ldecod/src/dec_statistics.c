@@ -24,7 +24,7 @@
  ***********************************************************************
  */
 void init_dec_stats(DecStatParameters *stats)
-{ 
+{
   int i, j;
   int64 *hist;
   for (i = 0; i < NUM_SLICE_TYPES; i++)
@@ -32,7 +32,7 @@ void init_dec_stats(DecStatParameters *stats)
     stats->frame_ctr[i] = 0;
     for (j = 0; j < MAXMODE; j++)
     {
-      stats->mode_use          [i][j]    = 0; 
+      stats->mode_use[i][j] = 0;
       stats->mode_use_transform[i][j][0] = 0;
       stats->mode_use_transform[i][j][1] = 0;
     }
@@ -42,20 +42,20 @@ void init_dec_stats(DecStatParameters *stats)
   {
     for (j = 0; j < 2; j++)
     {
-      if ((hist = (int64 *) malloc (4096 * sizeof (int64)))== NULL)
-        no_mem_exit ("init_dec_stats: stats->histogram_mv");
-      memset(hist, 0, 4096 * sizeof (int64));
+      if ((hist = (int64 *)malloc(4096 * sizeof(int64))) == NULL)
+        no_mem_exit("init_dec_stats: stats->histogram_mv");
+      memset(hist, 0, 4096 * sizeof(int64));
       stats->histogram_mv[i][j] = hist + 2048;
     }
-    if ((hist = (int64 *) malloc (17 * sizeof (int64)))== NULL)
-      no_mem_exit ("init_dec_stats: stats->histogram_refs");
-    memset(hist, 0, 17 * sizeof (int64));
+    if ((hist = (int64 *)malloc(17 * sizeof(int64))) == NULL)
+      no_mem_exit("init_dec_stats: stats->histogram_refs");
+    memset(hist, 0, 17 * sizeof(int64));
     stats->histogram_refs[i] = hist + 1;
   }
 }
 
 void delete_dec_stats(DecStatParameters *stats)
-{ 
+{
   int i, j;
 
   for (i = 0; i < 2; i++)

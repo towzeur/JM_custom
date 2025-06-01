@@ -26,16 +26,15 @@
  *************************************************************************************
  */
 
-pic_parameter_set_rbsp_t *AllocPPS ()
- {
-   pic_parameter_set_rbsp_t *p;
+pic_parameter_set_rbsp_t *AllocPPS()
+{
+  pic_parameter_set_rbsp_t *p;
 
-   if ((p=calloc (1, sizeof (pic_parameter_set_rbsp_t))) == NULL)
-     no_mem_exit ("AllocPPS: PPS");
-   p->slice_group_id = NULL;
-   return p;
- }
-
+  if ((p = calloc(1, sizeof(pic_parameter_set_rbsp_t))) == NULL)
+    no_mem_exit("AllocPPS: PPS");
+  p->slice_group_id = NULL;
+  return p;
+}
 
 /*!
  *************************************************************************************
@@ -47,15 +46,14 @@ pic_parameter_set_rbsp_t *AllocPPS ()
  *************************************************************************************
  */
 
-seq_parameter_set_rbsp_t *AllocSPS ()
- {
-   seq_parameter_set_rbsp_t *p;
+seq_parameter_set_rbsp_t *AllocSPS()
+{
+  seq_parameter_set_rbsp_t *p;
 
-   if ((p=calloc (1, sizeof (seq_parameter_set_rbsp_t))) == NULL)
-     no_mem_exit ("AllocSPS: SPS");
-   return p;
- }
-
+  if ((p = calloc(1, sizeof(seq_parameter_set_rbsp_t))) == NULL)
+    no_mem_exit("AllocSPS: SPS");
+  return p;
+}
 
 /*!
  *************************************************************************************
@@ -67,31 +65,29 @@ seq_parameter_set_rbsp_t *AllocSPS ()
  *************************************************************************************
  */
 
- void FreePPS (pic_parameter_set_rbsp_t *pps)
- {
-   assert (pps != NULL);
-   if (pps->slice_group_id != NULL) 
-     free (pps->slice_group_id);
-   free (pps);
- }
+void FreePPS(pic_parameter_set_rbsp_t *pps)
+{
+  assert(pps != NULL);
+  if (pps->slice_group_id != NULL)
+    free(pps->slice_group_id);
+  free(pps);
+}
 
+/*!
+*************************************************************************************
+* \brief
+*    Frees a sps
+*
+* \param sps
+*   Sequence parameter set to be freed
+*************************************************************************************
+*/
 
- /*!
- *************************************************************************************
- * \brief
- *    Frees a sps
- *
- * \param sps
- *   Sequence parameter set to be freed
- *************************************************************************************
- */
-
- void FreeSPS (seq_parameter_set_rbsp_t *sps)
- {
-   assert (sps != NULL);
-   free (sps);
- }
-
+void FreeSPS(seq_parameter_set_rbsp_t *sps)
+{
+  assert(sps != NULL);
+  free(sps);
+}
 
 int sps_is_equal(seq_parameter_set_rbsp_t *sps1, seq_parameter_set_rbsp_t *sps2)
 {
@@ -110,22 +106,24 @@ int sps_is_equal(seq_parameter_set_rbsp_t *sps1, seq_parameter_set_rbsp_t *sps2)
   equal &= (sps1->log2_max_frame_num_minus4 == sps2->log2_max_frame_num_minus4);
   equal &= (sps1->pic_order_cnt_type == sps2->pic_order_cnt_type);
 
-  if (!equal) return equal;
+  if (!equal)
+    return equal;
 
-  if( sps1->pic_order_cnt_type == 0 )
+  if (sps1->pic_order_cnt_type == 0)
   {
     equal &= (sps1->log2_max_pic_order_cnt_lsb_minus4 == sps2->log2_max_pic_order_cnt_lsb_minus4);
   }
 
-  else if( sps1->pic_order_cnt_type == 1 )
+  else if (sps1->pic_order_cnt_type == 1)
   {
     equal &= (sps1->delta_pic_order_always_zero_flag == sps2->delta_pic_order_always_zero_flag);
     equal &= (sps1->offset_for_non_ref_pic == sps2->offset_for_non_ref_pic);
     equal &= (sps1->offset_for_top_to_bottom_field == sps2->offset_for_top_to_bottom_field);
     equal &= (sps1->num_ref_frames_in_pic_order_cnt_cycle == sps2->num_ref_frames_in_pic_order_cnt_cycle);
-    if (!equal) return equal;
+    if (!equal)
+      return equal;
 
-    for ( i = 0 ; i< sps1->num_ref_frames_in_pic_order_cnt_cycle ;i ++)
+    for (i = 0; i < sps1->num_ref_frames_in_pic_order_cnt_cycle; i++)
       equal &= (sps1->offset_for_ref_frame[i] == sps2->offset_for_ref_frame[i]);
   }
 
@@ -135,13 +133,15 @@ int sps_is_equal(seq_parameter_set_rbsp_t *sps1, seq_parameter_set_rbsp_t *sps2)
   equal &= (sps1->pic_height_in_map_units_minus1 == sps2->pic_height_in_map_units_minus1);
   equal &= (sps1->frame_mbs_only_flag == sps2->frame_mbs_only_flag);
 
-  if (!equal) return equal;
-  if( !sps1->frame_mbs_only_flag )
+  if (!equal)
+    return equal;
+  if (!sps1->frame_mbs_only_flag)
     equal &= (sps1->mb_adaptive_frame_field_flag == sps2->mb_adaptive_frame_field_flag);
 
   equal &= (sps1->direct_8x8_inference_flag == sps2->direct_8x8_inference_flag);
   equal &= (sps1->frame_cropping_flag == sps2->frame_cropping_flag);
-  if (!equal) return equal;
+  if (!equal)
+    return equal;
   if (sps1->frame_cropping_flag)
   {
     equal &= (sps1->frame_crop_left_offset == sps2->frame_crop_left_offset);
@@ -168,37 +168,40 @@ int pps_is_equal(pic_parameter_set_rbsp_t *pps1, pic_parameter_set_rbsp_t *pps2)
   equal &= (pps1->bottom_field_pic_order_in_frame_present_flag == pps2->bottom_field_pic_order_in_frame_present_flag);
   equal &= (pps1->num_slice_groups_minus1 == pps2->num_slice_groups_minus1);
 
-  if (!equal) return equal;
+  if (!equal)
+    return equal;
 
-  if (pps1->num_slice_groups_minus1>0)
+  if (pps1->num_slice_groups_minus1 > 0)
   {
-      equal &= (pps1->slice_group_map_type == pps2->slice_group_map_type);
-      if (!equal) return equal;
-      if (pps1->slice_group_map_type == 0)
+    equal &= (pps1->slice_group_map_type == pps2->slice_group_map_type);
+    if (!equal)
+      return equal;
+    if (pps1->slice_group_map_type == 0)
+    {
+      for (i = 0; i <= pps1->num_slice_groups_minus1; i++)
+        equal &= (pps1->run_length_minus1[i] == pps2->run_length_minus1[i]);
+    }
+    else if (pps1->slice_group_map_type == 2)
+    {
+      for (i = 0; i < pps1->num_slice_groups_minus1; i++)
       {
-        for (i=0; i<=pps1->num_slice_groups_minus1; i++)
-          equal &= (pps1->run_length_minus1[i] == pps2->run_length_minus1[i]);
+        equal &= (pps1->top_left[i] == pps2->top_left[i]);
+        equal &= (pps1->bottom_right[i] == pps2->bottom_right[i]);
       }
-      else if( pps1->slice_group_map_type == 2 )
-      {
-        for (i=0; i<pps1->num_slice_groups_minus1; i++)
-        {
-          equal &= (pps1->top_left[i] == pps2->top_left[i]);
-          equal &= (pps1->bottom_right[i] == pps2->bottom_right[i]);
-        }
-      }
-      else if( pps1->slice_group_map_type == 3 || pps1->slice_group_map_type==4 || pps1->slice_group_map_type==5 )
-      {
-        equal &= (pps1->slice_group_change_direction_flag == pps2->slice_group_change_direction_flag);
-        equal &= (pps1->slice_group_change_rate_minus1 == pps2->slice_group_change_rate_minus1);
-      }
-      else if( pps1->slice_group_map_type == 6 )
-      {
-        equal &= (pps1->pic_size_in_map_units_minus1 == pps2->pic_size_in_map_units_minus1);
-        if (!equal) return equal;
-        for (i=0; i<=pps1->pic_size_in_map_units_minus1; i++)
-          equal &= (pps1->slice_group_id[i] == pps2->slice_group_id[i]);
-      }
+    }
+    else if (pps1->slice_group_map_type == 3 || pps1->slice_group_map_type == 4 || pps1->slice_group_map_type == 5)
+    {
+      equal &= (pps1->slice_group_change_direction_flag == pps2->slice_group_change_direction_flag);
+      equal &= (pps1->slice_group_change_rate_minus1 == pps2->slice_group_change_rate_minus1);
+    }
+    else if (pps1->slice_group_map_type == 6)
+    {
+      equal &= (pps1->pic_size_in_map_units_minus1 == pps2->pic_size_in_map_units_minus1);
+      if (!equal)
+        return equal;
+      for (i = 0; i <= pps1->pic_size_in_map_units_minus1; i++)
+        equal &= (pps1->slice_group_id[i] == pps2->slice_group_id[i]);
+    }
   }
 
   equal &= (pps1->num_ref_idx_l0_default_active_minus1 == pps2->num_ref_idx_l0_default_active_minus1);
@@ -212,20 +215,21 @@ int pps_is_equal(pic_parameter_set_rbsp_t *pps1, pic_parameter_set_rbsp_t *pps2)
   equal &= (pps1->constrained_intra_pred_flag == pps2->constrained_intra_pred_flag);
   equal &= (pps1->redundant_pic_cnt_present_flag == pps2->redundant_pic_cnt_present_flag);
 
-  if (!equal) return equal;
+  if (!equal)
+    return equal;
 
-  //Fidelity Range Extensions Stuff
-  //It is initialized to zero, so should be ok to check all the time.
+  // Fidelity Range Extensions Stuff
+  // It is initialized to zero, so should be ok to check all the time.
   equal &= (pps1->transform_8x8_mode_flag == pps2->transform_8x8_mode_flag);
   equal &= (pps1->pic_scaling_matrix_present_flag == pps2->pic_scaling_matrix_present_flag);
-  if(pps1->pic_scaling_matrix_present_flag)
+  if (pps1->pic_scaling_matrix_present_flag)
   {
-    for(i = 0; i < (6 + ((unsigned)pps1->transform_8x8_mode_flag << 1)); i++)
+    for (i = 0; i < (6 + ((unsigned)pps1->transform_8x8_mode_flag << 1)); i++)
     {
       equal &= (pps1->pic_scaling_list_present_flag[i] == pps2->pic_scaling_list_present_flag[i]);
-      if(pps1->pic_scaling_list_present_flag[i])
+      if (pps1->pic_scaling_list_present_flag[i])
       {
-        if(i < 6)
+        if (i < 6)
         {
           for (j = 0; j < 16; j++)
             equal &= (pps1->ScalingList4x4[i][j] == pps2->ScalingList4x4[i][j]);
@@ -233,7 +237,7 @@ int pps_is_equal(pic_parameter_set_rbsp_t *pps1, pic_parameter_set_rbsp_t *pps2)
         else
         {
           for (j = 0; j < 64; j++)
-            equal &= (pps1->ScalingList8x8[i-6][j] == pps2->ScalingList8x8[i-6][j]);
+            equal &= (pps1->ScalingList8x8[i - 6][j] == pps2->ScalingList8x8[i - 6][j]);
         }
       }
     }

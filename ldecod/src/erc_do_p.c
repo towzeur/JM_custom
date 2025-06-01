@@ -26,27 +26,26 @@
 #include "mc_prediction.h"
 #include "macroblock.h"
 
-
 // static function declarations
 static int concealByCopy(frame *recfr, int currMBNum, objectBuffer_t *object_list, int picSizeX);
 static int concealByTrial(frame *recfr, imgpel *predMB,
                           int currMBNum, objectBuffer_t *object_list, int predBlocks[],
                           int picSizeX, int picSizeY, char *yCondition);
-static int edgeDistortion (int predBlocks[], int currYBlockNum, imgpel *predMB,
-                           imgpel *recY, int picSizeX, int regionSize);
-static void copyBetweenFrames (frame *recfr, int currYBlockNum, int picSizeX, int regionSize);
+static int edgeDistortion(int predBlocks[], int currYBlockNum, imgpel *predMB,
+                          imgpel *recY, int picSizeX, int regionSize);
+static void copyBetweenFrames(frame *recfr, int currYBlockNum, int picSizeX, int regionSize);
 static void buildPredRegionYUV(VideoParameters *p_Vid, int *mv, int x, int y, imgpel *predMB);
 
 // picture error concealment
 static void buildPredblockRegionYUV(VideoParameters *p_Vid, int *mv,
                                     int x, int y, imgpel *predMB, int list, int mb);
-static void CopyImgData(imgpel **inputY, imgpel ***inputUV, imgpel **outputY, imgpel ***outputUV, 
+static void CopyImgData(imgpel **inputY, imgpel ***inputUV, imgpel **outputY, imgpel ***outputUV,
                         int img_width, int img_height, int img_width_cr, int img_height_cr);
 
-static void copyPredMB (int currYBlockNum, imgpel *predMB, frame *recfr,
-                        int picSizeX, int regionSize);
-static void add_node   ( VideoParameters *p_Vid, struct concealment_node *ptr );
-static void delete_node( VideoParameters *p_Vid, struct concealment_node *ptr );
+static void copyPredMB(int currYBlockNum, imgpel *predMB, frame *recfr,
+                       int picSizeX, int regionSize);
+static void add_node(VideoParameters *p_Vid, struct concealment_node *ptr);
+static void delete_node(VideoParameters *p_Vid, struct concealment_node *ptr);
 
 static const int uv_div[2][4] = {{0, 1, 1, 0}, {0, 1, 0, 0}}; //[x/y][yuv_format]
 
@@ -72,7 +71,7 @@ static const int uv_div[2][4] = {{0, 1, 1, 0}, {0, 1, 0, 0}}; //[x/y][yuv_format
  ************************************************************************
  */
 int ercConcealInterFrame(frame *recfr, objectBuffer_t *object_list,
-                         int picSizeX, int picSizeY, ercVariables_t *errorVar, int chroma_format_idc )
+                         int picSizeX, int picSizeY, ercVariables_t *errorVar, int chroma_format_idc)
 {
   VideoParameters *p_Vid = recfr->p_Vid;
   int lastColumn = 0, lastRow = 0, predBlocks[8];
@@ -81,127 +80,127 @@ int ercConcealInterFrame(frame *recfr, objectBuffer_t *object_list,
   imgpel *predMB;
 
   /* if concealment is on */
-  if ( errorVar && errorVar->concealment )
+  if (errorVar && errorVar->concealment)
   {
     /* if there are segments to be concealed */
-    if ( errorVar->nOfCorruptedSegments )
+    if (errorVar->nOfCorruptedSegments)
     {
       if (chroma_format_idc != YUV400)
-        predMB = (imgpel *) malloc ( (256 + (p_Vid->mb_cr_size)*2) * sizeof (imgpel));
+        predMB = (imgpel *)malloc((256 + (p_Vid->mb_cr_size) * 2) * sizeof(imgpel));
       else
-        predMB = (imgpel *) malloc(256 * sizeof (imgpel));
+        predMB = (imgpel *)malloc(256 * sizeof(imgpel));
 
-      if ( predMB == NULL ) no_mem_exit("ercConcealInterFrame: predMB");
+      if (predMB == NULL)
+        no_mem_exit("ercConcealInterFrame: predMB");
 
-      lastRow = (int) (picSizeY>>4);
-      lastColumn = (int) (picSizeX>>4);
+      lastRow = (int)(picSizeY >> 4);
+      lastColumn = (int)(picSizeX >> 4);
 
-      for ( columnInd = 0; columnInd < lastColumn; columnInd ++)
+      for (columnInd = 0; columnInd < lastColumn; columnInd++)
       {
 
-        column = ((columnInd%2) ? (lastColumn - columnInd/2 -1) : (columnInd/2));
+        column = ((columnInd % 2) ? (lastColumn - columnInd / 2 - 1) : (columnInd / 2));
 
-        for ( row = 0; row < lastRow; row++)
+        for (row = 0; row < lastRow; row++)
         {
 
-          if ( errorVar->yCondition[MBxy2YBlock(column, row, 0, picSizeX)] <= ERC_BLOCK_CORRUPTED )
-          {                           // ERC_BLOCK_CORRUPTED (1) or ERC_BLOCK_EMPTY (0)
+          if (errorVar->yCondition[MBxy2YBlock(column, row, 0, picSizeX)] <= ERC_BLOCK_CORRUPTED)
+          { // ERC_BLOCK_CORRUPTED (1) or ERC_BLOCK_EMPTY (0)
             firstCorruptedRow = row;
             /* find the last row which has corrupted blocks (in same continuous area) */
-            for ( lastCorruptedRow = row+1; lastCorruptedRow < lastRow; lastCorruptedRow++)
+            for (lastCorruptedRow = row + 1; lastCorruptedRow < lastRow; lastCorruptedRow++)
             {
               /* check blocks in the current column */
               if (errorVar->yCondition[MBxy2YBlock(column, lastCorruptedRow, 0, picSizeX)] > ERC_BLOCK_CORRUPTED)
               {
                 /* current one is already OK, so the last was the previous one */
-                lastCorruptedRow --;
+                lastCorruptedRow--;
                 break;
               }
             }
-            if ( lastCorruptedRow >= lastRow )
+            if (lastCorruptedRow >= lastRow)
             {
               /* correct only from above */
-              lastCorruptedRow = lastRow-1;
-              for ( currRow = firstCorruptedRow; currRow < lastRow; currRow++ )
+              lastCorruptedRow = lastRow - 1;
+              for (currRow = firstCorruptedRow; currRow < lastRow; currRow++)
               {
 
-                ercCollect8PredBlocks (predBlocks, (currRow<<1), (column<<1),
-                  errorVar->yCondition, (lastRow<<1), (lastColumn<<1), 2, 0);
+                ercCollect8PredBlocks(predBlocks, (currRow << 1), (column << 1),
+                                      errorVar->yCondition, (lastRow << 1), (lastColumn << 1), 2, 0);
 
-                if(p_Vid->erc_mvperMB >= MVPERMB_THR)
+                if (p_Vid->erc_mvperMB >= MVPERMB_THR)
                   concealByTrial(recfr, predMB,
-                    currRow*lastColumn+column, object_list, predBlocks,
-                    picSizeX, picSizeY,
-                    errorVar->yCondition);
+                                 currRow * lastColumn + column, object_list, predBlocks,
+                                 picSizeX, picSizeY,
+                                 errorVar->yCondition);
                 else
-                  concealByCopy(recfr, currRow*lastColumn+column,
-                    object_list, picSizeX);
+                  concealByCopy(recfr, currRow * lastColumn + column,
+                                object_list, picSizeX);
 
-                ercMarkCurrMBConcealed (currRow*lastColumn+column, -1, picSizeX, errorVar);
+                ercMarkCurrMBConcealed(currRow * lastColumn + column, -1, picSizeX, errorVar);
               }
               row = lastRow;
             }
-            else if ( firstCorruptedRow == 0 )
+            else if (firstCorruptedRow == 0)
             {
               /* correct only from below */
-              for ( currRow = lastCorruptedRow; currRow >= 0; currRow-- )
+              for (currRow = lastCorruptedRow; currRow >= 0; currRow--)
               {
 
-                ercCollect8PredBlocks (predBlocks, (currRow<<1), (column<<1),
-                  errorVar->yCondition, (lastRow<<1), (lastColumn<<1), 2, 0);
+                ercCollect8PredBlocks(predBlocks, (currRow << 1), (column << 1),
+                                      errorVar->yCondition, (lastRow << 1), (lastColumn << 1), 2, 0);
 
-                if(p_Vid->erc_mvperMB >= MVPERMB_THR)
+                if (p_Vid->erc_mvperMB >= MVPERMB_THR)
                   concealByTrial(recfr, predMB,
-                    currRow*lastColumn+column, object_list, predBlocks,
-                    picSizeX, picSizeY,
-                    errorVar->yCondition);
+                                 currRow * lastColumn + column, object_list, predBlocks,
+                                 picSizeX, picSizeY,
+                                 errorVar->yCondition);
                 else
-                  concealByCopy(recfr, currRow*lastColumn+column,
-                    object_list, picSizeX);
+                  concealByCopy(recfr, currRow * lastColumn + column,
+                                object_list, picSizeX);
 
-                ercMarkCurrMBConcealed (currRow*lastColumn+column, -1, picSizeX, errorVar);
+                ercMarkCurrMBConcealed(currRow * lastColumn + column, -1, picSizeX, errorVar);
               }
 
-              row = lastCorruptedRow+1;
+              row = lastCorruptedRow + 1;
             }
             else
             {
               /* correct bi-directionally */
 
-              row = lastCorruptedRow+1;
+              row = lastCorruptedRow + 1;
 
-              areaHeight = lastCorruptedRow-firstCorruptedRow+1;
+              areaHeight = lastCorruptedRow - firstCorruptedRow + 1;
 
               /*
-              *  Conceal the corrupted area switching between the up and the bottom rows
-              */
-              for ( i = 0; i < areaHeight; i++)
+               *  Conceal the corrupted area switching between the up and the bottom rows
+               */
+              for (i = 0; i < areaHeight; i++)
               {
-                if ( i % 2 )
+                if (i % 2)
                 {
                   currRow = lastCorruptedRow;
-                  lastCorruptedRow --;
+                  lastCorruptedRow--;
                 }
                 else
                 {
                   currRow = firstCorruptedRow;
-                  firstCorruptedRow ++;
+                  firstCorruptedRow++;
                 }
 
-                ercCollect8PredBlocks (predBlocks, (currRow<<1), (column<<1),
-                  errorVar->yCondition, (lastRow<<1), (lastColumn<<1), 2, 0);
+                ercCollect8PredBlocks(predBlocks, (currRow << 1), (column << 1),
+                                      errorVar->yCondition, (lastRow << 1), (lastColumn << 1), 2, 0);
 
-                if(p_Vid->erc_mvperMB >= MVPERMB_THR)
+                if (p_Vid->erc_mvperMB >= MVPERMB_THR)
                   concealByTrial(recfr, predMB,
-                    currRow*lastColumn+column, object_list, predBlocks,
-                    picSizeX, picSizeY,
-                    errorVar->yCondition);
+                                 currRow * lastColumn + column, object_list, predBlocks,
+                                 picSizeX, picSizeY,
+                                 errorVar->yCondition);
                 else
-                  concealByCopy(recfr, currRow*lastColumn+column,
-                    object_list, picSizeX);
+                  concealByCopy(recfr, currRow * lastColumn + column,
+                                object_list, picSizeX);
 
-                ercMarkCurrMBConcealed (currRow*lastColumn+column, -1, picSizeX, errorVar);
-
+                ercMarkCurrMBConcealed(currRow * lastColumn + column, -1, picSizeX, errorVar);
               }
             }
             lastCorruptedRow = -1;
@@ -241,13 +240,13 @@ static int concealByCopy(frame *recfr, int currMBNum,
 {
   objectBuffer_t *currRegion;
 
-  currRegion = object_list+(currMBNum<<2);
+  currRegion = object_list + (currMBNum << 2);
   currRegion->regionMode = REGMODE_INTER_COPY;
 
-  currRegion->xMin = (xPosMB(currMBNum,picSizeX)<<4);
-  currRegion->yMin = (yPosMB(currMBNum,picSizeX)<<4);
+  currRegion->xMin = (xPosMB(currMBNum, picSizeX) << 4);
+  currRegion->yMin = (yPosMB(currMBNum, picSizeX) << 4);
 
-  copyBetweenFrames (recfr, MBNum2YBlock(currMBNum,0,picSizeX), picSizeX, 16);
+  copyBetweenFrames(recfr, MBNum2YBlock(currMBNum, 0, picSizeX), picSizeX, 16);
 
   return 0;
 }
@@ -267,36 +266,36 @@ static int concealByCopy(frame *recfr, int currMBNum,
  *      can be 16 or 8 to tell the dimension of the region to copy
  ************************************************************************
  */
-static void copyBetweenFrames (frame *recfr, int currYBlockNum, int picSizeX, int regionSize)
+static void copyBetweenFrames(frame *recfr, int currYBlockNum, int picSizeX, int regionSize)
 {
   VideoParameters *p_Vid = recfr->p_Vid;
   StorablePicture *dec_picture = p_Vid->dec_picture;
   int j, k, location, xmin, ymin;
-  StorablePicture* refPic = p_Vid->ppSliceList[0]->listX[0][0];
+  StorablePicture *refPic = p_Vid->ppSliceList[0]->listX[0][0];
 
   /* set the position of the region to be copied */
-  xmin = (xPosYBlock(currYBlockNum,picSizeX)<<3);
-  ymin = (yPosYBlock(currYBlockNum,picSizeX)<<3);
+  xmin = (xPosYBlock(currYBlockNum, picSizeX) << 3);
+  ymin = (yPosYBlock(currYBlockNum, picSizeX) << 3);
 
   for (j = ymin; j < ymin + regionSize; j++)
     for (k = xmin; k < xmin + regionSize; k++)
     {
       location = j * picSizeX + k;
-//th      recfr->yptr[location] = dec_picture->imgY[j][k];
+      // th      recfr->yptr[location] = dec_picture->imgY[j][k];
       recfr->yptr[location] = refPic->imgY[j][k];
     }
 
-    for (j = ymin >> uv_div[1][dec_picture->chroma_format_idc]; j < (ymin + regionSize) >> uv_div[1][dec_picture->chroma_format_idc]; j++)
-      for (k = xmin >> uv_div[0][dec_picture->chroma_format_idc]; k < (xmin + regionSize) >> uv_div[0][dec_picture->chroma_format_idc]; k++)
-      {
-//        location = j * picSizeX / 2 + k;
-        location = ((j * picSizeX) >> uv_div[0][dec_picture->chroma_format_idc]) + k;
+  for (j = ymin >> uv_div[1][dec_picture->chroma_format_idc]; j < (ymin + regionSize) >> uv_div[1][dec_picture->chroma_format_idc]; j++)
+    for (k = xmin >> uv_div[0][dec_picture->chroma_format_idc]; k < (xmin + regionSize) >> uv_div[0][dec_picture->chroma_format_idc]; k++)
+    {
+      //        location = j * picSizeX / 2 + k;
+      location = ((j * picSizeX) >> uv_div[0][dec_picture->chroma_format_idc]) + k;
 
-//th        recfr->uptr[location] = dec_picture->imgUV[0][j][k];
-//th        recfr->vptr[location] = dec_picture->imgUV[1][j][k];
-        recfr->uptr[location] = refPic->imgUV[0][j][k];
-        recfr->vptr[location] = refPic->imgUV[1][j][k];
-      }
+      // th        recfr->uptr[location] = dec_picture->imgUV[0][j][k];
+      // th        recfr->vptr[location] = dec_picture->imgUV[1][j][k];
+      recfr->uptr[location] = refPic->imgUV[0][j][k];
+      recfr->vptr[location] = refPic->imgUV[1][j][k];
+    }
 }
 
 /*!
@@ -342,7 +341,7 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
   objectBuffer_t *currRegion;
   int mvBest[3] = {0, 0, 0}, mvPred[3] = {0, 0, 0}, *mvptr;
 
-  numMBPerLine = (int) (picSizeX>>4);
+  numMBPerLine = (int)(picSizeX >> 4);
 
   comp = 0;
   regionSize = 16;
@@ -350,12 +349,12 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
   do
   { /* 4 blocks loop */
 
-    currRegion = object_list+(currMBNum<<2)+comp;
+    currRegion = object_list + (currMBNum << 2) + comp;
 
     /* set the position of the region to be concealed */
 
-    currRegion->xMin = (xPosYBlock(MBNum2YBlock(currMBNum,comp,picSizeX),picSizeX)<<3);
-    currRegion->yMin = (yPosYBlock(MBNum2YBlock(currMBNum,comp,picSizeX),picSizeX)<<3);
+    currRegion->xMin = (xPosYBlock(MBNum2YBlock(currMBNum, comp, picSizeX), picSizeX) << 3);
+    currRegion->yMin = (yPosYBlock(MBNum2YBlock(currMBNum, comp, picSizeX), picSizeX) << 3);
 
     do
     { /* reliability loop */
@@ -375,25 +374,25 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
           switch (i)
           {
           case 4:
-            predMBNum = currMBNum-numMBPerLine;
+            predMBNum = currMBNum - numMBPerLine;
             compSplit1 = 2;
             compSplit2 = 3;
             break;
 
           case 5:
-            predMBNum = currMBNum-1;
+            predMBNum = currMBNum - 1;
             compSplit1 = 1;
             compSplit2 = 3;
             break;
 
           case 6:
-            predMBNum = currMBNum+numMBPerLine;
+            predMBNum = currMBNum + numMBPerLine;
             compSplit1 = 0;
             compSplit2 = 1;
             break;
 
           case 7:
-            predMBNum = currMBNum+1;
+            predMBNum = currMBNum + 1;
             compSplit1 = 0;
             compSplit2 = 2;
             break;
@@ -401,8 +400,8 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
 
           /* try the concealment with the Motion Info of the current neighbour
           only try if the neighbour is not Intra */
-          if (isBlock(object_list,predMBNum,compSplit1,INTRA) ||
-            isBlock(object_list,predMBNum,compSplit2,INTRA))
+          if (isBlock(object_list, predMBNum, compSplit1, INTRA) ||
+              isBlock(object_list, predMBNum, compSplit2, INTRA))
           {
             numIntraNeighbours++;
           }
@@ -410,10 +409,10 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
           {
             /* if neighbour MB is splitted, try both neighbour blocks */
             for (predSplitted = isSplitted(object_list, predMBNum),
-              compPred = compSplit1;
-              predSplitted >= 0;
-              compPred = compSplit2,
-              predSplitted -= ((compSplit1 == compSplit2) ? 2 : 1))
+                compPred = compSplit1;
+                 predSplitted >= 0;
+                 compPred = compSplit2,
+                predSplitted -= ((compSplit1 == compSplit2) ? 2 : 1))
             {
 
               /* if Zero Motion Block, do the copying. This option is tried only once */
@@ -435,7 +434,7 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
                 }
               }
               /* build motion using the neighbour's Motion Parameters */
-              else if (isBlock(object_list,predMBNum,compPred,INTRA))
+              else if (isBlock(object_list, predMBNum, compPred, INTRA))
               {
                 continue;
               }
@@ -452,8 +451,8 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
 
               /* measure absolute boundary pixel difference */
               currDist = edgeDistortion(predBlocks,
-                MBNum2YBlock(currMBNum,comp,picSizeX),
-                predMB, recfr->yptr, picSizeX, regionSize);
+                                        MBNum2YBlock(currMBNum, comp, picSizeX),
+                                        predMB, recfr->yptr, picSizeX, regionSize);
 
               /* if so far best -> store the pixels as the best concealment */
               if (currDist < minDist || !fInterNeighborExists)
@@ -461,25 +460,23 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
 
                 minDist = currDist;
 
-                for (k=0;k<3;k++)
+                for (k = 0; k < 3; k++)
                   mvBest[k] = mvPred[k];
 
                 currRegion->regionMode =
-                  (isBlock(object_list, predMBNum, compPred, INTER_COPY)) ?
-                  ((regionSize == 16) ? REGMODE_INTER_COPY : REGMODE_INTER_COPY_8x8) :
-                  ((regionSize == 16) ? REGMODE_INTER_PRED : REGMODE_INTER_PRED_8x8);
+                    (isBlock(object_list, predMBNum, compPred, INTER_COPY)) ? ((regionSize == 16) ? REGMODE_INTER_COPY : REGMODE_INTER_COPY_8x8) : ((regionSize == 16) ? REGMODE_INTER_PRED : REGMODE_INTER_PRED_8x8);
 
-                copyPredMB(MBNum2YBlock(currMBNum,comp,picSizeX), predMB, recfr,
-                  picSizeX, regionSize);
+                copyPredMB(MBNum2YBlock(currMBNum, comp, picSizeX), predMB, recfr,
+                           picSizeX, regionSize);
               }
 
               fInterNeighborExists = 1;
             }
           }
         }
-    }
+      }
 
-    threshold--;
+      threshold--;
 
     } while ((threshold >= ERC_BLOCK_CONCEALED) && (fInterNeighborExists == 0));
 
@@ -492,34 +489,34 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
       buildPredRegionYUV(p_Vid->erc_img, mvPred, currRegion->xMin, currRegion->yMin, predMB);
 
       currDist = edgeDistortion(predBlocks,
-        MBNum2YBlock(currMBNum,comp,picSizeX),
-        predMB, recfr->yptr, picSizeX, regionSize);
+                                MBNum2YBlock(currMBNum, comp, picSizeX),
+                                predMB, recfr->yptr, picSizeX, regionSize);
 
       if (currDist < minDist || !fInterNeighborExists)
       {
 
         minDist = currDist;
-        for (k=0;k<3;k++)
+        for (k = 0; k < 3; k++)
           mvBest[k] = mvPred[k];
 
         currRegion->regionMode =
-          ((regionSize == 16) ? REGMODE_INTER_COPY : REGMODE_INTER_COPY_8x8);
+            ((regionSize == 16) ? REGMODE_INTER_COPY : REGMODE_INTER_COPY_8x8);
 
-        copyPredMB(MBNum2YBlock(currMBNum,comp,picSizeX), predMB, recfr,
-          picSizeX, regionSize);
+        copyPredMB(MBNum2YBlock(currMBNum, comp, picSizeX), predMB, recfr,
+                   picSizeX, regionSize);
       }
     }
 
-    for (i=0; i<3; i++)
+    for (i = 0; i < 3; i++)
       currRegion->mv[i] = mvBest[i];
 
-    yCondition[MBNum2YBlock(currMBNum,comp,picSizeX)] = ERC_BLOCK_CONCEALED;
-    comp = (comp+order+4)%4;
+    yCondition[MBNum2YBlock(currMBNum, comp, picSizeX)] = ERC_BLOCK_CONCEALED;
+    comp = (comp + order + 4) % 4;
     compLeft--;
 
-    } while (compLeft);
+  } while (compLeft);
 
-    return 0;
+  return 0;
 }
 
 /*!
@@ -545,74 +542,73 @@ static int concealByTrial(frame *recfr, imgpel *predMB,
 static void buildPredRegionYUV(VideoParameters *p_Vid, int *mv, int x, int y, imgpel *predMB)
 {
   imgpel **tmp_block;
-  int i=0, j=0, ii=0, jj=0,i1=0,j1=0,j4=0,i4=0;
+  int i = 0, j = 0, ii = 0, jj = 0, i1 = 0, j1 = 0, j4 = 0, i4 = 0;
   int uv;
-  int vec1_x=0,vec1_y=0;
-  int ioff,joff;
+  int vec1_x = 0, vec1_y = 0;
+  int ioff, joff;
   imgpel *pMB = predMB;
-  Slice *currSlice;// = p_Vid->currentSlice;
+  Slice *currSlice; // = p_Vid->currentSlice;
   StorablePicture *dec_picture = p_Vid->dec_picture;
-  int ii0,jj0,ii1,jj1,if1,jf1,if0,jf0;
+  int ii0, jj0, ii1, jj1, if1, jf1, if0, jf0;
   int mv_mul;
 
-  //FRExt
+  // FRExt
   int f1_x, f1_y, f2_x, f2_y, f3, f4;
   int b8, b4;
   int yuv = dec_picture->chroma_format_idc - 1;
 
-  int ref_frame = imax (mv[2], 0); // !!KS: quick fix, we sometimes seem to get negative ref_pic here, so restrict to zero and above
-  int mb_nr = y/16*(p_Vid->width/16)+x/16; ///currSlice->current_mb_nr;
+  int ref_frame = imax(mv[2], 0);                    // !!KS: quick fix, we sometimes seem to get negative ref_pic here, so restrict to zero and above
+  int mb_nr = y / 16 * (p_Vid->width / 16) + x / 16; /// currSlice->current_mb_nr;
   int **tmp_res = NULL;
-  
-  Macroblock *currMB = &p_Vid->mb_data[mb_nr];   // intialization code deleted, see below, StW  
+
+  Macroblock *currMB = &p_Vid->mb_data[mb_nr]; // intialization code deleted, see below, StW
   currSlice = currMB->p_Slice;
   tmp_res = currSlice->tmp_res;
 
-  // This should be allocated only once. 
+  // This should be allocated only once.
   get_mem2Dpel(&tmp_block, MB_BLOCK_SIZE, MB_BLOCK_SIZE);
 
   /* Update coordinates of the current concealed macroblock */
-  currMB->mb.x = (short) (x/MB_BLOCK_SIZE);
-  currMB->mb.y = (short) (y/MB_BLOCK_SIZE);
+  currMB->mb.x = (short)(x / MB_BLOCK_SIZE);
+  currMB->mb.y = (short)(y / MB_BLOCK_SIZE);
   currMB->block_y = currMB->mb.y * BLOCK_SIZE;
   currMB->pix_c_y = currMB->mb.y * p_Vid->mb_cr_size_y;
   currMB->block_x = currMB->mb.x * BLOCK_SIZE;
   currMB->pix_c_x = currMB->mb.x * p_Vid->mb_cr_size_x;
 
-  mv_mul=4;
+  mv_mul = 4;
 
   // luma *******************************************************
 
-  for(j=0;j<MB_BLOCK_SIZE/BLOCK_SIZE;j++)
+  for (j = 0; j < MB_BLOCK_SIZE / BLOCK_SIZE; j++)
   {
-    joff=j*4;
-    j4=currMB->block_y+j;
-    for(i=0;i<MB_BLOCK_SIZE/BLOCK_SIZE;i++)
+    joff = j * 4;
+    j4 = currMB->block_y + j;
+    for (i = 0; i < MB_BLOCK_SIZE / BLOCK_SIZE; i++)
     {
-      ioff=i*4;
-      i4=currMB->block_x+i;
+      ioff = i * 4;
+      i4 = currMB->block_x + i;
 
-      vec1_x = i4*4*mv_mul + mv[0];
-      vec1_y = j4*4*mv_mul + mv[1];
+      vec1_x = i4 * 4 * mv_mul + mv[0];
+      vec1_y = j4 * 4 * mv_mul + mv[1];
 
       get_block_luma(currSlice->listX[0][ref_frame], vec1_x, vec1_y, BLOCK_SIZE, BLOCK_SIZE,
-        tmp_block,
-        dec_picture->iLumaStride,dec_picture->size_x_m1,
-        (currMB->mb_field) ? (dec_picture->size_y >> 1) - 1 : dec_picture->size_y_m1,tmp_res,
-        p_Vid->max_pel_value_comp[PLANE_Y],(imgpel) p_Vid->dc_pred_value_comp[PLANE_Y], currMB);
+                     tmp_block,
+                     dec_picture->iLumaStride, dec_picture->size_x_m1,
+                     (currMB->mb_field) ? (dec_picture->size_y >> 1) - 1 : dec_picture->size_y_m1, tmp_res,
+                     p_Vid->max_pel_value_comp[PLANE_Y], (imgpel)p_Vid->dc_pred_value_comp[PLANE_Y], currMB);
 
-      for(ii=0;ii<BLOCK_SIZE;ii++)
-        for(jj=0;jj<MB_BLOCK_SIZE/BLOCK_SIZE;jj++)
-          currSlice->mb_pred[LumaComp][jj+joff][ii+ioff]=tmp_block[jj][ii];
+      for (ii = 0; ii < BLOCK_SIZE; ii++)
+        for (jj = 0; jj < MB_BLOCK_SIZE / BLOCK_SIZE; jj++)
+          currSlice->mb_pred[LumaComp][jj + joff][ii + ioff] = tmp_block[jj][ii];
     }
   }
-
 
   for (j = 0; j < 16; j++)
   {
     for (i = 0; i < 16; i++)
     {
-      pMB[j*16+i] = currSlice->mb_pred[LumaComp][j][i];
+      pMB[j * 16 + i] = currSlice->mb_pred[LumaComp][j][i];
     }
   }
   pMB += 256;
@@ -620,48 +616,48 @@ static void buildPredRegionYUV(VideoParameters *p_Vid, int *mv, int x, int y, im
   if (dec_picture->chroma_format_idc != YUV400)
   {
     // chroma *******************************************************
-    f1_x = 64/p_Vid->mb_cr_size_x;
-    f2_x=f1_x-1;
+    f1_x = 64 / p_Vid->mb_cr_size_x;
+    f2_x = f1_x - 1;
 
-    f1_y = 64/p_Vid->mb_cr_size_y;
-    f2_y=f1_y-1;
+    f1_y = 64 / p_Vid->mb_cr_size_y;
+    f2_y = f1_y - 1;
 
-    f3=f1_x*f1_y;
-    f4=f3>>1;
+    f3 = f1_x * f1_y;
+    f4 = f3 >> 1;
 
-    for(uv=0;uv<2;uv++)
+    for (uv = 0; uv < 2; uv++)
     {
-      for (b8=0;b8<(p_Vid->num_uv_blocks);b8++)
+      for (b8 = 0; b8 < (p_Vid->num_uv_blocks); b8++)
       {
-        for(b4=0;b4<4;b4++)
+        for (b4 = 0; b4 < 4; b4++)
         {
           joff = subblk_offset_y[yuv][b8][b4];
-          j4=currMB->pix_c_y+joff;
+          j4 = currMB->pix_c_y + joff;
           ioff = subblk_offset_x[yuv][b8][b4];
-          i4=currMB->pix_c_x+ioff;
+          i4 = currMB->pix_c_x + ioff;
 
-          for(jj=0;jj<4;jj++)
+          for (jj = 0; jj < 4; jj++)
           {
-            for(ii=0;ii<4;ii++)
+            for (ii = 0; ii < 4; ii++)
             {
-              i1=(i4+ii)*f1_x + mv[0];
-              j1=(j4+jj)*f1_y + mv[1];
+              i1 = (i4 + ii) * f1_x + mv[0];
+              j1 = (j4 + jj) * f1_y + mv[1];
 
-              ii0=iClip3 (0, dec_picture->size_x_cr-1, i1/f1_x);
-              jj0=iClip3 (0, dec_picture->size_y_cr-1, j1/f1_y);
-              ii1=iClip3 (0, dec_picture->size_x_cr-1, ((i1+f2_x)/f1_x));
-              jj1=iClip3 (0, dec_picture->size_y_cr-1, ((j1+f2_y)/f1_y));
+              ii0 = iClip3(0, dec_picture->size_x_cr - 1, i1 / f1_x);
+              jj0 = iClip3(0, dec_picture->size_y_cr - 1, j1 / f1_y);
+              ii1 = iClip3(0, dec_picture->size_x_cr - 1, ((i1 + f2_x) / f1_x));
+              jj1 = iClip3(0, dec_picture->size_y_cr - 1, ((j1 + f2_y) / f1_y));
 
-              if1=(i1 & f2_x);
-              jf1=(j1 & f2_y);
-              if0=f1_x-if1;
-              jf0=f1_y-jf1;
+              if1 = (i1 & f2_x);
+              jf1 = (j1 & f2_y);
+              if0 = f1_x - if1;
+              jf0 = f1_y - jf1;
 
-              currSlice->mb_pred[uv + 1][jj+joff][ii+ioff] = (imgpel) 
-                ((if0*jf0*currSlice->listX[0][ref_frame]->imgUV[uv][jj0][ii0]+
-                if1*jf0*currSlice->listX[0][ref_frame]->imgUV[uv][jj0][ii1]+
-                if0*jf1*currSlice->listX[0][ref_frame]->imgUV[uv][jj1][ii0]+
-                if1*jf1*currSlice->listX[0][ref_frame]->imgUV[uv][jj1][ii1]+f4)/f3);
+              currSlice->mb_pred[uv + 1][jj + joff][ii + ioff] = (imgpel)((if0 * jf0 * currSlice->listX[0][ref_frame]->imgUV[uv][jj0][ii0] +
+                                                                           if1 * jf0 * currSlice->listX[0][ref_frame]->imgUV[uv][jj0][ii1] +
+                                                                           if0 * jf1 * currSlice->listX[0][ref_frame]->imgUV[uv][jj1][ii0] +
+                                                                           if1 * jf1 * currSlice->listX[0][ref_frame]->imgUV[uv][jj1][ii1] + f4) /
+                                                                          f3);
             }
           }
         }
@@ -671,15 +667,14 @@ static void buildPredRegionYUV(VideoParameters *p_Vid, int *mv, int x, int y, im
       {
         for (i = 0; i < 8; i++)
         {
-          pMB[j*8+i] = currSlice->mb_pred[uv + 1][j][i];
+          pMB[j * 8 + i] = currSlice->mb_pred[uv + 1][j][i];
         }
       }
       pMB += 64;
-
     }
   }
   // We should allocate this memory only once.
-  free_mem2Dpel(tmp_block); 
+  free_mem2Dpel(tmp_block);
 }
 /*!
  ************************************************************************
@@ -700,8 +695,8 @@ static void buildPredRegionYUV(VideoParameters *p_Vid, int *mv, int x, int y, im
  *      can be 16 or 8 to tell the dimension of the region to copy
  ************************************************************************
  */
-static void copyPredMB (int currYBlockNum, imgpel *predMB, frame *recfr,
-                        int picSizeX, int regionSize)
+static void copyPredMB(int currYBlockNum, imgpel *predMB, frame *recfr,
+                       int picSizeX, int regionSize)
 {
   VideoParameters *p_Vid = recfr->p_Vid;
   StorablePicture *dec_picture = p_Vid->dec_picture;
@@ -710,27 +705,27 @@ static void copyPredMB (int currYBlockNum, imgpel *predMB, frame *recfr,
   int uv_x = uv_div[0][dec_picture->chroma_format_idc];
   int uv_y = uv_div[1][dec_picture->chroma_format_idc];
 
-  xmin = (xPosYBlock(currYBlockNum,picSizeX)<<3);
-  ymin = (yPosYBlock(currYBlockNum,picSizeX)<<3);
-  xmax = xmin + regionSize -1;
-  ymax = ymin + regionSize -1;
+  xmin = (xPosYBlock(currYBlockNum, picSizeX) << 3);
+  ymin = (yPosYBlock(currYBlockNum, picSizeX) << 3);
+  xmax = xmin + regionSize - 1;
+  ymax = ymin + regionSize - 1;
 
   for (j = ymin; j <= ymax; j++)
   {
     for (k = xmin; k <= xmax; k++)
     {
-      locationTmp = (j-ymin) * 16 + (k-xmin);
+      locationTmp = (j - ymin) * 16 + (k - xmin);
       dec_picture->imgY[j][k] = predMB[locationTmp];
     }
   }
 
   if (dec_picture->chroma_format_idc != YUV400)
   {
-    for (j = (ymin>>uv_y); j <= (ymax>>uv_y); j++)
+    for (j = (ymin >> uv_y); j <= (ymax >> uv_y); j++)
     {
-      for (k = (xmin>>uv_x); k <= (xmax>>uv_x); k++)
+      for (k = (xmin >> uv_x); k <= (xmax >> uv_x); k++)
       {
-        locationTmp = (j-(ymin>>uv_y)) * p_Vid->mb_cr_size_x + (k-(xmin>>1)) + 256;
+        locationTmp = (j - (ymin >> uv_y)) * p_Vid->mb_cr_size_x + (k - (xmin >> 1)) + 256;
         dec_picture->imgUV[0][j][k] = predMB[locationTmp];
 
         locationTmp += 64;
@@ -768,19 +763,20 @@ static void copyPredMB (int currYBlockNum, imgpel *predMB, frame *recfr,
  *      can be 16 or 8 to tell the dimension of the region to copy
  ************************************************************************
  */
-static int edgeDistortion (int predBlocks[], int currYBlockNum, imgpel *predMB,
-                           imgpel *recY, int picSizeX, int regionSize)
+static int edgeDistortion(int predBlocks[], int currYBlockNum, imgpel *predMB,
+                          imgpel *recY, int picSizeX, int regionSize)
 {
   int i, j, distortion, numOfPredBlocks, threshold = ERC_BLOCK_OK;
   imgpel *currBlock = NULL, *neighbor = NULL;
   int currBlockOffset = 0;
 
-  currBlock = recY + (yPosYBlock(currYBlockNum,picSizeX)<<3)*picSizeX + (xPosYBlock(currYBlockNum,picSizeX)<<3);
+  currBlock = recY + (yPosYBlock(currYBlockNum, picSizeX) << 3) * picSizeX + (xPosYBlock(currYBlockNum, picSizeX) << 3);
 
   do
   {
 
-    distortion = 0; numOfPredBlocks = 0;
+    distortion = 0;
+    numOfPredBlocks = 0;
 
     // loop the 4 neighbors
     for (j = 4; j < 8; j++)
@@ -793,32 +789,32 @@ static int edgeDistortion (int predBlocks[], int currYBlockNum, imgpel *predMB,
         {
         case 4:
           neighbor = currBlock - picSizeX;
-          for ( i = 0; i < regionSize; i++ )
+          for (i = 0; i < regionSize; i++)
           {
             distortion += iabs((int)(predMB[i] - neighbor[i]));
           }
           break;
         case 5:
           neighbor = currBlock - 1;
-          for ( i = 0; i < regionSize; i++ )
+          for (i = 0; i < regionSize; i++)
           {
-            distortion += iabs((int)(predMB[i*16] - neighbor[i*picSizeX]));
+            distortion += iabs((int)(predMB[i * 16] - neighbor[i * picSizeX]));
           }
           break;
         case 6:
-          neighbor = currBlock + regionSize*picSizeX;
-          currBlockOffset = (regionSize-1)*16;
-          for ( i = 0; i < regionSize; i++ )
+          neighbor = currBlock + regionSize * picSizeX;
+          currBlockOffset = (regionSize - 1) * 16;
+          for (i = 0; i < regionSize; i++)
           {
-            distortion += iabs((int)(predMB[i+currBlockOffset] - neighbor[i]));
+            distortion += iabs((int)(predMB[i + currBlockOffset] - neighbor[i]));
           }
           break;
         case 7:
           neighbor = currBlock + regionSize;
-          currBlockOffset = regionSize-1;
-          for ( i = 0; i < regionSize; i++ )
+          currBlockOffset = regionSize - 1;
+          for (i = 0; i < regionSize; i++)
           {
-            distortion += iabs((int)(predMB[i*16+currBlockOffset] - neighbor[i*picSizeX]));
+            distortion += iabs((int)(predMB[i * 16 + currBlockOffset] - neighbor[i * picSizeX]));
           }
           break;
         }
@@ -832,12 +828,12 @@ static int edgeDistortion (int predBlocks[], int currYBlockNum, imgpel *predMB,
       break;
   } while (numOfPredBlocks == 0);
 
-  if(numOfPredBlocks == 0)
+  if (numOfPredBlocks == 0)
   {
     return 0;
     // assert (numOfPredBlocks != 0); !!!KS hmm, trying to continue...
   }
-  return (distortion/numOfPredBlocks);
+  return (distortion / numOfPredBlocks);
 }
 
 // picture error concealment below
@@ -855,58 +851,57 @@ static void buildPredblockRegionYUV(VideoParameters *p_Vid, int *mv,
                                     int x, int y, imgpel *predMB, int list, int current_mb_nr)
 {
   imgpel **tmp_block;
-  int i=0,j=0,ii=0,jj=0,i1=0,j1=0,j4=0,i4=0;
+  int i = 0, j = 0, ii = 0, jj = 0, i1 = 0, j1 = 0, j4 = 0, i4 = 0;
   int uv;
-  int vec1_x=0,vec1_y=0;
-  int ioff,joff;
+  int vec1_x = 0, vec1_y = 0;
+  int ioff, joff;
 
   StorablePicture *dec_picture = p_Vid->dec_picture;
   imgpel *pMB = predMB;
 
-  int ii0,jj0,ii1,jj1,if1,jf1,if0,jf0;
+  int ii0, jj0, ii1, jj1, if1, jf1, if0, jf0;
   int mv_mul;
 
-  //FRExt
+  // FRExt
   int f1_x, f1_y, f2_x, f2_y, f3, f4;
   int yuv = dec_picture->chroma_format_idc - 1;
 
   int ref_frame = mv[2];
   int mb_nr = current_mb_nr;
-  
-  Macroblock *currMB = &p_Vid->mb_data[mb_nr];   // intialization code deleted, see below, StW  
+
+  Macroblock *currMB = &p_Vid->mb_data[mb_nr]; // intialization code deleted, see below, StW
   Slice *currSlice = currMB->p_Slice;
 
   get_mem2Dpel(&tmp_block, MB_BLOCK_SIZE, MB_BLOCK_SIZE);
 
   /* Update coordinates of the current concealed macroblock */
 
-  currMB->mb.x = (short) (x/BLOCK_SIZE);
-  currMB->mb.y = (short) (y/BLOCK_SIZE);
+  currMB->mb.x = (short)(x / BLOCK_SIZE);
+  currMB->mb.y = (short)(y / BLOCK_SIZE);
   currMB->block_y = currMB->mb.y * BLOCK_SIZE;
-  currMB->pix_c_y = currMB->mb.y * p_Vid->mb_cr_size_y/4;
+  currMB->pix_c_y = currMB->mb.y * p_Vid->mb_cr_size_y / 4;
   currMB->block_x = currMB->mb.x * BLOCK_SIZE;
-  currMB->pix_c_x = currMB->mb.x * p_Vid->mb_cr_size_x/4;
+  currMB->pix_c_x = currMB->mb.x * p_Vid->mb_cr_size_x / 4;
 
-  mv_mul=4;
+  mv_mul = 4;
 
   // luma *******************************************************
 
-  vec1_x = x*mv_mul + mv[0];
-  vec1_y = y*mv_mul + mv[1];
-  get_block_luma(currSlice->listX[list][ref_frame],  vec1_x, vec1_y, BLOCK_SIZE, BLOCK_SIZE, tmp_block,
-    dec_picture->iLumaStride,dec_picture->size_x_m1, (currMB->mb_field) ? (dec_picture->size_y >> 1) - 1 : dec_picture->size_y_m1,currSlice->tmp_res,
-    p_Vid->max_pel_value_comp[PLANE_Y],(imgpel) p_Vid->dc_pred_value_comp[PLANE_Y], currMB);
+  vec1_x = x * mv_mul + mv[0];
+  vec1_y = y * mv_mul + mv[1];
+  get_block_luma(currSlice->listX[list][ref_frame], vec1_x, vec1_y, BLOCK_SIZE, BLOCK_SIZE, tmp_block,
+                 dec_picture->iLumaStride, dec_picture->size_x_m1, (currMB->mb_field) ? (dec_picture->size_y >> 1) - 1 : dec_picture->size_y_m1, currSlice->tmp_res,
+                 p_Vid->max_pel_value_comp[PLANE_Y], (imgpel)p_Vid->dc_pred_value_comp[PLANE_Y], currMB);
 
-  for(jj=0;jj<MB_BLOCK_SIZE/BLOCK_SIZE;jj++)
-    for(ii=0;ii<BLOCK_SIZE;ii++)
-      currSlice->mb_pred[LumaComp][jj][ii]=tmp_block[jj][ii];
-
+  for (jj = 0; jj < MB_BLOCK_SIZE / BLOCK_SIZE; jj++)
+    for (ii = 0; ii < BLOCK_SIZE; ii++)
+      currSlice->mb_pred[LumaComp][jj][ii] = tmp_block[jj][ii];
 
   for (j = 0; j < 4; j++)
   {
     for (i = 0; i < 4; i++)
     {
-      pMB[j*4+i] = currSlice->mb_pred[LumaComp][j][i];
+      pMB[j * 4 + i] = currSlice->mb_pred[LumaComp][j][i];
     }
   }
   pMB += 16;
@@ -914,43 +909,44 @@ static void buildPredblockRegionYUV(VideoParameters *p_Vid, int *mv,
   if (dec_picture->chroma_format_idc != YUV400)
   {
     // chroma *******************************************************
-    f1_x = 64/(p_Vid->mb_cr_size_x);
-    f2_x=f1_x-1;
+    f1_x = 64 / (p_Vid->mb_cr_size_x);
+    f2_x = f1_x - 1;
 
-    f1_y = 64/(p_Vid->mb_cr_size_y);
-    f2_y=f1_y-1;
+    f1_y = 64 / (p_Vid->mb_cr_size_y);
+    f2_y = f1_y - 1;
 
-    f3=f1_x*f1_y;
-    f4=f3>>1;
+    f3 = f1_x * f1_y;
+    f4 = f3 >> 1;
 
-    for(uv=0;uv<2;uv++)
+    for (uv = 0; uv < 2; uv++)
     {
       joff = subblk_offset_y[yuv][0][0];
-      j4=currMB->pix_c_y+joff;
+      j4 = currMB->pix_c_y + joff;
       ioff = subblk_offset_x[yuv][0][0];
-      i4=currMB->pix_c_x+ioff;
+      i4 = currMB->pix_c_x + ioff;
 
-      for(jj=0;jj<2;jj++)
+      for (jj = 0; jj < 2; jj++)
       {
-        for(ii=0;ii<2;ii++)
+        for (ii = 0; ii < 2; ii++)
         {
-          i1=(i4+ii)*f1_x + mv[0];
-          j1=(j4+jj)*f1_y + mv[1];
+          i1 = (i4 + ii) * f1_x + mv[0];
+          j1 = (j4 + jj) * f1_y + mv[1];
 
-          ii0=iClip3 (0, dec_picture->size_x_cr-1, i1/f1_x);
-          jj0=iClip3 (0, dec_picture->size_y_cr-1, j1/f1_y);
-          ii1=iClip3 (0, dec_picture->size_x_cr-1, ((i1+f2_x)/f1_x));
-          jj1=iClip3 (0, dec_picture->size_y_cr-1, ((j1+f2_y)/f1_y));
+          ii0 = iClip3(0, dec_picture->size_x_cr - 1, i1 / f1_x);
+          jj0 = iClip3(0, dec_picture->size_y_cr - 1, j1 / f1_y);
+          ii1 = iClip3(0, dec_picture->size_x_cr - 1, ((i1 + f2_x) / f1_x));
+          jj1 = iClip3(0, dec_picture->size_y_cr - 1, ((j1 + f2_y) / f1_y));
 
-          if1=(i1 & f2_x);
-          jf1=(j1 & f2_y);
-          if0=f1_x-if1;
-          jf0=f1_y-jf1;
+          if1 = (i1 & f2_x);
+          jf1 = (j1 & f2_y);
+          if0 = f1_x - if1;
+          jf0 = f1_y - jf1;
 
-          currSlice->mb_pred[uv + 1][jj][ii]=(imgpel) ((if0*jf0*currSlice->listX[list][ref_frame]->imgUV[uv][jj0][ii0]+
-            if1*jf0*currSlice->listX[list][ref_frame]->imgUV[uv][jj0][ii1]+
-            if0*jf1*currSlice->listX[list][ref_frame]->imgUV[uv][jj1][ii0]+
-            if1*jf1*currSlice->listX[list][ref_frame]->imgUV[uv][jj1][ii1]+f4)/f3);
+          currSlice->mb_pred[uv + 1][jj][ii] = (imgpel)((if0 * jf0 * currSlice->listX[list][ref_frame]->imgUV[uv][jj0][ii0] +
+                                                         if1 * jf0 * currSlice->listX[list][ref_frame]->imgUV[uv][jj0][ii1] +
+                                                         if0 * jf1 * currSlice->listX[list][ref_frame]->imgUV[uv][jj1][ii0] +
+                                                         if1 * jf1 * currSlice->listX[list][ref_frame]->imgUV[uv][jj1][ii1] + f4) /
+                                                        f3);
         }
       }
 
@@ -958,11 +954,10 @@ static void buildPredblockRegionYUV(VideoParameters *p_Vid, int *mv,
       {
         for (i = 0; i < 2; i++)
         {
-          pMB[j*2+i] = currSlice->mb_pred[uv + 1][j][i];
+          pMB[j * 2 + i] = currSlice->mb_pred[uv + 1][j][i];
         }
       }
       pMB += 4;
-
     }
   }
   free_mem2Dpel(tmp_block);
@@ -975,10 +970,10 @@ static void buildPredblockRegionYUV(VideoParameters *p_Vid, int *mv,
 *
 ************************************************************************
 */
-static inline int compare_pic_by_pic_num_desc( const void *arg1, const void *arg2 )
+static inline int compare_pic_by_pic_num_desc(const void *arg1, const void *arg2)
 {
-  int pic_num1 = (*(StorablePicture**)arg1)->pic_num;
-  int pic_num2 = (*(StorablePicture**)arg2)->pic_num;
+  int pic_num1 = (*(StorablePicture **)arg1)->pic_num;
+  int pic_num2 = (*(StorablePicture **)arg2)->pic_num;
 
   if (pic_num1 < pic_num2)
     return 1;
@@ -995,14 +990,14 @@ static inline int compare_pic_by_pic_num_desc( const void *arg1, const void *arg
 *
 ************************************************************************
 */
-static inline int compare_pic_by_lt_pic_num_asc( const void *arg1, const void *arg2 )
+static inline int compare_pic_by_lt_pic_num_asc(const void *arg1, const void *arg2)
 {
-  int long_term_pic_num1 = (*(StorablePicture**)arg1)->long_term_pic_num;
-  int long_term_pic_num2 = (*(StorablePicture**)arg2)->long_term_pic_num;
-  if ( long_term_pic_num1 < long_term_pic_num2)
+  int long_term_pic_num1 = (*(StorablePicture **)arg1)->long_term_pic_num;
+  int long_term_pic_num2 = (*(StorablePicture **)arg2)->long_term_pic_num;
+  if (long_term_pic_num1 < long_term_pic_num2)
     return -1;
 
-  if ( long_term_pic_num1 > long_term_pic_num2)
+  if (long_term_pic_num1 > long_term_pic_num2)
     return 1;
   else
     return 0;
@@ -1015,19 +1010,18 @@ static inline int compare_pic_by_lt_pic_num_asc( const void *arg1, const void *a
 *
 ************************************************************************
 */
-static inline int compare_pic_by_poc_asc( const void *arg1, const void *arg2 )
+static inline int compare_pic_by_poc_asc(const void *arg1, const void *arg2)
 {
-  int poc1 = (*(StorablePicture**)arg1)->poc;
-  int poc2 = (*(StorablePicture**)arg2)->poc;
+  int poc1 = (*(StorablePicture **)arg1)->poc;
+  int poc2 = (*(StorablePicture **)arg2)->poc;
 
-  if ( poc1 < poc2)
-    return -1;  
-  if ( poc1 > poc2)
+  if (poc1 < poc2)
+    return -1;
+  if (poc1 > poc2)
     return 1;
   else
     return 0;
 }
-
 
 /*!
 ************************************************************************
@@ -1036,10 +1030,10 @@ static inline int compare_pic_by_poc_asc( const void *arg1, const void *arg2 )
 *
 ************************************************************************
 */
-static inline int compare_pic_by_poc_desc( const void *arg1, const void *arg2 )
+static inline int compare_pic_by_poc_desc(const void *arg1, const void *arg2)
 {
-  int poc1 = (*(StorablePicture**)arg1)->poc;
-  int poc2 = (*(StorablePicture**)arg2)->poc;
+  int poc1 = (*(StorablePicture **)arg1)->poc;
+  int poc2 = (*(StorablePicture **)arg2)->poc;
 
   if (poc1 < poc2)
     return 1;
@@ -1056,17 +1050,17 @@ static inline int compare_pic_by_poc_desc( const void *arg1, const void *arg2 )
 ************************************************************************
 */
 
-static void CopyImgData(imgpel **inputY, imgpel ***inputUV, imgpel **outputY, imgpel ***outputUV, 
+static void CopyImgData(imgpel **inputY, imgpel ***inputUV, imgpel **outputY, imgpel ***outputUV,
                         int img_width, int img_height, int img_width_cr, int img_height_cr)
 {
   int x, y;
 
-  for (y=0; y<img_height; y++)
-    for (x=0; x<img_width; x++)
+  for (y = 0; y < img_height; y++)
+    for (x = 0; x < img_width; x++)
       outputY[y][x] = inputY[y][x];
 
-  for (y=0; y<img_height_cr; y++)
-    for (x=0; x<img_width_cr; x++)
+  for (y = 0; y < img_height_cr; y++)
+    for (x = 0; x < img_width_cr; x++)
     {
       outputUV[0][y][x] = inputUV[0][y][x];
       outputUV[1][y][x] = inputUV[1][y][x];
@@ -1080,18 +1074,19 @@ static void CopyImgData(imgpel **inputY, imgpel ***inputUV, imgpel **outputY, im
 ************************************************************************
 */
 
-static StorablePicture* get_last_ref_pic_from_dpb(DecodedPictureBuffer *p_Dpb)
+static StorablePicture *get_last_ref_pic_from_dpb(DecodedPictureBuffer *p_Dpb)
 {
   int used_size = p_Dpb->used_size - 1;
   int i;
 
-  for(i = used_size; i >= 0; i--)
+  for (i = used_size; i >= 0; i--)
   {
-    if (p_Dpb->fs[i]->is_used==3)
+    if (p_Dpb->fs[i]->is_used == 3)
     {
       if (((p_Dpb->fs[i]->frame->used_for_reference) &&
-        (!p_Dpb->fs[i]->frame->is_long_term)) /*||  ((p_Dpb->fs[i]->frame->used_for_reference==0)
-                                           && (p_Dpb->fs[i]->frame->slice_type == P_SLICE))*/ )
+           (!p_Dpb->fs[i]->frame->is_long_term)) /*||  ((p_Dpb->fs[i]->frame->used_for_reference==0)
+                                              && (p_Dpb->fs[i]->frame->slice_type == P_SLICE))*/
+      )
       {
         return p_Dpb->fs[i]->frame;
       }
@@ -1112,11 +1107,11 @@ static StorablePicture* get_last_ref_pic_from_dpb(DecodedPictureBuffer *p_Dpb)
 
 static void copy_to_conceal(StorablePicture *src, StorablePicture *dst, VideoParameters *p_Vid)
 {
-  int i=0;
+  int i = 0;
   int mv[3];
   int multiplier;
   imgpel *predMB, *storeYUV;
-  int j, y, x, mb_height, mb_width, ii=0, jj=0;
+  int j, y, x, mb_height, mb_width, ii = 0, jj = 0;
   int uv;
   int mm, nn;
   int scale = 1;
@@ -1125,11 +1120,11 @@ static void copy_to_conceal(StorablePicture *src, StorablePicture *dst, VideoPar
 
   int current_mb_nr = 0;
 
-  dst->PicSizeInMbs  = src->PicSizeInMbs;
+  dst->PicSizeInMbs = src->PicSizeInMbs;
 
   dst->slice_type = src->slice_type = p_Vid->conceal_slice_type;
 
-  dst->idr_flag = FALSE; //since we do not want to clears the ref list
+  dst->idr_flag = FALSE; // since we do not want to clears the ref list
 
   dst->no_output_of_prior_pics_flag = src->no_output_of_prior_pics_flag;
   dst->long_term_reference_flag = src->long_term_reference_flag;
@@ -1148,26 +1143,26 @@ static void copy_to_conceal(StorablePicture *src, StorablePicture *dst, VideoPar
   dec_picture = src;
 
   // Conceals the missing frame by frame copy concealment
-  if (p_Vid->conceal_mode==1)
+  if (p_Vid->conceal_mode == 1)
   {
     // We need these initializations for using deblocking filter for frame copy
     // concealment as well.
     dst->PicWidthInMbs = src->PicWidthInMbs;
     dst->PicSizeInMbs = src->PicSizeInMbs;
 
-    CopyImgData( src->imgY, src->imgUV, dst->imgY, dst->imgUV, p_Vid->width, p_Vid->height, p_Vid->width_cr, p_Vid->height_cr);
+    CopyImgData(src->imgY, src->imgUV, dst->imgY, dst->imgUV, p_Vid->width, p_Vid->height, p_Vid->width_cr, p_Vid->height_cr);
   }
 
   // Conceals the missing frame by motion vector copy concealment
-  if (p_Vid->conceal_mode==2)
+  if (p_Vid->conceal_mode == 2)
   {
     if (dec_picture->chroma_format_idc != YUV400)
     {
-      storeYUV = (imgpel *) malloc ( (16 + (p_Vid->mb_cr_size_x*p_Vid->mb_cr_size_y)*2/16) * sizeof (imgpel));
+      storeYUV = (imgpel *)malloc((16 + (p_Vid->mb_cr_size_x * p_Vid->mb_cr_size_y) * 2 / 16) * sizeof(imgpel));
     }
     else
     {
-      storeYUV = (imgpel *) malloc (16  * sizeof (imgpel));
+      storeYUV = (imgpel *)malloc(16 * sizeof(imgpel));
     }
 
     p_Vid->erc_img = p_Vid;
@@ -1175,24 +1170,24 @@ static void copy_to_conceal(StorablePicture *src, StorablePicture *dst, VideoPar
     dst->PicWidthInMbs = src->PicWidthInMbs;
     dst->PicSizeInMbs = src->PicSizeInMbs;
     mb_width = dst->PicWidthInMbs;
-    mb_height = (dst->PicSizeInMbs)/(dst->PicWidthInMbs);
+    mb_height = (dst->PicSizeInMbs) / (dst->PicWidthInMbs);
     scale = (p_Vid->conceal_slice_type == B_SLICE) ? 2 : 1;
 
-    if(p_Vid->conceal_slice_type == B_SLICE)
+    if (p_Vid->conceal_slice_type == B_SLICE)
     {
       init_lists_for_non_reference_loss(
-        p_Vid->p_Dpb_layer[0],
-        dst->slice_type, p_Vid->ppSliceList[0]->structure);
+          p_Vid->p_Dpb_layer[0],
+          dst->slice_type, p_Vid->ppSliceList[0]->structure);
     }
     else
-      p_Vid->ppSliceList[0]->init_lists(p_Vid->ppSliceList[0]); //p_Vid->currentSlice);
+      p_Vid->ppSliceList[0]->init_lists(p_Vid->ppSliceList[0]); // p_Vid->currentSlice);
 
     multiplier = BLOCK_SIZE;
 
-    for(i=0;i<mb_height*4;i++)
+    for (i = 0; i < mb_height * 4; i++)
     {
       mm = i * BLOCK_SIZE;
-      for(j=0;j<mb_width*4;j++)
+      for (j = 0; j < mb_width * 4; j++)
       {
         nn = j * BLOCK_SIZE;
 
@@ -1200,46 +1195,46 @@ static void copy_to_conceal(StorablePicture *src, StorablePicture *dst, VideoPar
         mv[1] = src->mv_info[i][j].mv[LIST_0].mv_y / scale;
         mv[2] = src->mv_info[i][j].ref_idx[LIST_0];
 
-        if(mv[2]<0)
-          mv[2]=0;
+        if (mv[2] < 0)
+          mv[2] = 0;
 
-        dst->mv_info[i][j].mv[LIST_0].mv_x = (short) mv[0];
-        dst->mv_info[i][j].mv[LIST_0].mv_y = (short) mv[1];
-        dst->mv_info[i][j].ref_idx[LIST_0] = (char) mv[2];
+        dst->mv_info[i][j].mv[LIST_0].mv_x = (short)mv[0];
+        dst->mv_info[i][j].mv[LIST_0].mv_y = (short)mv[1];
+        dst->mv_info[i][j].ref_idx[LIST_0] = (char)mv[2];
 
-        x = (j) * multiplier;
-        y = (i) * multiplier;
+        x = (j)*multiplier;
+        y = (i)*multiplier;
 
-        if ((mm%16==0) && (nn%16==0))
+        if ((mm % 16 == 0) && (nn % 16 == 0))
           current_mb_nr++;
 
         buildPredblockRegionYUV(p_Vid->erc_img, mv, x, y, storeYUV, LIST_0, current_mb_nr);
 
         predMB = storeYUV;
 
-        for(ii=0;ii<multiplier;ii++)
+        for (ii = 0; ii < multiplier; ii++)
         {
-          for(jj=0;jj<multiplier;jj++)
+          for (jj = 0; jj < multiplier; jj++)
           {
-            dst->imgY[i*multiplier+ii][j*multiplier+jj] = predMB[ii*(multiplier)+jj];
+            dst->imgY[i * multiplier + ii][j * multiplier + jj] = predMB[ii * (multiplier) + jj];
           }
         }
 
-        predMB = predMB + (multiplier*multiplier);
+        predMB = predMB + (multiplier * multiplier);
 
         if (dec_picture->chroma_format_idc != YUV400)
         {
 
-          for(uv=0;uv<2;uv++)
+          for (uv = 0; uv < 2; uv++)
           {
-            for(ii=0;ii< (multiplier/2);ii++)
+            for (ii = 0; ii < (multiplier / 2); ii++)
             {
-              for(jj=0;jj< (multiplier/2);jj++)
+              for (jj = 0; jj < (multiplier / 2); jj++)
               {
-                dst->imgUV[uv][i*multiplier/2 +ii][j*multiplier/2 +jj] = predMB[ii*(multiplier/2)+jj];
+                dst->imgUV[uv][i * multiplier / 2 + ii][j * multiplier / 2 + jj] = predMB[ii * (multiplier / 2) + jj];
               }
             }
-            predMB = predMB + (multiplier*multiplier/4);
+            predMB = predMB + (multiplier * multiplier / 4);
           }
         }
       }
@@ -1270,7 +1265,6 @@ copy_prev_pic_to_concealed_pic(StorablePicture *picture, DecodedPictureBuffer *p
   copy_to_conceal(ref_pic, picture, p_Vid);
 }
 
-
 /*!
 ************************************************************************
 * \brief
@@ -1295,7 +1289,7 @@ void conceal_lost_frames(DecodedPictureBuffer *p_Dpb, Slice *pSlice)
 
   // printf("A gap in frame number is found, try to fill it.\n");
 
-  if(p_Vid->IDR_concealment_flag == 1)
+  if (p_Vid->IDR_concealment_flag == 1)
   {
     // Conceals an IDR frame loss. Uses the reference frame in the previous
     // GOP for concealment.
@@ -1310,7 +1304,7 @@ void conceal_lost_frames(DecodedPictureBuffer *p_Dpb, Slice *pSlice)
 
   while (CurrFrameNum != UnusedShortTermFrameNum)
   {
-    picture = alloc_storable_picture (p_Vid, FRAME, p_Vid->width, p_Vid->height, p_Vid->width_cr, p_Vid->height_cr, 1);
+    picture = alloc_storable_picture(p_Vid, FRAME, p_Vid->width, p_Vid->height, p_Vid->width_cr, p_Vid->height_cr, 1);
 
     picture->coded_frame = 1;
     picture->pic_num = UnusedShortTermFrameNum;
@@ -1324,38 +1318,38 @@ void conceal_lost_frames(DecodedPictureBuffer *p_Dpb, Slice *pSlice)
 
     pSlice->frame_num = UnusedShortTermFrameNum;
 
-    picture->top_poc=p_Vid->last_ref_pic_poc + p_Vid->ref_poc_gap;
-    picture->bottom_poc=picture->top_poc;
-    picture->frame_poc=picture->top_poc;
-    picture->poc=picture->top_poc;
+    picture->top_poc = p_Vid->last_ref_pic_poc + p_Vid->ref_poc_gap;
+    picture->bottom_poc = picture->top_poc;
+    picture->frame_poc = picture->top_poc;
+    picture->poc = picture->top_poc;
     p_Vid->last_ref_pic_poc = picture->poc;
 
     copy_prev_pic_to_concealed_pic(picture, p_Dpb);
 
-    //if (UnusedShortTermFrameNum == 0)
-    if(p_Vid->IDR_concealment_flag == 1)
+    // if (UnusedShortTermFrameNum == 0)
+    if (p_Vid->IDR_concealment_flag == 1)
     {
       picture->slice_type = I_SLICE;
       picture->idr_flag = TRUE;
       flush_dpb(p_Dpb);
-      picture->top_poc= 0;
-      picture->bottom_poc=picture->top_poc;
-      picture->frame_poc=picture->top_poc;
-      picture->poc=picture->top_poc;
+      picture->top_poc = 0;
+      picture->bottom_poc = picture->top_poc;
+      picture->frame_poc = picture->top_poc;
+      picture->poc = picture->top_poc;
       p_Vid->last_ref_pic_poc = picture->poc;
     }
 
     store_picture_in_dpb(p_Vid->p_Dpb_layer[0], picture);
 
-    picture=NULL;
+    picture = NULL;
 
     p_Vid->pre_frame_num = UnusedShortTermFrameNum;
     UnusedShortTermFrameNum = (UnusedShortTermFrameNum + 1) % p_Vid->max_frame_num;
 
     // update reference flags and set current flag.
-    for(i=16;i>0;i--)
+    for (i = 16; i > 0; i--)
     {
-      pSlice->ref_flag[i] = pSlice->ref_flag[i-1];
+      pSlice->ref_flag[i] = pSlice->ref_flag[i - 1];
     }
     pSlice->ref_flag[0] = 0;
   }
@@ -1376,7 +1370,7 @@ void conceal_lost_frames(DecodedPictureBuffer *p_Dpb, Slice *pSlice)
 void update_ref_list_for_concealment(DecodedPictureBuffer *p_Dpb)
 {
   VideoParameters *p_Vid = p_Dpb->p_Vid;
-  unsigned i, j= 0;
+  unsigned i, j = 0;
 
   for (i = 0; i < p_Dpb->used_size; i++)
   {
@@ -1415,11 +1409,11 @@ void init_lists_for_non_reference_loss(DecodedPictureBuffer *p_Dpb, int currSlic
 
   if (currPicStructure == FRAME)
   {
-    for(i=0;i<p_Dpb->ref_frames_in_buffer; i++)
+    for (i = 0; i < p_Dpb->ref_frames_in_buffer; i++)
     {
-      if(p_Dpb->fs[i]->concealment_reference == 1)
+      if (p_Dpb->fs[i]->concealment_reference == 1)
       {
-        if(p_Dpb->fs[i]->frame_num > p_Vid->frame_to_conceal)
+        if (p_Dpb->fs[i]->frame_num > p_Vid->frame_to_conceal)
           p_Dpb->fs_ref[i]->frame_num_wrap = p_Dpb->fs[i]->frame_num - max_frame_num;
         else
           p_Dpb->fs_ref[i]->frame_num_wrap = p_Dpb->fs[i]->frame_num;
@@ -1433,16 +1427,16 @@ void init_lists_for_non_reference_loss(DecodedPictureBuffer *p_Dpb, int currSlic
     // Calculate FrameNumWrap and PicNum
     if (currPicStructure == FRAME)
     {
-      for(i=0;i<p_Dpb->used_size; i++)
+      for (i = 0; i < p_Dpb->used_size; i++)
       {
-        if(p_Dpb->fs[i]->concealment_reference == 1)
+        if (p_Dpb->fs[i]->concealment_reference == 1)
         {
           p_Vid->ppSliceList[0]->listX[0][list0idx++] = p_Dpb->fs[i]->frame;
         }
       }
       // order list 0 by PicNum
-      qsort((void *)p_Vid->ppSliceList[0]->listX[0], list0idx, sizeof(StorablePicture*), compare_pic_by_pic_num_desc);
-      p_Vid->ppSliceList[0]->listXsize[0] = (char) list0idx;
+      qsort((void *)p_Vid->ppSliceList[0]->listX[0], list0idx, sizeof(StorablePicture *), compare_pic_by_pic_num_desc);
+      p_Vid->ppSliceList[0]->listXsize[0] = (char)list0idx;
     }
   }
 
@@ -1451,80 +1445,79 @@ void init_lists_for_non_reference_loss(DecodedPictureBuffer *p_Dpb, int currSlic
     if (currPicStructure == FRAME)
     {
       //      for(i=0;i<p_Dpb->ref_frames_in_buffer; i++)
-      for(i=0;i<p_Dpb->used_size; i++)
+      for (i = 0; i < p_Dpb->used_size; i++)
       {
-        if(p_Dpb->fs[i]->concealment_reference == 1)
+        if (p_Dpb->fs[i]->concealment_reference == 1)
         {
-          if(p_Vid->earlier_missing_poc > p_Dpb->fs[i]->frame->poc)
+          if (p_Vid->earlier_missing_poc > p_Dpb->fs[i]->frame->poc)
             p_Vid->ppSliceList[0]->listX[0][list0idx++] = p_Dpb->fs[i]->frame;
         }
       }
 
-      qsort((void *)p_Vid->ppSliceList[0]->listX[0], list0idx, sizeof(StorablePicture*), compare_pic_by_poc_desc);
+      qsort((void *)p_Vid->ppSliceList[0]->listX[0], list0idx, sizeof(StorablePicture *), compare_pic_by_poc_desc);
       list0idx_1 = list0idx;
 
       //      for(i=0;i<p_Dpb->ref_frames_in_buffer; i++)
-      for(i=0;i<p_Dpb->used_size; i++)
+      for (i = 0; i < p_Dpb->used_size; i++)
       {
-        if(p_Dpb->fs[i]->concealment_reference == 1)
+        if (p_Dpb->fs[i]->concealment_reference == 1)
         {
-          if(p_Vid->earlier_missing_poc < p_Dpb->fs[i]->frame->poc)
+          if (p_Vid->earlier_missing_poc < p_Dpb->fs[i]->frame->poc)
             p_Vid->ppSliceList[0]->listX[0][list0idx++] = p_Dpb->fs[i]->frame;
         }
       }
 
-      qsort((void *)&p_Vid->ppSliceList[0]->listX[0][list0idx_1], list0idx-list0idx_1, sizeof(StorablePicture*), compare_pic_by_poc_asc);
+      qsort((void *)&p_Vid->ppSliceList[0]->listX[0][list0idx_1], list0idx - list0idx_1, sizeof(StorablePicture *), compare_pic_by_poc_asc);
 
-      for (j=0; j<list0idx_1; j++)
+      for (j = 0; j < list0idx_1; j++)
       {
-        p_Vid->ppSliceList[0]->listX[1][list0idx-list0idx_1+j]=p_Vid->ppSliceList[0]->listX[0][j];
+        p_Vid->ppSliceList[0]->listX[1][list0idx - list0idx_1 + j] = p_Vid->ppSliceList[0]->listX[0][j];
       }
-      for (j=list0idx_1; j<list0idx; j++)
+      for (j = list0idx_1; j < list0idx; j++)
       {
-        p_Vid->ppSliceList[0]->listX[1][j-list0idx_1]=p_Vid->ppSliceList[0]->listX[0][j];
+        p_Vid->ppSliceList[0]->listX[1][j - list0idx_1] = p_Vid->ppSliceList[0]->listX[0][j];
       }
 
-      p_Vid->ppSliceList[0]->listXsize[0] = p_Vid->ppSliceList[0]->listXsize[1] = (char) list0idx;
+      p_Vid->ppSliceList[0]->listXsize[0] = p_Vid->ppSliceList[0]->listXsize[1] = (char)list0idx;
 
-      qsort((void *)&p_Vid->ppSliceList[0]->listX[0][(short) p_Vid->ppSliceList[0]->listXsize[0]], list0idx-p_Vid->ppSliceList[0]->listXsize[0], sizeof(StorablePicture*), compare_pic_by_lt_pic_num_asc);
-      qsort((void *)&p_Vid->ppSliceList[0]->listX[1][(short) p_Vid->ppSliceList[0]->listXsize[0]], list0idx-p_Vid->ppSliceList[0]->listXsize[0], sizeof(StorablePicture*), compare_pic_by_lt_pic_num_asc);
-      p_Vid->ppSliceList[0]->listXsize[0] = p_Vid->ppSliceList[0]->listXsize[1] = (char) list0idx;
+      qsort((void *)&p_Vid->ppSliceList[0]->listX[0][(short)p_Vid->ppSliceList[0]->listXsize[0]], list0idx - p_Vid->ppSliceList[0]->listXsize[0], sizeof(StorablePicture *), compare_pic_by_lt_pic_num_asc);
+      qsort((void *)&p_Vid->ppSliceList[0]->listX[1][(short)p_Vid->ppSliceList[0]->listXsize[0]], list0idx - p_Vid->ppSliceList[0]->listXsize[0], sizeof(StorablePicture *), compare_pic_by_lt_pic_num_asc);
+      p_Vid->ppSliceList[0]->listXsize[0] = p_Vid->ppSliceList[0]->listXsize[1] = (char)list0idx;
     }
   }
 
   if ((p_Vid->ppSliceList[0]->listXsize[0] == p_Vid->ppSliceList[0]->listXsize[1]) && (p_Vid->ppSliceList[0]->listXsize[0] > 1))
   {
     // check if lists are identical, if yes swap first two elements of listX[1]
-    diff=0;
-    for (j = 0; j< p_Vid->ppSliceList[0]->listXsize[0]; j++)
+    diff = 0;
+    for (j = 0; j < p_Vid->ppSliceList[0]->listXsize[0]; j++)
     {
-      if (p_Vid->ppSliceList[0]->listX[0][j]!=p_Vid->ppSliceList[0]->listX[1][j])
-        diff=1;
+      if (p_Vid->ppSliceList[0]->listX[0][j] != p_Vid->ppSliceList[0]->listX[1][j])
+        diff = 1;
     }
     if (!diff)
     {
       tmp_s = p_Vid->ppSliceList[0]->listX[1][0];
-      p_Vid->ppSliceList[0]->listX[1][0]=p_Vid->ppSliceList[0]->listX[1][1];
-      p_Vid->ppSliceList[0]->listX[1][1]=tmp_s;
+      p_Vid->ppSliceList[0]->listX[1][0] = p_Vid->ppSliceList[0]->listX[1][1];
+      p_Vid->ppSliceList[0]->listX[1][1] = tmp_s;
     }
   }
 
   // set max size
-  p_Vid->ppSliceList[0]->listXsize[0] = (char) imin (p_Vid->ppSliceList[0]->listXsize[0], (int)active_sps->num_ref_frames);
-  p_Vid->ppSliceList[0]->listXsize[1] = (char) imin (p_Vid->ppSliceList[0]->listXsize[1], (int)active_sps->num_ref_frames);
+  p_Vid->ppSliceList[0]->listXsize[0] = (char)imin(p_Vid->ppSliceList[0]->listXsize[0], (int)active_sps->num_ref_frames);
+  p_Vid->ppSliceList[0]->listXsize[1] = (char)imin(p_Vid->ppSliceList[0]->listXsize[1], (int)active_sps->num_ref_frames);
 
   p_Vid->ppSliceList[0]->listXsize[1] = 0;
   // set the unused list entries to NULL
-  for (i=p_Vid->ppSliceList[0]->listXsize[0]; i< (MAX_LIST_SIZE) ; i++)
+  for (i = p_Vid->ppSliceList[0]->listXsize[0]; i < (MAX_LIST_SIZE); i++)
   {
     p_Vid->ppSliceList[0]->listX[0][i] = NULL;
   }
-  for (i=p_Vid->ppSliceList[0]->listXsize[1]; i< (MAX_LIST_SIZE) ; i++)
+  for (i = p_Vid->ppSliceList[0]->listXsize[1]; i < (MAX_LIST_SIZE); i++)
   {
     p_Vid->ppSliceList[0]->listX[1][i] = NULL;
   }
 }
-
 
 /*!
 ************************************************************************
@@ -1542,14 +1535,14 @@ StorablePicture *get_pic_from_dpb(DecodedPictureBuffer *p_Dpb, int missingpoc, u
   int used_size = p_Dpb->used_size - 1;
   int i, concealfrom = 0;
 
-  if(p_Vid->conceal_mode == 1)
+  if (p_Vid->conceal_mode == 1)
     concealfrom = missingpoc - p_Vid->poc_gap;
   else if (p_Vid->conceal_mode == 2)
     concealfrom = missingpoc + p_Vid->poc_gap;
 
-  for(i = used_size; i >= 0; i--)
+  for (i = used_size; i >= 0; i--)
   {
-    if(p_Dpb->fs[i]->poc == concealfrom)
+    if (p_Dpb->fs[i]->poc == concealfrom)
     {
       *pos = i;
       return p_Dpb->fs[i]->frame;
@@ -1582,15 +1575,16 @@ int comp(const void *i, const void *j)
 ************************************************************************
 */
 
-struct concealment_node * init_node( StorablePicture* picture, int missingpoc )
+struct concealment_node *init_node(StorablePicture *picture, int missingpoc)
 {
   struct concealment_node *ptr;
 
-  ptr = (struct concealment_node *) calloc( 1, sizeof(struct concealment_node ) );
+  ptr = (struct concealment_node *)calloc(1, sizeof(struct concealment_node));
 
-  if( ptr == NULL )
-    return (struct concealment_node *) NULL;
-  else {
+  if (ptr == NULL)
+    return (struct concealment_node *)NULL;
+  else
+  {
     ptr->picture = picture;
     ptr->missingpocs = missingpoc;
     ptr->next = NULL;
@@ -1606,11 +1600,10 @@ struct concealment_node * init_node( StorablePicture* picture, int missingpoc )
 ************************************************************************
 */
 
-void print_node( struct concealment_node *ptr )
+void print_node(struct concealment_node *ptr)
 {
-  printf("Missing POC=%d\n", ptr->missingpocs );
+  printf("Missing POC=%d\n", ptr->missingpocs);
 }
-
 
 /*!
 ************************************************************************
@@ -1620,11 +1613,11 @@ void print_node( struct concealment_node *ptr )
 ************************************************************************
 */
 
-void print_list( struct concealment_node *ptr )
+void print_list(struct concealment_node *ptr)
 {
-  while( ptr != NULL )
+  while (ptr != NULL)
   {
-    print_node( ptr );
+    print_node(ptr);
     ptr = ptr->next;
   }
 }
@@ -1637,10 +1630,9 @@ void print_list( struct concealment_node *ptr )
 ************************************************************************
 */
 
-
-static void add_node( VideoParameters *p_Vid, struct concealment_node *concealment_new )
+static void add_node(VideoParameters *p_Vid, struct concealment_node *concealment_new)
 {
-  if( p_Vid->concealment_head == NULL )
+  if (p_Vid->concealment_head == NULL)
   {
     p_Vid->concealment_end = p_Vid->concealment_head = concealment_new;
     return;
@@ -1648,7 +1640,6 @@ static void add_node( VideoParameters *p_Vid, struct concealment_node *concealme
   p_Vid->concealment_end->next = concealment_new;
   p_Vid->concealment_end = concealment_new;
 }
-
 
 /*!
 ************************************************************************
@@ -1658,14 +1649,13 @@ static void add_node( VideoParameters *p_Vid, struct concealment_node *concealme
 ************************************************************************
 */
 
-
-static void delete_node( VideoParameters *p_Vid, struct concealment_node *ptr )
+static void delete_node(VideoParameters *p_Vid, struct concealment_node *ptr)
 {
   // We only need to delete the first node in the linked list
-  if( ptr == p_Vid->concealment_head ) 
+  if (ptr == p_Vid->concealment_head)
   {
     p_Vid->concealment_head = p_Vid->concealment_head->next;
-    if( p_Vid->concealment_end == ptr )
+    if (p_Vid->concealment_end == ptr)
       p_Vid->concealment_end = p_Vid->concealment_end->next;
     free(ptr);
   }
@@ -1679,13 +1669,14 @@ static void delete_node( VideoParameters *p_Vid, struct concealment_node *ptr )
 ************************************************************************
 */
 
-void delete_list( VideoParameters *p_Vid, struct concealment_node *ptr )
+void delete_list(VideoParameters *p_Vid, struct concealment_node *ptr)
 {
   struct concealment_node *temp;
 
-  if( p_Vid->concealment_head == NULL ) return;
+  if (p_Vid->concealment_head == NULL)
+    return;
 
-  if( ptr == p_Vid->concealment_head ) 
+  if (ptr == p_Vid->concealment_head)
   {
     p_Vid->concealment_head = NULL;
     p_Vid->concealment_end = NULL;
@@ -1694,15 +1685,15 @@ void delete_list( VideoParameters *p_Vid, struct concealment_node *ptr )
   {
     temp = p_Vid->concealment_head;
 
-    while( temp->next != ptr )
+    while (temp->next != ptr)
       temp = temp->next;
     p_Vid->concealment_end = temp;
   }
 
-  while( ptr != NULL ) 
+  while (ptr != NULL)
   {
     temp = ptr->next;
-    free( ptr );
+    free(ptr);
     ptr = temp;
   }
 }
@@ -1728,25 +1719,25 @@ void conceal_non_ref_pics(DecodedPictureBuffer *p_Dpb, int diff)
   struct concealment_node *concealment_ptr = NULL;
   int temp_used_size = p_Dpb->used_size;
 
-  if(p_Dpb->used_size == 0 )
+  if (p_Dpb->used_size == 0)
     return;
 
   qsort(p_Vid->pocs_in_dpb, p_Dpb->size, sizeof(int), comp);
 
-  for(i=0;i<p_Dpb->size-diff;i++)
+  for (i = 0; i < p_Dpb->size - diff; i++)
   {
     p_Dpb->used_size = p_Dpb->size;
-    if((p_Vid->pocs_in_dpb[i+1] - p_Vid->pocs_in_dpb[i]) > p_Vid->poc_gap)
+    if ((p_Vid->pocs_in_dpb[i + 1] - p_Vid->pocs_in_dpb[i]) > p_Vid->poc_gap)
     {
-      conceal_to_picture = alloc_storable_picture (p_Vid, FRAME, p_Vid->width, p_Vid->height, p_Vid->width_cr, p_Vid->height_cr, 1);
+      conceal_to_picture = alloc_storable_picture(p_Vid, FRAME, p_Vid->width, p_Vid->height, p_Vid->width_cr, p_Vid->height_cr, 1);
 
       missingpoc = p_Vid->pocs_in_dpb[i] + p_Vid->poc_gap;
       // Diagnostics
       // printf("\n missingpoc = %d\n",missingpoc);
 
-      if(missingpoc > p_Vid->earlier_missing_poc)
+      if (missingpoc > p_Vid->earlier_missing_poc)
       {
-        p_Vid->earlier_missing_poc  = missingpoc;
+        p_Vid->earlier_missing_poc = missingpoc;
         conceal_to_picture->top_poc = missingpoc;
         conceal_to_picture->bottom_poc = missingpoc;
         conceal_to_picture->frame_poc = missingpoc;
@@ -1762,7 +1753,7 @@ void conceal_non_ref_pics(DecodedPictureBuffer *p_Dpb, int diff)
         update_ref_list_for_concealment(p_Dpb);
         p_Vid->conceal_slice_type = B_SLICE;
         copy_to_conceal(conceal_from_picture, conceal_to_picture, p_Vid);
-        concealment_ptr = init_node( conceal_to_picture, missingpoc );
+        concealment_ptr = init_node(conceal_to_picture, missingpoc);
         add_node(p_Vid, concealment_ptr);
         // Diagnostics
         // print_node(concealment_ptr);
@@ -1770,8 +1761,8 @@ void conceal_non_ref_pics(DecodedPictureBuffer *p_Dpb, int diff)
     }
   }
 
-  //restore the original value
-  //p_Dpb->used_size = p_Dpb->size;
+  // restore the original value
+  // p_Dpb->used_size = p_Dpb->size;
   p_Dpb->used_size = temp_used_size;
 }
 
@@ -1785,17 +1776,16 @@ void conceal_non_ref_pics(DecodedPictureBuffer *p_Dpb, int diff)
 */
 
 void sliding_window_poc_management(DecodedPictureBuffer *p_Dpb, StorablePicture *p)
-{    
+{
   if (p_Dpb->used_size == p_Dpb->size)
   {
     VideoParameters *p_Vid = p_Dpb->p_Vid;
     unsigned int i;
 
-    for(i=0;i<p_Dpb->size-1; i++)
-      p_Vid->pocs_in_dpb[i] = p_Vid->pocs_in_dpb[i+1];
+    for (i = 0; i < p_Dpb->size - 1; i++)
+      p_Vid->pocs_in_dpb[i] = p_Vid->pocs_in_dpb[i + 1];
   }
 }
-
 
 /*!
 ************************************************************************
@@ -1812,9 +1802,9 @@ void write_lost_non_ref_pic(DecodedPictureBuffer *p_Dpb, int poc, int p_out)
 {
   VideoParameters *p_Vid = p_Dpb->p_Vid;
   FrameStore concealment_fs;
-  if(poc > 0)
+  if (poc > 0)
   {
-    if((poc - p_Dpb->last_output_poc) > p_Vid->poc_gap)
+    if ((poc - p_Dpb->last_output_poc) > p_Vid->poc_gap)
     {
 
       concealment_fs.frame = p_Vid->concealment_head->picture;
@@ -1843,14 +1833,14 @@ void write_lost_ref_after_idr(DecodedPictureBuffer *p_Dpb, int pos)
 
   int temp = 1;
 
-  if(p_Vid->last_out_fs->frame == NULL)
+  if (p_Vid->last_out_fs->frame == NULL)
   {
-    p_Vid->last_out_fs->frame = alloc_storable_picture (p_Vid, FRAME, p_Vid->width, p_Vid->height,
-      p_Vid->width_cr, p_Vid->height_cr, 1);
+    p_Vid->last_out_fs->frame = alloc_storable_picture(p_Vid, FRAME, p_Vid->width, p_Vid->height,
+                                                       p_Vid->width_cr, p_Vid->height_cr, 1);
     p_Vid->last_out_fs->is_used = 3;
   }
 
-  if(p_Vid->conceal_mode == 2)
+  if (p_Vid->conceal_mode == 2)
   {
     temp = 2;
     p_Vid->conceal_mode = 1;
@@ -1859,4 +1849,3 @@ void write_lost_ref_after_idr(DecodedPictureBuffer *p_Dpb, int pos)
 
   p_Vid->conceal_mode = temp;
 }
-

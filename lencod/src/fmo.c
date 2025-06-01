@@ -45,33 +45,29 @@
  *  picture currently coded.  It can be accessed only through the access
  *  functions.
  *****************************************************************************
-*/
+ */
 
-//#define PRINT_FMO_MAPS  1
-
+// #define PRINT_FMO_MAPS  1
 
 #include "global.h"
 
 #include "fmo.h"
 
+static void FmoGenerateType0MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps);
+static void FmoGenerateType1MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps);
+static void FmoGenerateType2MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps);
+static void FmoGenerateType3MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps);
+static void FmoGenerateType4MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps);
+static void FmoGenerateType5MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps);
+static void FmoGenerateType6MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps);
 
-static void FmoGenerateType0MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps);
-static void FmoGenerateType1MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps);
-static void FmoGenerateType2MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps);
-static void FmoGenerateType3MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps);
-static void FmoGenerateType4MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps);
-static void FmoGenerateType5MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps);
-static void FmoGenerateType6MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps);
-
-
-static int FmoGenerateMapUnitToSliceGroupMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps);
-static int FmoGenerateMBAmap                 (VideoParameters * p_Vid, seq_parameter_set_rbsp_t* sps);
-
+static int FmoGenerateMapUnitToSliceGroupMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps);
+static int FmoGenerateMBAmap(VideoParameters *p_Vid, seq_parameter_set_rbsp_t *sps);
 
 /*!
  ************************************************************************
  * \brief
- *    Generates p_Vid->MapUnitToSliceGroupMap 
+ *    Generates p_Vid->MapUnitToSliceGroupMap
  *
  * \param p_Vid
  *    Image Parameter to be used for map generation
@@ -80,70 +76,68 @@ static int FmoGenerateMBAmap                 (VideoParameters * p_Vid, seq_param
  *
  ************************************************************************
  */
-static int FmoGenerateMapUnitToSliceGroupMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps)
+static int FmoGenerateMapUnitToSliceGroupMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps)
 {
   p_Vid->PicSizeInMapUnits = p_Vid->PicHeightInMapUnits * p_Vid->PicWidthInMbs;
 
-
   if (pps->slice_group_map_type == 6)
   {
-    if ((pps->pic_size_in_map_units_minus1+1) != p_Vid->PicSizeInMapUnits)
+    if ((pps->pic_size_in_map_units_minus1 + 1) != p_Vid->PicSizeInMapUnits)
     {
-      error ("wrong pps->pic_size_in_map_units_minus1 for used SPS and FMO type 6", 500);
+      error("wrong pps->pic_size_in_map_units_minus1 for used SPS and FMO type 6", 500);
     }
   }
 
-  // allocate memory for p_Vid->MapUnitToSliceGroupMap 
+  // allocate memory for p_Vid->MapUnitToSliceGroupMap
   if (p_Vid->MapUnitToSliceGroupMap)
-    free (p_Vid->MapUnitToSliceGroupMap);
+    free(p_Vid->MapUnitToSliceGroupMap);
 
-  if ((p_Vid->MapUnitToSliceGroupMap = malloc ((p_Vid->PicSizeInMapUnits) * sizeof (byte))) == NULL)
+  if ((p_Vid->MapUnitToSliceGroupMap = malloc((p_Vid->PicSizeInMapUnits) * sizeof(byte))) == NULL)
   {
-    printf ("cannot allocated %d bytes for p_Vid->MapUnitToSliceGroupMap , exit\n", (int) ( p_Vid->PicSizeInMapUnits * sizeof (byte)));
-    exit (-1);
+    printf("cannot allocated %d bytes for p_Vid->MapUnitToSliceGroupMap , exit\n", (int)(p_Vid->PicSizeInMapUnits * sizeof(byte)));
+    exit(-1);
   }
 
-  if (pps->num_slice_groups_minus1 == 0)    // only one slice group
+  if (pps->num_slice_groups_minus1 == 0) // only one slice group
   {
-    memset (p_Vid->MapUnitToSliceGroupMap, 0,  p_Vid->PicSizeInMapUnits * sizeof (byte));
+    memset(p_Vid->MapUnitToSliceGroupMap, 0, p_Vid->PicSizeInMapUnits * sizeof(byte));
     return 0;
   }
 
   switch (pps->slice_group_map_type)
   {
   case 0:
-    FmoGenerateType0MapUnitMap (p_Vid, pps);
+    FmoGenerateType0MapUnitMap(p_Vid, pps);
     break;
   case 1:
-    FmoGenerateType1MapUnitMap (p_Vid, pps);
+    FmoGenerateType1MapUnitMap(p_Vid, pps);
     break;
   case 2:
-    FmoGenerateType2MapUnitMap (p_Vid, pps);
+    FmoGenerateType2MapUnitMap(p_Vid, pps);
     break;
   case 3:
-    FmoGenerateType3MapUnitMap (p_Vid, pps);
+    FmoGenerateType3MapUnitMap(p_Vid, pps);
     break;
   case 4:
-    FmoGenerateType4MapUnitMap (p_Vid, pps);
+    FmoGenerateType4MapUnitMap(p_Vid, pps);
     break;
   case 5:
-    FmoGenerateType5MapUnitMap (p_Vid, pps);
+    FmoGenerateType5MapUnitMap(p_Vid, pps);
     break;
   case 6:
-    FmoGenerateType6MapUnitMap (p_Vid, pps);
+    FmoGenerateType6MapUnitMap(p_Vid, pps);
     break;
   default:
-    printf ("Illegal slice_group_map_type %d , exit \n", pps->slice_group_map_type);
-    exit (-1);
+    printf("Illegal slice_group_map_type %d , exit \n", pps->slice_group_map_type);
+    exit(-1);
   }
   return 0;
 }
 
-
 /*!
  ************************************************************************
  * \brief
- *    Generates MBAmap from p_Vid->MapUnitToSliceGroupMap 
+ *    Generates MBAmap from p_Vid->MapUnitToSliceGroupMap
  *
  * \param p_Vid
  *    Image Parameter to be used for map generation
@@ -152,46 +146,43 @@ static int FmoGenerateMapUnitToSliceGroupMap (VideoParameters * p_Vid, pic_param
  *
  ************************************************************************
  */
-static int FmoGenerateMBAmap (VideoParameters * p_Vid, seq_parameter_set_rbsp_t* sps)
+static int FmoGenerateMBAmap(VideoParameters *p_Vid, seq_parameter_set_rbsp_t *sps)
 {
   unsigned i;
 
   // allocate memory for p_Vid->MBAmap
   if (p_Vid->MBAmap)
-    free (p_Vid->MBAmap);
+    free(p_Vid->MBAmap);
 
-
-  if ((p_Vid->MBAmap = malloc ((p_Vid->PicSizeInMbs) * sizeof (byte))) == NULL)
+  if ((p_Vid->MBAmap = malloc((p_Vid->PicSizeInMbs) * sizeof(byte))) == NULL)
   {
-    printf ("cannot allocated %d bytes for p_Vid->MBAmap, exit\n", (int) ((p_Vid->PicSizeInMbs) * sizeof (byte)));
-    exit (-1);
+    printf("cannot allocated %d bytes for p_Vid->MBAmap, exit\n", (int)((p_Vid->PicSizeInMbs) * sizeof(byte)));
+    exit(-1);
   }
 
   if ((sps->frame_mbs_only_flag) || p_Vid->field_picture)
   {
-    for (i=0; i<p_Vid->PicSizeInMbs; i++)
+    for (i = 0; i < p_Vid->PicSizeInMbs; i++)
     {
-      p_Vid->MBAmap[i] = p_Vid->MapUnitToSliceGroupMap [i];
+      p_Vid->MBAmap[i] = p_Vid->MapUnitToSliceGroupMap[i];
+    }
+  }
+  else if (sps->mb_adaptive_frame_field_flag && (!p_Vid->field_picture))
+  {
+    for (i = 0; i < p_Vid->PicSizeInMbs; i++)
+    {
+      p_Vid->MBAmap[i] = p_Vid->MapUnitToSliceGroupMap[i >> 1];
     }
   }
   else
-    if (sps->mb_adaptive_frame_field_flag  &&  (! p_Vid->field_picture))
+  {
+    for (i = 0; i < p_Vid->PicSizeInMbs; i++)
     {
-      for (i=0; i<p_Vid->PicSizeInMbs; i++)
-      {
-        p_Vid->MBAmap[i] = p_Vid->MapUnitToSliceGroupMap [i >> 1];
-      }
+      p_Vid->MBAmap[i] = p_Vid->MapUnitToSliceGroupMap[(i / (2 * p_Vid->PicWidthInMbs)) * p_Vid->PicWidthInMbs + (i % p_Vid->PicWidthInMbs)];
     }
-    else
-    {
-      for (i=0; i<p_Vid->PicSizeInMbs; i++)
-      {
-        p_Vid->MBAmap[i] = p_Vid->MapUnitToSliceGroupMap [(i/(2*p_Vid->PicWidthInMbs))*p_Vid->PicWidthInMbs+(i%p_Vid->PicWidthInMbs)];
-      }
-    }
-    return 0;
+  }
+  return 0;
 }
-
 
 /*!
  ************************************************************************
@@ -206,11 +197,11 @@ static int FmoGenerateMBAmap (VideoParameters * p_Vid, seq_parameter_set_rbsp_t*
  *    Sequence Parameter set to be used for map generation
  ************************************************************************
  */
-int FmoInit(VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps, seq_parameter_set_rbsp_t * sps)
+int FmoInit(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps, seq_parameter_set_rbsp_t *sps)
 {
 
 #ifdef PRINT_FMO_MAPS
-  unsigned i,j;
+  unsigned i, j;
   int bottom;
 #endif
 
@@ -225,24 +216,24 @@ int FmoInit(VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps, seq_paramet
   printf("\n");
   printf("FMO Map (Units):\n");
 
-  for (j=0; j<p_Vid->PicHeightInMapUnits; j++)
+  for (j = 0; j < p_Vid->PicHeightInMapUnits; j++)
   {
-    for (i=0; i<p_Vid->PicWidthInMbs; i++)
+    for (i = 0; i < p_Vid->PicWidthInMbs; i++)
     {
-      printf("%d ",p_Vid->MapUnitToSliceGroupMap [i+j*p_Vid->PicWidthInMbs]);
+      printf("%d ", p_Vid->MapUnitToSliceGroupMap[i + j * p_Vid->PicWidthInMbs]);
     }
     printf("\n");
   }
   printf("\n");
 
-  if(sps->mb_adaptive_frame_field_flag==0)
+  if (sps->mb_adaptive_frame_field_flag == 0)
   {
     printf("FMO Map (Mb):\n");
-    for (j=0; j<(p_Vid->PicSizeInMbs/p_Vid->PicWidthInMbs); j++)
+    for (j = 0; j < (p_Vid->PicSizeInMbs / p_Vid->PicWidthInMbs); j++)
     {
-      for (i=0; i<p_Vid->PicWidthInMbs; i++)
+      for (i = 0; i < p_Vid->PicWidthInMbs; i++)
       {
-        printf("%d ",p_Vid->MBAmap[i+j*p_Vid->PicWidthInMbs]);
+        printf("%d ", p_Vid->MBAmap[i + j * p_Vid->PicWidthInMbs]);
       }
       printf("\n");
     }
@@ -251,25 +242,22 @@ int FmoInit(VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps, seq_paramet
   else
   {
     printf("FMO Map (Mb in scan order for MBAFF):\n");
-    for (j=0; j<(p_Vid->PicSizeInMbs/p_Vid->PicWidthInMbs); j++)
+    for (j = 0; j < (p_Vid->PicSizeInMbs / p_Vid->PicWidthInMbs); j++)
     {
-      for (i=0; i<p_Vid->PicWidthInMbs; i++)
+      for (i = 0; i < p_Vid->PicWidthInMbs; i++)
       {
-        bottom=(j & 0x01);
-        printf("%d ",p_Vid->MBAmap[(j-bottom)*p_Vid->PicWidthInMbs+i*2+bottom]);
+        bottom = (j & 0x01);
+        printf("%d ", p_Vid->MBAmap[(j - bottom) * p_Vid->PicWidthInMbs + i * 2 + bottom]);
       }
       printf("\n");
-
     }
     printf("\n");
-
   }
 
 #endif
 
   return 0;
 }
-
 
 /*!
  ************************************************************************
@@ -281,17 +269,15 @@ void FmoUninit(VideoParameters *p_Vid)
 {
   if (p_Vid->MBAmap)
   {
-    free (p_Vid->MBAmap);
+    free(p_Vid->MBAmap);
     p_Vid->MBAmap = NULL;
   }
-  if (p_Vid->MapUnitToSliceGroupMap )
+  if (p_Vid->MapUnitToSliceGroupMap)
   {
-    free (p_Vid->MapUnitToSliceGroupMap );
-    p_Vid->MapUnitToSliceGroupMap  = NULL;
+    free(p_Vid->MapUnitToSliceGroupMap);
+    p_Vid->MapUnitToSliceGroupMap = NULL;
   }
-
 }
-
 
 /*!
  ************************************************************************
@@ -304,24 +290,22 @@ void FmoUninit(VideoParameters *p_Vid)
  *    Picture Parameter set to be used for map generation
  ************************************************************************
  */
-static void FmoGenerateType0MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps )
+static void FmoGenerateType0MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps)
 {
   unsigned iGroup, j;
   unsigned i = 0;
-  
+
   do
   {
-    for( iGroup = 0;
-    (iGroup <= pps->num_slice_groups_minus1) && (i < p_Vid->PicSizeInMapUnits);
-    i += pps->run_length_minus1[iGroup++] + 1)
+    for (iGroup = 0;
+         (iGroup <= pps->num_slice_groups_minus1) && (i < p_Vid->PicSizeInMapUnits);
+         i += pps->run_length_minus1[iGroup++] + 1)
     {
-      for( j = 0; j <= pps->run_length_minus1[ iGroup ] && i + j < p_Vid->PicSizeInMapUnits; j++ )
-        p_Vid->MapUnitToSliceGroupMap [i+j] = (byte)  iGroup;
+      for (j = 0; j <= pps->run_length_minus1[iGroup] && i + j < p_Vid->PicSizeInMapUnits; j++)
+        p_Vid->MapUnitToSliceGroupMap[i + j] = (byte)iGroup;
     }
-  }
-  while( i < p_Vid->PicSizeInMapUnits );
+  } while (i < p_Vid->PicSizeInMapUnits);
 }
-
 
 /*!
  ************************************************************************
@@ -334,13 +318,12 @@ static void FmoGenerateType0MapUnitMap (VideoParameters * p_Vid, pic_parameter_s
  *    Picture Parameter set to be used for map generation
  ************************************************************************
  */
-static void FmoGenerateType1MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps )
+static void FmoGenerateType1MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps)
 {
   unsigned i;
-  for( i = 0; i < p_Vid->PicSizeInMapUnits; i++ )
+  for (i = 0; i < p_Vid->PicSizeInMapUnits; i++)
   {
-    p_Vid->MapUnitToSliceGroupMap [i] = (byte) (((i%p_Vid->PicWidthInMbs)+(((i/p_Vid->PicWidthInMbs)*(pps->num_slice_groups_minus1+1))>>1))
-      %(pps->num_slice_groups_minus1+1));
+    p_Vid->MapUnitToSliceGroupMap[i] = (byte)(((i % p_Vid->PicWidthInMbs) + (((i / p_Vid->PicWidthInMbs) * (pps->num_slice_groups_minus1 + 1)) >> 1)) % (pps->num_slice_groups_minus1 + 1));
   }
 }
 
@@ -355,27 +338,26 @@ static void FmoGenerateType1MapUnitMap (VideoParameters * p_Vid, pic_parameter_s
  *    Picture Parameter set to be used for map generation
  ************************************************************************
  */
-static void FmoGenerateType2MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps )
+static void FmoGenerateType2MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps)
 {
   int iGroup;
   unsigned i, x, y;
   unsigned yTopLeft, xTopLeft, yBottomRight, xBottomRight;
 
-  for( i = 0; i < p_Vid->PicSizeInMapUnits; i++ )
-    p_Vid->MapUnitToSliceGroupMap [ i ] = (byte) pps->num_slice_groups_minus1;
+  for (i = 0; i < p_Vid->PicSizeInMapUnits; i++)
+    p_Vid->MapUnitToSliceGroupMap[i] = (byte)pps->num_slice_groups_minus1;
 
-  for( iGroup = pps->num_slice_groups_minus1 - 1 ; iGroup >= 0; iGroup-- )
+  for (iGroup = pps->num_slice_groups_minus1 - 1; iGroup >= 0; iGroup--)
   {
-    yTopLeft = pps->top_left[ iGroup ] / p_Vid->PicWidthInMbs;
-    xTopLeft = pps->top_left[ iGroup ] % p_Vid->PicWidthInMbs;
-    yBottomRight = pps->bottom_right[ iGroup ] / p_Vid->PicWidthInMbs;
-    xBottomRight = pps->bottom_right[ iGroup ] % p_Vid->PicWidthInMbs;
-    for( y = yTopLeft; y <= yBottomRight; y++ )
-      for( x = xTopLeft; x <= xBottomRight; x++ )
-        p_Vid->MapUnitToSliceGroupMap [ y * p_Vid->PicWidthInMbs + x ] = (byte) iGroup;
+    yTopLeft = pps->top_left[iGroup] / p_Vid->PicWidthInMbs;
+    xTopLeft = pps->top_left[iGroup] % p_Vid->PicWidthInMbs;
+    yBottomRight = pps->bottom_right[iGroup] / p_Vid->PicWidthInMbs;
+    xBottomRight = pps->bottom_right[iGroup] % p_Vid->PicWidthInMbs;
+    for (y = yTopLeft; y <= yBottomRight; y++)
+      for (x = xTopLeft; x <= xBottomRight; x++)
+        p_Vid->MapUnitToSliceGroupMap[y * p_Vid->PicWidthInMbs + x] = (byte)iGroup;
   }
 }
-
 
 /*!
  ************************************************************************
@@ -388,7 +370,7 @@ static void FmoGenerateType2MapUnitMap (VideoParameters * p_Vid, pic_parameter_s
  *    Picture Parameter set to be used for map generation
  ************************************************************************
  */
-static void FmoGenerateType3MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps )
+static void FmoGenerateType3MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps)
 {
   unsigned i, k;
   int leftBound, topBound, rightBound, bottomBound;
@@ -397,64 +379,60 @@ static void FmoGenerateType3MapUnitMap (VideoParameters * p_Vid, pic_parameter_s
 
   unsigned mapUnitsInSliceGroup0 = imin((pps->slice_group_change_rate_minus1 + 1) * p_Vid->slice_group_change_cycle, p_Vid->PicSizeInMapUnits);
 
-  for( i = 0; i < p_Vid->PicSizeInMapUnits; i++ )
-    p_Vid->MapUnitToSliceGroupMap [ i ] = 2;
+  for (i = 0; i < p_Vid->PicSizeInMapUnits; i++)
+    p_Vid->MapUnitToSliceGroupMap[i] = 2;
 
-  x = ( p_Vid->PicWidthInMbs - pps->slice_group_change_direction_flag ) / 2;
-  y = ( p_Vid->PicHeightInMapUnits - pps->slice_group_change_direction_flag ) / 2;
+  x = (p_Vid->PicWidthInMbs - pps->slice_group_change_direction_flag) / 2;
+  y = (p_Vid->PicHeightInMapUnits - pps->slice_group_change_direction_flag) / 2;
 
-  leftBound   = x;
-  topBound    = y;
-  rightBound  = x;
+  leftBound = x;
+  topBound = y;
+  rightBound = x;
   bottomBound = y;
 
-  xDir =  pps->slice_group_change_direction_flag - 1;
-  yDir =  pps->slice_group_change_direction_flag;
+  xDir = pps->slice_group_change_direction_flag - 1;
+  yDir = pps->slice_group_change_direction_flag;
 
-  for( k = 0; k < p_Vid->PicSizeInMapUnits; k += mapUnitVacant )
+  for (k = 0; k < p_Vid->PicSizeInMapUnits; k += mapUnitVacant)
   {
-    mapUnitVacant = ( p_Vid->MapUnitToSliceGroupMap [ y * p_Vid->PicWidthInMbs + x ]  ==  2 );
-    if( mapUnitVacant )
-      p_Vid->MapUnitToSliceGroupMap [ y * p_Vid->PicWidthInMbs + x ] = (byte) ( k >= mapUnitsInSliceGroup0 );
+    mapUnitVacant = (p_Vid->MapUnitToSliceGroupMap[y * p_Vid->PicWidthInMbs + x] == 2);
+    if (mapUnitVacant)
+      p_Vid->MapUnitToSliceGroupMap[y * p_Vid->PicWidthInMbs + x] = (byte)(k >= mapUnitsInSliceGroup0);
 
-    if( xDir  ==  -1  &&  x  ==  leftBound )
+    if (xDir == -1 && x == leftBound)
     {
-      leftBound = imax( leftBound - 1, 0 );
+      leftBound = imax(leftBound - 1, 0);
       x = leftBound;
       xDir = 0;
       yDir = 2 * pps->slice_group_change_direction_flag - 1;
     }
+    else if (xDir == 1 && x == rightBound)
+    {
+      rightBound = imin(rightBound + 1, (int)p_Vid->PicWidthInMbs - 1);
+      x = rightBound;
+      xDir = 0;
+      yDir = 1 - 2 * pps->slice_group_change_direction_flag;
+    }
+    else if (yDir == -1 && y == topBound)
+    {
+      topBound = imax(topBound - 1, 0);
+      y = topBound;
+      xDir = 1 - 2 * pps->slice_group_change_direction_flag;
+      yDir = 0;
+    }
+    else if (yDir == 1 && y == bottomBound)
+    {
+      bottomBound = imin(bottomBound + 1, (int)p_Vid->PicHeightInMapUnits - 1);
+      y = bottomBound;
+      xDir = 2 * pps->slice_group_change_direction_flag - 1;
+      yDir = 0;
+    }
     else
-      if( xDir  ==  1  &&  x  ==  rightBound )
-      {
-        rightBound = imin( rightBound + 1, (int)p_Vid->PicWidthInMbs - 1 );
-        x = rightBound;
-        xDir = 0;
-        yDir = 1 - 2 * pps->slice_group_change_direction_flag;
-      }
-      else
-        if( yDir  ==  -1  &&  y  ==  topBound )
-        {
-          topBound = imax( topBound - 1, 0 );
-          y = topBound;
-          xDir = 1 - 2 * pps->slice_group_change_direction_flag;
-          yDir = 0;
-        }
-        else
-          if( yDir  ==  1  &&  y  ==  bottomBound )
-          {
-            bottomBound = imin( bottomBound + 1, (int)p_Vid->PicHeightInMapUnits - 1 );
-            y = bottomBound;
-            xDir = 2 * pps->slice_group_change_direction_flag - 1;
-            yDir = 0;
-          }
-          else
-          {
-            x = x + xDir;
-            y = y + yDir;
-          }
+    {
+      x = x + xDir;
+      y = y + yDir;
+    }
   }
-
 }
 
 /*!
@@ -468,20 +446,19 @@ static void FmoGenerateType3MapUnitMap (VideoParameters * p_Vid, pic_parameter_s
  *    Picture Parameter set to be used for map generation
  ************************************************************************
  */
-static void FmoGenerateType4MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps )
+static void FmoGenerateType4MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps)
 {
 
   unsigned mapUnitsInSliceGroup0 = imin((pps->slice_group_change_rate_minus1 + 1) * p_Vid->slice_group_change_cycle, p_Vid->PicSizeInMapUnits);
-  unsigned sizeOfUpperLeftGroup = pps->slice_group_change_direction_flag ? ( p_Vid->PicSizeInMapUnits - mapUnitsInSliceGroup0 ) : mapUnitsInSliceGroup0;
+  unsigned sizeOfUpperLeftGroup = pps->slice_group_change_direction_flag ? (p_Vid->PicSizeInMapUnits - mapUnitsInSliceGroup0) : mapUnitsInSliceGroup0;
 
   unsigned i;
 
-  for( i = 0; i < p_Vid->PicSizeInMapUnits; i++ )
-    if( i < sizeOfUpperLeftGroup )
-      p_Vid->MapUnitToSliceGroupMap [ i ] = (byte) pps->slice_group_change_direction_flag;
+  for (i = 0; i < p_Vid->PicSizeInMapUnits; i++)
+    if (i < sizeOfUpperLeftGroup)
+      p_Vid->MapUnitToSliceGroupMap[i] = (byte)pps->slice_group_change_direction_flag;
     else
-      p_Vid->MapUnitToSliceGroupMap [ i ] = (byte) (1 - pps->slice_group_change_direction_flag);
-
+      p_Vid->MapUnitToSliceGroupMap[i] = (byte)(1 - pps->slice_group_change_direction_flag);
 }
 
 /*!
@@ -494,22 +471,21 @@ static void FmoGenerateType4MapUnitMap (VideoParameters * p_Vid, pic_parameter_s
  * \param pps
  *    Picture Parameter set to be used for map generation
  ************************************************************************
-*/
-static void FmoGenerateType5MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps )
+ */
+static void FmoGenerateType5MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps)
 {
 
   unsigned mapUnitsInSliceGroup0 = imin((pps->slice_group_change_rate_minus1 + 1) * p_Vid->slice_group_change_cycle, p_Vid->PicSizeInMapUnits);
-  unsigned sizeOfUpperLeftGroup = pps->slice_group_change_direction_flag ? ( p_Vid->PicSizeInMapUnits - mapUnitsInSliceGroup0 ) : mapUnitsInSliceGroup0;
+  unsigned sizeOfUpperLeftGroup = pps->slice_group_change_direction_flag ? (p_Vid->PicSizeInMapUnits - mapUnitsInSliceGroup0) : mapUnitsInSliceGroup0;
 
-  unsigned i,j, k = 0;
+  unsigned i, j, k = 0;
 
-  for( j = 0; j < p_Vid->PicWidthInMbs; j++ )
-    for( i = 0; i < p_Vid->PicHeightInMapUnits; i++ )
-      if( k++ < sizeOfUpperLeftGroup )
-        p_Vid->MapUnitToSliceGroupMap [ i * p_Vid->PicWidthInMbs + j ] = (byte) pps->slice_group_change_direction_flag;
+  for (j = 0; j < p_Vid->PicWidthInMbs; j++)
+    for (i = 0; i < p_Vid->PicHeightInMapUnits; i++)
+      if (k++ < sizeOfUpperLeftGroup)
+        p_Vid->MapUnitToSliceGroupMap[i * p_Vid->PicWidthInMbs + j] = (byte)pps->slice_group_change_direction_flag;
       else
-        p_Vid->MapUnitToSliceGroupMap [ i * p_Vid->PicWidthInMbs + j ] = (byte) (1 - pps->slice_group_change_direction_flag);
-
+        p_Vid->MapUnitToSliceGroupMap[i * p_Vid->PicWidthInMbs + j] = (byte)(1 - pps->slice_group_change_direction_flag);
 }
 
 /*!
@@ -523,12 +499,12 @@ static void FmoGenerateType5MapUnitMap (VideoParameters * p_Vid, pic_parameter_s
  *    Picture Parameter set to be used for map generation
  ************************************************************************
  */
-static void FmoGenerateType6MapUnitMap (VideoParameters * p_Vid, pic_parameter_set_rbsp_t * pps )
+static void FmoGenerateType6MapUnitMap(VideoParameters *p_Vid, pic_parameter_set_rbsp_t *pps)
 {
   unsigned i;
-  for (i=0; i<p_Vid->PicSizeInMapUnits; i++)
+  for (i = 0; i < p_Vid->PicSizeInMapUnits; i++)
   {
-    p_Vid->MapUnitToSliceGroupMap [i] = (byte) pps->slice_group_id[i];
+    p_Vid->MapUnitToSliceGroupMap[i] = (byte)pps->slice_group_id[i];
   }
 }
 
@@ -541,18 +517,16 @@ static void FmoGenerateType6MapUnitMap (VideoParameters * p_Vid, pic_parameter_s
  *    None
  ************************************************************************
  */
-int FmoStartPicture (VideoParameters *p_Vid)
+int FmoStartPicture(VideoParameters *p_Vid)
 {
   int i;
 
-  assert (p_Vid->MBAmap != NULL);
+  assert(p_Vid->MBAmap != NULL);
 
-  for (i=0; i<MAXSLICEGROUPIDS; i++)
-    p_Vid->FirstMBInSlice[i] = FmoGetFirstMBOfSliceGroup (p_Vid, i);
+  for (i = 0; i < MAXSLICEGROUPIDS; i++)
+    p_Vid->FirstMBInSlice[i] = FmoGetFirstMBOfSliceGroup(p_Vid, i);
   return 0;
 }
-
-
 
 /*!
  ************************************************************************
@@ -564,12 +538,11 @@ int FmoStartPicture (VideoParameters *p_Vid)
  *    None
  ************************************************************************
  */
-int FmoEndPicture ()
+int FmoEndPicture()
 {
   // Do nothing
   return 0;
 }
-
 
 /*!
  ************************************************************************
@@ -580,10 +553,10 @@ int FmoEndPicture ()
  *    Macroblock Nr (in scan order)
  ************************************************************************
  */
-int FmoMB2SliceGroup (VideoParameters *p_Vid, int mb)
+int FmoMB2SliceGroup(VideoParameters *p_Vid, int mb)
 {
-  assert (mb < (int)p_Vid->PicSizeInMbs);
-  assert (p_Vid->MBAmap != NULL);
+  assert(mb < (int)p_Vid->PicSizeInMbs);
+  assert(p_Vid->MBAmap != NULL);
   return p_Vid->MBAmap[mb];
 }
 
@@ -597,20 +570,19 @@ int FmoMB2SliceGroup (VideoParameters *p_Vid, int mb)
  *    CurrentMbNr
  ************************************************************************
  */
-int FmoGetNextMBNr (VideoParameters *p_Vid, int CurrentMbNr)
+int FmoGetNextMBNr(VideoParameters *p_Vid, int CurrentMbNr)
 {
 
-  int  SliceGroupID = FmoMB2SliceGroup (p_Vid, CurrentMbNr);
+  int SliceGroupID = FmoMB2SliceGroup(p_Vid, CurrentMbNr);
 
-  while (++CurrentMbNr<(int)p_Vid->PicSizeInMbs &&  p_Vid->MBAmap[CurrentMbNr] != SliceGroupID)
+  while (++CurrentMbNr < (int)p_Vid->PicSizeInMbs && p_Vid->MBAmap[CurrentMbNr] != SliceGroupID)
     ;
 
   if (CurrentMbNr >= (int)p_Vid->PicSizeInMbs)
-    return -1;    // No further MB in this slice (could be end of picture)
+    return -1; // No further MB in this slice (could be end of picture)
   else
     return CurrentMbNr;
 }
-
 
 /*!
  ************************************************************************
@@ -622,20 +594,19 @@ int FmoGetNextMBNr (VideoParameters *p_Vid, int CurrentMbNr)
  *    CurrentMbNr
  ************************************************************************
  */
-int FmoGetPreviousMBNr (VideoParameters *p_Vid, int CurrentMbNr)
+int FmoGetPreviousMBNr(VideoParameters *p_Vid, int CurrentMbNr)
 {
 
-  int  SliceGroupID = FmoMB2SliceGroup (p_Vid, CurrentMbNr);
+  int SliceGroupID = FmoMB2SliceGroup(p_Vid, CurrentMbNr);
   CurrentMbNr--;
-  while (CurrentMbNr>=0 &&  p_Vid->MBAmap[CurrentMbNr] != SliceGroupID)
+  while (CurrentMbNr >= 0 && p_Vid->MBAmap[CurrentMbNr] != SliceGroupID)
     CurrentMbNr--;
 
   if (CurrentMbNr < 0)
-    return -1;    // No previous MB in this slice
+    return -1; // No previous MB in this slice
   else
     return CurrentMbNr;
 }
-
 
 /*!
  ************************************************************************
@@ -647,10 +618,10 @@ int FmoGetPreviousMBNr (VideoParameters *p_Vid, int CurrentMbNr)
  *    SliceGroupID: Id of SliceGroup
  ************************************************************************
  */
-int FmoGetFirstMBOfSliceGroup (VideoParameters *p_Vid, int SliceGroupID)
+int FmoGetFirstMBOfSliceGroup(VideoParameters *p_Vid, int SliceGroupID)
 {
   int i = 0;
-  while ((i<(int)p_Vid->PicSizeInMbs) && (FmoMB2SliceGroup (p_Vid, i) != SliceGroupID))
+  while ((i < (int)p_Vid->PicSizeInMbs) && (FmoMB2SliceGroup(p_Vid, i) != SliceGroupID))
     i++;
 
   if (i < (int)p_Vid->PicSizeInMbs)
@@ -658,7 +629,6 @@ int FmoGetFirstMBOfSliceGroup (VideoParameters *p_Vid, int SliceGroupID)
   else
     return -1;
 }
-
 
 /*!
  ************************************************************************
@@ -673,45 +643,40 @@ int FmoGetFirstMBOfSliceGroup (VideoParameters *p_Vid, int SliceGroupID)
  *    -1 if the SliceGroup doesn't exist
  ************************************************************************
  */
-int FmoGetLastCodedMBOfSliceGroup (VideoParameters *p_Vid, int SliceGroupID)
+int FmoGetLastCodedMBOfSliceGroup(VideoParameters *p_Vid, int SliceGroupID)
 {
   int i;
   int LastMB = -1;
 
-  for (i=0; i<(int)p_Vid->PicSizeInMbs; i++)
-    if (FmoMB2SliceGroup (p_Vid, i) == SliceGroupID)
+  for (i = 0; i < (int)p_Vid->PicSizeInMbs; i++)
+    if (FmoMB2SliceGroup(p_Vid, i) == SliceGroupID)
       LastMB = i;
   return LastMB;
 }
 
-
-void FmoSetLastMacroblockInSlice ( VideoParameters *p_Vid, int mb)
+void FmoSetLastMacroblockInSlice(VideoParameters *p_Vid, int mb)
 {
   // called by terminate_slice(), writes the last processed MB into the
   // FirstMBInSlice[MAXSLICEGROUPIDS] array.  FmoGetFirstMacroblockInSlice()
   // uses this info to identify the first uncoded MB in each slice group
 
-  int currSliceGroup = FmoMB2SliceGroup (p_Vid, mb);
-  assert (mb >= 0);
-  mb = FmoGetNextMBNr (p_Vid, mb);   // The next (still uncoded) MB, or -1 if SG is finished
+  int currSliceGroup = FmoMB2SliceGroup(p_Vid, mb);
+  assert(mb >= 0);
+  mb = FmoGetNextMBNr(p_Vid, mb); // The next (still uncoded) MB, or -1 if SG is finished
   p_Vid->FirstMBInSlice[currSliceGroup] = mb;
 }
 
-int FmoGetFirstMacroblockInSlice ( VideoParameters *p_Vid, int SliceGroup)
+int FmoGetFirstMacroblockInSlice(VideoParameters *p_Vid, int SliceGroup)
 {
   return p_Vid->FirstMBInSlice[SliceGroup];
   // returns the first uncoded MB in each slice group, -1 if there is no
   // more to do in this slice group
 }
 
-
-int FmoSliceGroupCompletelyCoded( VideoParameters *p_Vid, int SliceGroupID)
+int FmoSliceGroupCompletelyCoded(VideoParameters *p_Vid, int SliceGroupID)
 {
-  if (FmoGetFirstMacroblockInSlice (p_Vid, SliceGroupID) < 0)  // slice group completelty coded or not present
+  if (FmoGetFirstMacroblockInSlice(p_Vid, SliceGroupID) < 0) // slice group completelty coded or not present
     return TRUE;
   else
     return FALSE;
 }
-
-
-

@@ -17,19 +17,18 @@
 #include "report.h"
 
 static const VIDEO_SIZE VideoRes[] = {
-  { "qcif"  ,  176,  144},
-  { "qqvga" ,  160,  128},
-  { "qvga"  ,  320,  240},
-  { "sif"   ,  352,  240},
-  { "cif"   ,  352,  288},
-  { "vga"   ,  640,  480},
-  { "sd1"   ,  720,  480},
-  { "sd2"   ,  704,  576},
-  { "sd3"   ,  720,  576},
-  { "720p"  , 1280,  720},
-  { "1080p" , 1920, 1080},
-  { NULL, 0, 0}
-};
+    {"qcif", 176, 144},
+    {"qqvga", 160, 128},
+    {"qvga", 320, 240},
+    {"sif", 352, 240},
+    {"cif", 352, 288},
+    {"vga", 640, 480},
+    {"sd1", 720, 480},
+    {"sd2", 704, 576},
+    {"sd3", 720, 576},
+    {"720p", 1280, 720},
+    {"1080p", 1920, 1080},
+    {NULL, 0, 0}};
 
 /*!
  ************************************************************************
@@ -38,7 +37,7 @@ static const VIDEO_SIZE VideoRes[] = {
  *
  ************************************************************************
  */
-int ParseSizeFromString (VideoDataFile *input_file, int *x_size, int *y_size, double *fps) 
+int ParseSizeFromString(VideoDataFile *input_file, int *x_size, int *y_size, double *fps)
 {
   char *p1, *p2, *tail;
   char *fn = input_file->fname;
@@ -47,26 +46,26 @@ int ParseSizeFromString (VideoDataFile *input_file, int *x_size, int *y_size, do
 
   *x_size = *y_size = -1;
   p1 = p2 = fn;
-  while (p1 != NULL && p2 != NULL) 
+  while (p1 != NULL && p2 != NULL)
   {
     // Search for first '_'
-    p1 = strstr( p1, "_");
+    p1 = strstr(p1, "_");
     if (p1 == NULL)
       break;
 
     // Search for end character of x_size (first 'x' after last '_')
-    p2 = strstr( p1, "x");
+    p2 = strstr(p1, "x");
 
     // If no 'x' is found, exit
-    if (p2 == NULL)    
+    if (p2 == NULL)
       break;
 
     // Try conversion of number
     *p2 = 0;
-    *x_size = strtol( p1 + 1, &tail, 10);
+    *x_size = strtol(p1 + 1, &tail, 10);
 
     // If there are characters left in the string, or the string is null, discard conversion
-    if (*tail != '\0' || *(p1 + 1) == '\0') 
+    if (*tail != '\0' || *(p1 + 1) == '\0')
     {
       *p2 = 'x';
       p1 = tail;
@@ -77,9 +76,9 @@ int ParseSizeFromString (VideoDataFile *input_file, int *x_size, int *y_size, do
     *p2 = 'x';
 
     // Search for end character of y_size (first '_' or '.' after last 'x')
-    p1 = strpbrk( p2 + 1, "_.");
+    p1 = strpbrk(p2 + 1, "_.");
     // If no '_' or '.' is found, try again from current position
-    if (p1 == NULL) 
+    if (p1 == NULL)
     {
       p1 = p2 + 1;
       continue;
@@ -88,10 +87,10 @@ int ParseSizeFromString (VideoDataFile *input_file, int *x_size, int *y_size, do
     // Try conversion of number
     c = *p1;
     *p1 = 0;
-    *y_size = strtol( p2 + 1, &tail, 10);
+    *y_size = strtol(p2 + 1, &tail, 10);
 
     // If there are characters left in the string, or the string is null, discard conversion
-    if (*tail != '\0' || *(p2 + 1) == '\0') 
+    if (*tail != '\0' || *(p2 + 1) == '\0')
     {
       *p1 = c;
       p1 = tail;
@@ -102,19 +101,19 @@ int ParseSizeFromString (VideoDataFile *input_file, int *x_size, int *y_size, do
     *p1 = c;
 
     // Search for end character of y_size (first 'i' or 'p' after last '_')
-    p2 = strstr( p1 + 1, "ip");
+    p2 = strstr(p1 + 1, "ip");
 
     // If no 'i' or 'p' is found, exit
-    if (p2 == NULL)      
+    if (p2 == NULL)
       break;
 
     // Try conversion of number
     c = *p2;
     *p2 = 0;
-    *fps = strtod( p1 + 1, &tail);
+    *fps = strtod(p1 + 1, &tail);
 
     // If there are characters left in the string, or the string is null, discard conversion
-    if (*tail != '\0' || *(p1 + 1) == '\0') 
+    if (*tail != '\0' || *(p1 + 1) == '\0')
     {
       *p2 = c;
       p1 = tail;
@@ -128,20 +127,20 @@ int ParseSizeFromString (VideoDataFile *input_file, int *x_size, int *y_size, do
 
   // Now lets test some common video file formats
   if (p1 == NULL || p2 == NULL)
-  {       
-    for (i = 0; VideoRes[i].name != NULL; i++) 
+  {
+    for (i = 0; VideoRes[i].name != NULL; i++)
     {
-      if (strcasecmp (fn, VideoRes[i].name)) 
+      if (strcasecmp(fn, VideoRes[i].name))
       {
         *x_size = VideoRes[i].x_size;
-        *y_size = VideoRes[i].y_size;       
+        *y_size = VideoRes[i].y_size;
         // Should add frame rate support as well
         break;
       }
     }
   }
 
-  return (*x_size == -1 || *y_size == -1) ? 0 : 1; 
+  return (*x_size == -1 || *y_size == -1) ? 0 : 1;
 }
 
 /*!
@@ -151,44 +150,44 @@ int ParseSizeFromString (VideoDataFile *input_file, int *x_size, int *y_size, do
  *
  ************************************************************************
  */
-void ParseFrameNoFormatFromString (VideoDataFile *input_file)
+void ParseFrameNoFormatFromString(VideoDataFile *input_file)
 {
-  char *p1, *p2, *tail;  
-  char *fn         = input_file->fname;
-  char *fhead      = input_file->fhead;
-  char *ftail      = input_file->ftail;
-  int  *zero_pad   = &input_file->zero_pad;
-  int  *num_digits = &input_file->num_digits;
+  char *p1, *p2, *tail;
+  char *fn = input_file->fname;
+  char *fhead = input_file->fhead;
+  char *ftail = input_file->ftail;
+  int *zero_pad = &input_file->zero_pad;
+  int *num_digits = &input_file->num_digits;
 
   *zero_pad = 0;
   *num_digits = -1;
   p1 = p2 = fn;
-  while (p1 != NULL && p2 != NULL) 
+  while (p1 != NULL && p2 != NULL)
   {
     // Search for first '_'
-    p1 = strstr( p1, "%");
+    p1 = strstr(p1, "%");
     if (p1 == NULL)
       break;
 
     strncpy(fhead, fn, p1 - fn);
 
     // Search for end character of x_size (first 'x' after last '_')
-    p2 = strstr( p1, "d");
+    p2 = strstr(p1, "d");
 
     // If no 'x' is found, exit
-    if (p2 == NULL)    
+    if (p2 == NULL)
       break;
-    
+
     // Try conversion of number
     *p2 = 0;
 
     if (*(p1 + 1) == '0')
       *zero_pad = 1;
 
-    *num_digits = strtol( p1 + 1, &tail, 10);
+    *num_digits = strtol(p1 + 1, &tail, 10);
 
     // If there are characters left in the string, or the string is null, discard conversion
-    if (*tail != '\0' || *(p1 + 1) == '\0') 
+    if (*tail != '\0' || *(p1 + 1) == '\0')
     {
       *p2 = 'd';
       p1 = tail;
@@ -199,7 +198,7 @@ void ParseFrameNoFormatFromString (VideoDataFile *input_file)
     *p2 = 'd';
 
     tail++;
-    strncpy(ftail, tail, (int) strlen(tail));
+    strncpy(ftail, tail, (int)strlen(tail));
     break;
   }
 
@@ -217,25 +216,25 @@ void ParseFrameNoFormatFromString (VideoDataFile *input_file)
  *    Open file containing a single frame
  ************************************************************************
  */
-void OpenFrameFile( VideoDataFile *input_file, int FrameNumberInFile)
+void OpenFrameFile(VideoDataFile *input_file, int FrameNumberInFile)
 {
-  char infile [FILE_NAME_SIZE], in_number[16];
-  infile[FILE_NAME_SIZE-1]='\0';
-  strncpy(infile, input_file->fhead, FILE_NAME_SIZE-1);
+  char infile[FILE_NAME_SIZE], in_number[16];
+  infile[FILE_NAME_SIZE - 1] = '\0';
+  strncpy(infile, input_file->fhead, FILE_NAME_SIZE - 1);
 
-  if (input_file->zero_pad)       
+  if (input_file->zero_pad)
     snprintf(in_number, 16, "%0*d", input_file->num_digits, FrameNumberInFile);
   else
     snprintf(in_number, 16, "%*d", input_file->num_digits, FrameNumberInFile);
 
-  strncat(infile, in_number, FILE_NAME_SIZE-strlen(in_number)-1);
-  strncat(infile, input_file->ftail, FILE_NAME_SIZE-strlen(input_file->ftail)-1);
+  strncat(infile, in_number, FILE_NAME_SIZE - strlen(in_number) - 1);
+  strncat(infile, input_file->ftail, FILE_NAME_SIZE - strlen(input_file->ftail) - 1);
 
   if ((input_file->f_num = open(infile, OPENFLAGS_READ)) == -1)
   {
-    printf ("OpenFrameFile: cannot open file %s\n", infile);
+    printf("OpenFrameFile: cannot open file %s\n", infile);
     report_stats_on_error();
-  }    
+  }
 }
 
 /*!
@@ -244,20 +243,20 @@ void OpenFrameFile( VideoDataFile *input_file, int FrameNumberInFile)
  *    Open file(s) containing the entire frame sequence
  ************************************************************************
  */
-void OpenFiles( VideoDataFile *input_file)
+void OpenFiles(VideoDataFile *input_file)
 {
   if (input_file->is_concatenated == 1)
   {
-    if ((int) strlen(input_file->fname) == 0)
+    if ((int)strlen(input_file->fname) == 0)
     {
       snprintf(errortext, ET_SIZE, "No input sequence name was provided. Please check settings.");
-      error (errortext, 500);
+      error(errortext, 500);
     }
 
     if ((input_file->f_num = open(input_file->fname, OPENFLAGS_READ)) == -1)
     {
-      snprintf(errortext, ET_SIZE, "Input file %s does not exist",input_file->fname);
-      error (errortext, 500);
+      snprintf(errortext, ET_SIZE, "Input file %s does not exist", input_file->fname);
+      error(errortext, 500);
     }
   }
 }
@@ -280,38 +279,38 @@ void CloseFiles(VideoDataFile *input_file)
  * ParseVideoType
  *
  * ==========================================================================
-*/
-VideoFileType ParseVideoType (VideoDataFile *input_file)
+ */
+VideoFileType ParseVideoType(VideoDataFile *input_file)
 {
   char *format;
 
-  format = input_file->fname + (int) strlen(input_file->fname) - 3;
+  format = input_file->fname + (int)strlen(input_file->fname) - 3;
 
-  if (strcasecmp (format, "yuv") == 0)
+  if (strcasecmp(format, "yuv") == 0)
   {
     input_file->vdtype = VIDEO_YUV;
     input_file->format.yuv_format = YUV420;
     input_file->avi = NULL;
   }
-  else if (strcasecmp (format, "rgb") == 0)
+  else if (strcasecmp(format, "rgb") == 0)
   {
     input_file->vdtype = VIDEO_RGB;
     input_file->format.yuv_format = YUV444;
     input_file->avi = NULL;
   }
-  else if (strcasecmp (format, "tif") == 0)
+  else if (strcasecmp(format, "tif") == 0)
   {
     input_file->vdtype = VIDEO_TIFF;
     input_file->avi = NULL;
   }
-  else if (strcasecmp (format, "avi") == 0) 
+  else if (strcasecmp(format, "avi") == 0)
   {
     input_file->vdtype = VIDEO_AVI;
   }
   else
   {
-    //snprintf(errortext, ET_SIZE, "ERROR: video file format not supported");
-    //error (errortext, 500);
+    // snprintf(errortext, ET_SIZE, "ERROR: video file format not supported");
+    // error (errortext, 500);
     input_file->vdtype = VIDEO_YUV;
     input_file->format.yuv_format = YUV420;
     input_file->avi = NULL;

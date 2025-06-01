@@ -35,11 +35,11 @@ void EstimateWPPSlicePeriodic(Slice *currSlice, int select_offset)
 
   int n;
   short default_weight[3];
-  int list_offset   = ((currSlice->mb_aff_frame_flag) && (p_Vid->mb_data[p_Vid->current_mb_nr].mb_field))? (p_Vid->current_mb_nr & 0x01) ? 4 : 2 : 0;
+  int list_offset = ((currSlice->mb_aff_frame_flag) && (p_Vid->mb_data[p_Vid->current_mb_nr].mb_field)) ? (p_Vid->current_mb_nr & 0x01) ? 4 : 2 : 0;
   int clist;
-  int start_mb, end_mb; 
+  int start_mb, end_mb;
   int comp;
-  int bitdepth[3] = { (p_Vid->bitdepth_luma - 8), (p_Vid->bitdepth_chroma - 8), (p_Vid->bitdepth_chroma - 8)};
+  int bitdepth[3] = {(p_Vid->bitdepth_luma - 8), (p_Vid->bitdepth_chroma - 8), (p_Vid->bitdepth_chroma - 8)};
 
   short weight[2][MAX_REFERENCE_PICTURES][3];
   short offset[2][MAX_REFERENCE_PICTURES][3];
@@ -47,28 +47,26 @@ void EstimateWPPSlicePeriodic(Slice *currSlice, int select_offset)
   int cur_slice;
   int cur_weight, cur_offset;
 
-  currSlice->luma_log_weight_denom   = 5;
+  currSlice->luma_log_weight_denom = 5;
   currSlice->chroma_log_weight_denom = 5;
 
-  currSlice->wp_luma_round           = 1 << (currSlice->luma_log_weight_denom - 1);
-  currSlice->wp_chroma_round         = 1 << (currSlice->chroma_log_weight_denom - 1);
-  default_weight[0]       = 1 << currSlice->luma_log_weight_denom;
-  default_weight[1]       = default_weight[2] = 1 << currSlice->chroma_log_weight_denom;
+  currSlice->wp_luma_round = 1 << (currSlice->luma_log_weight_denom - 1);
+  currSlice->wp_chroma_round = 1 << (currSlice->chroma_log_weight_denom - 1);
+  default_weight[0] = 1 << currSlice->luma_log_weight_denom;
+  default_weight[1] = default_weight[2] = 1 << currSlice->chroma_log_weight_denom;
 
-
-  if(p_Inp->slice_mode == 1)
+  if (p_Inp->slice_mode == 1)
   {
-    cur_slice = p_Vid->current_mb_nr / p_Inp->slice_argument; 
+    cur_slice = p_Vid->current_mb_nr / p_Inp->slice_argument;
   }
   else
     cur_slice = 0;
 
- 
-  if(p_Inp->slice_mode == 1)
+  if (p_Inp->slice_mode == 1)
   {
     start_mb = cur_slice * p_Inp->slice_argument;
     end_mb = start_mb + p_Inp->slice_argument;
-    if(end_mb > (int)p_Vid->FrameSizeInMbs)
+    if (end_mb > (int)p_Vid->FrameSizeInMbs)
       end_mb = p_Vid->FrameSizeInMbs;
   }
   else
@@ -80,12 +78,12 @@ void EstimateWPPSlicePeriodic(Slice *currSlice, int select_offset)
   for (clist = 0; clist < 2 + list_offset; clist++)
   {
     for (n = 0; n < currSlice->listXsize[clist]; n++)
-    {          
-      for (comp=0; comp < 3; comp ++)
+    {
+      for (comp = 0; comp < 3; comp++)
       {
-        cur_weight = (int) ((127.0 * cos (p_Vid->number *PI / 30)) + (4.0 * (((float) rand()) / RAND_MAX)) - 4.0);
+        cur_weight = (int)((127.0 * cos(p_Vid->number * PI / 30)) + (4.0 * (((float)rand()) / RAND_MAX)) - 4.0);
         weight[clist][n][comp] = sClip3(-128, 127, cur_weight);
-        cur_offset = (int) ((127.0 * cos ((p_Vid->number + 15) * PI / 45)) + (4.0 * (((float) rand()) / RAND_MAX)) - 4.0);
+        cur_offset = (int)((127.0 * cos((p_Vid->number + 15) * PI / 45)) + (4.0 * (((float)rand()) / RAND_MAX)) - 4.0);
         offset[clist][n][comp] = (sClip3(-128, 127, cur_offset) << bitdepth[comp]);
       }
     }
@@ -95,18 +93,18 @@ void EstimateWPPSlicePeriodic(Slice *currSlice, int select_offset)
   {
     for (n = 0; n < currSlice->listXsize[clist]; n++)
     {
-      for (comp=0; comp < 3; comp ++)
+      for (comp = 0; comp < 3; comp++)
       {
         currSlice->wp_weight[clist][n][comp] = weight[clist][n][comp];
         currSlice->wp_offset[clist][n][comp] = offset[clist][n][comp];
-        if(p_Vid->wp_weights)
+        if (p_Vid->wp_weights)
           p_Vid->wp_weights[comp][clist][n][cur_slice] = weight[clist][n][comp];
-        if(p_Vid->wp_offsets)
+        if (p_Vid->wp_offsets)
           p_Vid->wp_offsets[comp][clist][n][cur_slice] = offset[clist][n][comp];
       }
-#if DEBUG_WP 
-      for(comp = 0; comp < 3; comp++)
-        printf("slice %d: index %d component %d weight %d offset %d\n", cur_slice, n,comp,currSlice->wp_weight[clist][n][comp],currSlice->wp_offset[clist][n][comp]);
+#if DEBUG_WP
+      for (comp = 0; comp < 3; comp++)
+        printf("slice %d: index %d component %d weight %d offset %d\n", cur_slice, n, comp, currSlice->wp_weight[clist][n][comp], currSlice->wp_offset[clist][n][comp]);
 #endif
     }
   }
@@ -128,33 +126,32 @@ void EstimateWPBSlicePeriodic(Slice *currSlice)
   int k;
 
   short default_weight[3];
-  int list_offset   = ((currSlice->mb_aff_frame_flag) && (p_Vid->mb_data[p_Vid->current_mb_nr].mb_field))? (p_Vid->current_mb_nr & 0x01) ? 4 : 2 : 0;
+  int list_offset = ((currSlice->mb_aff_frame_flag) && (p_Vid->mb_data[p_Vid->current_mb_nr].mb_field)) ? (p_Vid->current_mb_nr & 0x01) ? 4 : 2 : 0;
   int clist;
   int cur_slice = 0;
   int cur_weight, cur_offset;
-  int bitdepth[3] = { (p_Vid->bitdepth_luma - 8), (p_Vid->bitdepth_chroma - 8), (p_Vid->bitdepth_chroma - 8)};
+  int bitdepth[3] = {(p_Vid->bitdepth_luma - 8), (p_Vid->bitdepth_chroma - 8), (p_Vid->bitdepth_chroma - 8)};
 
   if (p_Vid->active_pps->weighted_bipred_idc == 2) //! implicit mode. Values are fixed and it is important to show it here
   {
     currSlice->luma_log_weight_denom = 5;
     currSlice->chroma_log_weight_denom = 5;
   }
-  else                                     //! explicit mode. Values can be changed for higher precision.
+  else //! explicit mode. Values can be changed for higher precision.
   {
     currSlice->luma_log_weight_denom = 5;
     currSlice->chroma_log_weight_denom = 5;
   }
 
-  currSlice->wp_luma_round   = 1 << (currSlice->luma_log_weight_denom - 1);
+  currSlice->wp_luma_round = 1 << (currSlice->luma_log_weight_denom - 1);
   currSlice->wp_chroma_round = 1 << (currSlice->chroma_log_weight_denom - 1);
   default_weight[0] = 1 << currSlice->luma_log_weight_denom;
   default_weight[1] = 1 << currSlice->chroma_log_weight_denom;
   default_weight[2] = 1 << currSlice->chroma_log_weight_denom;
 
-
-  if(p_Inp->slice_mode == 1)
+  if (p_Inp->slice_mode == 1)
   {
-    cur_slice = p_Vid->current_mb_nr / p_Inp->slice_argument ; 
+    cur_slice = p_Vid->current_mb_nr / p_Inp->slice_argument;
   }
   else
     cur_slice = 0;
@@ -179,7 +176,7 @@ void EstimateWPBSlicePeriodic(Slice *currSlice)
       }
     }
 
-    for (clist=0; clist<2 + list_offset; clist++)
+    for (clist = 0; clist < 2 + list_offset; clist++)
     {
       for (i = 0; i < currSlice->listXsize[clist]; i++)
       {
@@ -191,7 +188,7 @@ void EstimateWPBSlicePeriodic(Slice *currSlice)
       }
     }
   }
-  else  // explicit mode
+  else // explicit mode
   {
     int start_mb, end_mb;
 
@@ -200,11 +197,11 @@ void EstimateWPBSlicePeriodic(Slice *currSlice)
     short wp_weight[6][MAX_REFERENCE_PICTURES][3];
     short wp_offset[6][MAX_REFERENCE_PICTURES][3];
 
-    if(p_Inp->slice_mode == 1)
+    if (p_Inp->slice_mode == 1)
     {
       start_mb = cur_slice * p_Inp->slice_argument;
       end_mb = start_mb + p_Inp->slice_argument;
-      if(end_mb > (int)p_Vid->FrameSizeInMbs)
+      if (end_mb > (int)p_Vid->FrameSizeInMbs)
         end_mb = p_Vid->FrameSizeInMbs;
     }
     else
@@ -216,15 +213,15 @@ void EstimateWPBSlicePeriodic(Slice *currSlice)
     for (clist = 0; clist < 2 + list_offset; clist++)
     {
       for (n = 0; n < currSlice->listXsize[clist]; n++)
-      {          
-        for (comp = 0; comp < 3; comp ++)
+      {
+        for (comp = 0; comp < 3; comp++)
         {
-          cur_weight = (int) ((127.0 * cos (p_Vid->number *PI / 30)) + (4.0 * (((float) rand()) / RAND_MAX)) - 4.0);
+          cur_weight = (int)((127.0 * cos(p_Vid->number * PI / 30)) + (4.0 * (((float)rand()) / RAND_MAX)) - 4.0);
           wp_weight[clist][n][comp] = sClip3(-128, 127, cur_weight);
-          cur_offset = (int) ((127.0 * cos ((p_Vid->number + 45) * PI / 45)) + (4.0 * (((float) rand()) / RAND_MAX)) - 4.0);
+          cur_offset = (int)((127.0 * cos((p_Vid->number + 45) * PI / 45)) + (4.0 * (((float)rand()) / RAND_MAX)) - 4.0);
           wp_offset[clist][n][comp] = (sClip3(-128, 127, cur_offset) << bitdepth[comp]);
           /*
-          printf("(%d %d %d) weights %d %d %d %d %d %d\n", 
+          printf("(%d %d %d) weights %d %d %d %d %d %d\n",
             clist, n, comp,
             cur_offset, wp_offset[clist][n][comp], bitdepth[comp],
             cur_weight, wp_weight[clist][n][comp], bitdepth[comp]);
@@ -233,20 +230,20 @@ void EstimateWPBSlicePeriodic(Slice *currSlice)
       }
     }
 
-    for (clist=0; clist<2 + list_offset; clist++)
+    for (clist = 0; clist < 2 + list_offset; clist++)
     {
       for (n = 0; n < currSlice->listXsize[clist]; n++)
       {
-        for (comp=0; comp < 3; comp ++)
+        for (comp = 0; comp < 3; comp++)
         {
           currSlice->wp_weight[clist][n][comp] = wp_weight[clist][n][comp];
           currSlice->wp_offset[clist][n][comp] = wp_offset[clist][n][comp];
-          if(p_Vid->wp_weights)
+          if (p_Vid->wp_weights)
             p_Vid->wp_weights[comp][clist][n][cur_slice] = wp_weight[clist][n][comp];
-          if(p_Vid->wp_offsets)
+          if (p_Vid->wp_offsets)
             p_Vid->wp_offsets[comp][clist][n][cur_slice] = wp_offset[clist][n][comp];
           /*
-          printf("(%d %d %d) single weights %d %d\n", 
+          printf("(%d %d %d) single weights %d %d\n",
             clist, n, comp,
             currSlice->wp_weight[clist][n][comp],
             currSlice->wp_offset[clist][n][comp]);
@@ -264,7 +261,7 @@ void EstimateWPBSlicePeriodic(Slice *currSlice)
           currSlice->wbp_weight[0][i][j][comp] = currSlice->wp_weight[0][i][comp];
           currSlice->wbp_weight[1][i][j][comp] = currSlice->wp_weight[1][j][comp];
           /*
-          printf("(%d %d %d) bi weights %d %d\n", 
+          printf("(%d %d %d) bi weights %d %d\n",
             i, j, comp,
             currSlice->wbp_weight[0][i][j][comp],
             currSlice->wbp_weight[1][i][j][comp]);
@@ -272,9 +269,8 @@ void EstimateWPBSlicePeriodic(Slice *currSlice)
         }
       }
     }
-  }    
+  }
 }
-
 
 /*!
 ************************************************************************
@@ -283,13 +279,12 @@ void EstimateWPBSlicePeriodic(Slice *currSlice)
 ************************************************************************
 */
 int TestWPPSlicePeriodic(Slice *currSlice, int select_offset)
-{  
+{
   VideoParameters *p_Vid = currSlice->p_Vid;
-  p_Vid->wp_parameters_set = 1; 
+  p_Vid->wp_parameters_set = 1;
 
   return 1;
 }
-
 
 /*!
 ************************************************************************
@@ -301,9 +296,7 @@ int TestWPPSlicePeriodic(Slice *currSlice, int select_offset)
 int TestWPBSlicePeriodic(Slice *currSlice, int select_method)
 {
   VideoParameters *p_Vid = currSlice->p_Vid;
-  p_Vid->wp_parameters_set = 1; 
+  p_Vid->wp_parameters_set = 1;
 
   return 1;
 }
-
-

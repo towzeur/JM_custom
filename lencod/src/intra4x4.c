@@ -32,9 +32,9 @@ void generate_pred_error_4x4(imgpel **cur_img, imgpel **prd_img, imgpel **cur_pr
 
     for (i = 0; i < BLOCK_SIZE; i++)
     {
-      *m7_line++ = (int) (*cur_line++ - *prd_line++);
+      *m7_line++ = (int)(*cur_line++ - *prd_line++);
     }
-  }        
+  }
 }
 
 // Notation for comments regarding prediction and predictors.
@@ -87,12 +87,12 @@ static inline void get_i4x4_horizontal(imgpel **cur_pred, imgpel *PredPel)
 {
   int i;
 
-  for (i=0; i < BLOCK_SIZE; i++)
+  for (i = 0; i < BLOCK_SIZE; i++)
   {
-    cur_pred[i][0]  =
-    cur_pred[i][1]  =
-    cur_pred[i][2]  =
-    cur_pred[i][3]  = (imgpel) (&P_I)[i];
+    cur_pred[i][0] =
+        cur_pred[i][1] =
+            cur_pred[i][2] =
+                cur_pred[i][3] = (imgpel)(&P_I)[i];
   }
 }
 
@@ -113,23 +113,24 @@ static inline void get_i4x4_dc(imgpel **cur_pred, imgpel *PredPel, int left_avai
   else if (!up_available && left_available)
   {
     // upper edge
-    s0 = (P_I + P_J + P_K + P_L + 2) >> BLOCK_SHIFT;;
+    s0 = (P_I + P_J + P_K + P_L + 2) >> BLOCK_SHIFT;
+    ;
   }
   else if (up_available && !left_available)
   {
     // left edge
     s0 = (P_A + P_B + P_C + P_D + 2) >> BLOCK_SHIFT;
   }
-  else //if (!up_available && !left_available)
+  else // if (!up_available && !left_available)
   {
     // top left corner, nothing to predict from
     s0 = P_A; // P_A already set to p_Vid->dc_pred_value;
   }
 
-  for (j=0; j < BLOCK_SIZE; j++)
+  for (j = 0; j < BLOCK_SIZE; j++)
   {
-    for (i=0; i < BLOCK_SIZE; i++)
-      cur_pred[j][i] = (imgpel) s0;
+    for (i = 0; i < BLOCK_SIZE; i++)
+      cur_pred[j][i] = (imgpel)s0;
   }
 }
 
@@ -141,22 +142,22 @@ static inline void get_i4x4_dc(imgpel **cur_pred, imgpel *PredPel, int left_avai
  */
 static inline void get_i4x4_downleft(imgpel **cur_pred, imgpel *PredPel)
 {
-  cur_pred[0][0] = (imgpel) ((P_A + P_C + ((P_B) << 1) + 2) >> 2);
+  cur_pred[0][0] = (imgpel)((P_A + P_C + ((P_B) << 1) + 2) >> 2);
   cur_pred[0][1] =
-  cur_pred[1][0] = (imgpel) ((P_B + P_D + ((P_C) << 1) + 2) >> 2);
+      cur_pred[1][0] = (imgpel)((P_B + P_D + ((P_C) << 1) + 2) >> 2);
   cur_pred[0][2] =
-  cur_pred[1][1] =
-  cur_pred[2][0] = (imgpel) ((P_C + P_E + ((P_D) << 1) + 2) >> 2);
+      cur_pred[1][1] =
+          cur_pred[2][0] = (imgpel)((P_C + P_E + ((P_D) << 1) + 2) >> 2);
   cur_pred[0][3] =
-  cur_pred[1][2] =
-  cur_pred[2][1] =
-  cur_pred[3][0] = (imgpel) ((P_D + P_F + ((P_E) << 1) + 2) >> 2);
+      cur_pred[1][2] =
+          cur_pred[2][1] =
+              cur_pred[3][0] = (imgpel)((P_D + P_F + ((P_E) << 1) + 2) >> 2);
   cur_pred[1][3] =
-  cur_pred[2][2] =
-  cur_pred[3][1] = (imgpel) ((P_E + P_G + ((P_F)<<1) + 2) >> 2);
+      cur_pred[2][2] =
+          cur_pred[3][1] = (imgpel)((P_E + P_G + ((P_F) << 1) + 2) >> 2);
   cur_pred[2][3] =
-  cur_pred[3][2] = (imgpel) ((P_F + P_H + ((P_G)<<1) + 2) >> 2);
-  cur_pred[3][3] = (imgpel) ((P_G + 3*(P_H) + 2) >> 2);
+      cur_pred[3][2] = (imgpel)((P_F + P_H + ((P_G) << 1) + 2) >> 2);
+  cur_pred[3][3] = (imgpel)((P_G + 3 * (P_H) + 2) >> 2);
 }
 
 /*!
@@ -167,24 +168,23 @@ static inline void get_i4x4_downleft(imgpel **cur_pred, imgpel *PredPel)
  */
 static inline void get_i4x4_downright(imgpel **cur_pred, imgpel *PredPel)
 {
-  cur_pred[3][0] = (imgpel) ((P_L + 2*P_K + P_J + 2) >> 2);
+  cur_pred[3][0] = (imgpel)((P_L + 2 * P_K + P_J + 2) >> 2);
   cur_pred[2][0] =
-  cur_pred[3][1] = (imgpel) ((P_K + 2*P_J + P_I + 2) >> 2);
+      cur_pred[3][1] = (imgpel)((P_K + 2 * P_J + P_I + 2) >> 2);
   cur_pred[1][0] =
-  cur_pred[2][1] =
-  cur_pred[3][2] = (imgpel) ((P_J + 2*P_I + P_X + 2) >> 2);
+      cur_pred[2][1] =
+          cur_pred[3][2] = (imgpel)((P_J + 2 * P_I + P_X + 2) >> 2);
   cur_pred[0][0] =
-  cur_pred[1][1] =
-  cur_pred[2][2] =
-  cur_pred[3][3] = (imgpel) ((P_I + 2*P_X + P_A + 2) >> 2);
+      cur_pred[1][1] =
+          cur_pred[2][2] =
+              cur_pred[3][3] = (imgpel)((P_I + 2 * P_X + P_A + 2) >> 2);
   cur_pred[0][1] =
-  cur_pred[1][2] =
-  cur_pred[2][3] = (imgpel) ((P_X + 2*P_A + P_B + 2) >> 2);
+      cur_pred[1][2] =
+          cur_pred[2][3] = (imgpel)((P_X + 2 * P_A + P_B + 2) >> 2);
   cur_pred[0][2] =
-  cur_pred[1][3] = (imgpel) ((P_A + 2*P_B + P_C + 2) >> 2);
-  cur_pred[0][3] = (imgpel) ((P_B + 2*P_C + P_D + 2) >> 2);
+      cur_pred[1][3] = (imgpel)((P_A + 2 * P_B + P_C + 2) >> 2);
+  cur_pred[0][3] = (imgpel)((P_B + 2 * P_C + P_D + 2) >> 2);
 }
-
 
 /*!
  ************************************************************************
@@ -194,22 +194,22 @@ static inline void get_i4x4_downright(imgpel **cur_pred, imgpel *PredPel)
  */
 static inline void get_i4x4_vertleft(imgpel **cur_pred, imgpel *PredPel)
 {
-  cur_pred[0][0] = (imgpel) ((P_A + P_B + 1) >> 1);
+  cur_pred[0][0] = (imgpel)((P_A + P_B + 1) >> 1);
   cur_pred[0][1] =
-  cur_pred[2][0] = (imgpel) ((P_B + P_C + 1) >> 1);
+      cur_pred[2][0] = (imgpel)((P_B + P_C + 1) >> 1);
   cur_pred[0][2] =
-  cur_pred[2][1] = (imgpel) ((P_C + P_D + 1) >> 1);
+      cur_pred[2][1] = (imgpel)((P_C + P_D + 1) >> 1);
   cur_pred[0][3] =
-  cur_pred[2][2] = (imgpel) ((P_D + P_E + 1) >> 1);
-  cur_pred[2][3] = (imgpel) ((P_E + P_F + 1) >> 1);
-  cur_pred[1][0] = (imgpel) ((P_A + ((P_B)<<1) + P_C + 2) >> 2);
+      cur_pred[2][2] = (imgpel)((P_D + P_E + 1) >> 1);
+  cur_pred[2][3] = (imgpel)((P_E + P_F + 1) >> 1);
+  cur_pred[1][0] = (imgpel)((P_A + ((P_B) << 1) + P_C + 2) >> 2);
   cur_pred[1][1] =
-  cur_pred[3][0] = (imgpel) ((P_B + ((P_C)<<1) + P_D + 2) >> 2);
+      cur_pred[3][0] = (imgpel)((P_B + ((P_C) << 1) + P_D + 2) >> 2);
   cur_pred[1][2] =
-  cur_pred[3][1] = (imgpel) ((P_C + ((P_D)<<1) + P_E + 2) >> 2);
+      cur_pred[3][1] = (imgpel)((P_C + ((P_D) << 1) + P_E + 2) >> 2);
   cur_pred[1][3] =
-  cur_pred[3][2] = (imgpel) ((P_D + ((P_E)<<1) + P_F + 2) >> 2);
-  cur_pred[3][3] = (imgpel) ((P_E + ((P_F)<<1) + P_G + 2) >> 2);
+      cur_pred[3][2] = (imgpel)((P_D + ((P_E) << 1) + P_F + 2) >> 2);
+  cur_pred[3][3] = (imgpel)((P_E + ((P_F) << 1) + P_G + 2) >> 2);
 }
 
 /*!
@@ -221,21 +221,21 @@ static inline void get_i4x4_vertleft(imgpel **cur_pred, imgpel *PredPel)
 static inline void get_i4x4_vertright(imgpel **cur_pred, imgpel *PredPel)
 {
   cur_pred[0][0] =
-  cur_pred[2][1] = (imgpel) ((P_X + P_A + 1) >> 1);
+      cur_pred[2][1] = (imgpel)((P_X + P_A + 1) >> 1);
   cur_pred[0][1] =
-  cur_pred[2][2] = (imgpel) ((P_A + P_B + 1) >> 1);
+      cur_pred[2][2] = (imgpel)((P_A + P_B + 1) >> 1);
   cur_pred[0][2] =
-  cur_pred[2][3] = (imgpel) ((P_B + P_C + 1) >> 1);
-  cur_pred[0][3] = (imgpel) ((P_C + P_D + 1) >> 1);  
+      cur_pred[2][3] = (imgpel)((P_B + P_C + 1) >> 1);
+  cur_pred[0][3] = (imgpel)((P_C + P_D + 1) >> 1);
   cur_pred[1][0] =
-  cur_pred[3][1] = (imgpel) ((P_I + 2*P_X + P_A + 2) >> 2);
+      cur_pred[3][1] = (imgpel)((P_I + 2 * P_X + P_A + 2) >> 2);
   cur_pred[1][1] =
-  cur_pred[3][2] = (imgpel) ((P_X + 2*P_A + P_B + 2) >> 2);
+      cur_pred[3][2] = (imgpel)((P_X + 2 * P_A + P_B + 2) >> 2);
   cur_pred[1][2] =
-  cur_pred[3][3] = (imgpel) ((P_A + 2*P_B + P_C + 2) >> 2);
-  cur_pred[1][3] = (imgpel) ((P_B + 2*P_C + P_D + 2) >> 2);
-  cur_pred[2][0] = (imgpel) ((P_X + 2*P_I + P_J + 2) >> 2);
-  cur_pred[3][0] = (imgpel) ((P_I + 2*P_J + P_K + 2) >> 2);
+      cur_pred[3][3] = (imgpel)((P_A + 2 * P_B + P_C + 2) >> 2);
+  cur_pred[1][3] = (imgpel)((P_B + 2 * P_C + P_D + 2) >> 2);
+  cur_pred[2][0] = (imgpel)((P_X + 2 * P_I + P_J + 2) >> 2);
+  cur_pred[3][0] = (imgpel)((P_I + 2 * P_J + P_K + 2) >> 2);
 }
 
 /*!
@@ -247,23 +247,22 @@ static inline void get_i4x4_vertright(imgpel **cur_pred, imgpel *PredPel)
 static inline void get_i4x4_hordown(imgpel **cur_pred, imgpel *PredPel)
 {
   cur_pred[0][0] =
-  cur_pred[1][2] = (imgpel) ((P_X + P_I + 1) >> 1);
+      cur_pred[1][2] = (imgpel)((P_X + P_I + 1) >> 1);
   cur_pred[0][1] =
-  cur_pred[1][3] = (imgpel) ((P_I + 2*P_X + P_A + 2) >> 2);
-  cur_pred[0][2] = (imgpel) ((P_X + 2*P_A + P_B + 2) >> 2);
-  cur_pred[0][3] = (imgpel) ((P_A + 2*P_B + P_C + 2) >> 2);
+      cur_pred[1][3] = (imgpel)((P_I + 2 * P_X + P_A + 2) >> 2);
+  cur_pred[0][2] = (imgpel)((P_X + 2 * P_A + P_B + 2) >> 2);
+  cur_pred[0][3] = (imgpel)((P_A + 2 * P_B + P_C + 2) >> 2);
   cur_pred[1][0] =
-  cur_pred[2][2] = (imgpel) ((P_I + P_J + 1) >> 1);
+      cur_pred[2][2] = (imgpel)((P_I + P_J + 1) >> 1);
   cur_pred[1][1] =
-  cur_pred[2][3] = (imgpel) ((P_X + 2*P_I + P_J + 2) >> 2);
+      cur_pred[2][3] = (imgpel)((P_X + 2 * P_I + P_J + 2) >> 2);
   cur_pred[2][0] =
-  cur_pred[3][2] = (imgpel) ((P_J + P_K + 1) >> 1);
+      cur_pred[3][2] = (imgpel)((P_J + P_K + 1) >> 1);
   cur_pred[2][1] =
-  cur_pred[3][3] = (imgpel) ((P_I + 2*P_J + P_K + 2) >> 2);
-  cur_pred[3][0] = (imgpel) ((P_K + P_L + 1) >> 1);
-  cur_pred[3][1] = (imgpel) ((P_J + 2*P_K + P_L + 2) >> 2);
+      cur_pred[3][3] = (imgpel)((P_I + 2 * P_J + P_K + 2) >> 2);
+  cur_pred[3][0] = (imgpel)((P_K + P_L + 1) >> 1);
+  cur_pred[3][1] = (imgpel)((P_J + 2 * P_K + P_L + 2) >> 2);
 }
-
 
 /*!
  ************************************************************************
@@ -273,22 +272,22 @@ static inline void get_i4x4_hordown(imgpel **cur_pred, imgpel *PredPel)
  */
 static inline void get_i4x4_horup(imgpel **cur_pred, imgpel *PredPel)
 {
-  cur_pred[0][0] = (imgpel) ((P_I + P_J + 1) >> 1);
-  cur_pred[0][1] = (imgpel) ((P_I + 2*P_J + P_K + 2) >> 2);
+  cur_pred[0][0] = (imgpel)((P_I + P_J + 1) >> 1);
+  cur_pred[0][1] = (imgpel)((P_I + 2 * P_J + P_K + 2) >> 2);
   cur_pred[0][2] =
-  cur_pred[1][0] = (imgpel) ((P_J + P_K + 1) >> 1);
+      cur_pred[1][0] = (imgpel)((P_J + P_K + 1) >> 1);
   cur_pred[0][3] =
-  cur_pred[1][1] = (imgpel) ((P_J + 2*P_K + P_L + 2) >> 2);
+      cur_pred[1][1] = (imgpel)((P_J + 2 * P_K + P_L + 2) >> 2);
   cur_pred[1][2] =
-  cur_pred[2][0] = (imgpel) ((P_K + P_L + 1) >> 1);
+      cur_pred[2][0] = (imgpel)((P_K + P_L + 1) >> 1);
   cur_pred[1][3] =
-  cur_pred[2][1] = (imgpel) ((P_K + 2*P_L + P_L + 2) >> 2);
+      cur_pred[2][1] = (imgpel)((P_K + 2 * P_L + P_L + 2) >> 2);
   cur_pred[3][0] =
-  cur_pred[2][2] =
-  cur_pred[2][3] =
-  cur_pred[3][1] =
-  cur_pred[3][2] =
-  cur_pred[3][3] = (imgpel) P_L;
+      cur_pred[2][2] =
+          cur_pred[2][3] =
+              cur_pred[3][1] =
+                  cur_pred[3][2] =
+                      cur_pred[3][3] = (imgpel)P_L;
 }
 
 /*!
@@ -307,14 +306,14 @@ static inline void get_i4x4_horup(imgpel **cur_pred, imgpel *PredPel)
  *      none
  ************************************************************************
  */
-void set_intrapred_4x4_mbaff(Macroblock *currMB, ColorPlane pl, int img_x,int img_y, int *left_available, int *up_available, int *all_available)
+void set_intrapred_4x4_mbaff(Macroblock *currMB, ColorPlane pl, int img_x, int img_y, int *left_available, int *up_available, int *all_available)
 {
   VideoParameters *p_Vid = currMB->p_Vid;
   InputParameters *p_Inp = currMB->p_Inp;
 
   int i;
-  imgpel  *PredPel = currMB->intra4x4_pred[pl];  // array of predictor pels
-  imgpel   **img_enc = p_Vid->enc_picture->p_curr_img;
+  imgpel *PredPel = currMB->intra4x4_pred[pl]; // array of predictor pels
+  imgpel **img_enc = p_Vid->enc_picture->p_curr_img;
 
   int ioff = (img_x & 15);
   int joff = (img_y & 15);
@@ -330,34 +329,34 @@ void set_intrapred_4x4_mbaff(Macroblock *currMB, ColorPlane pl, int img_x,int im
 
   for (i = 0; i < 4; i++)
   {
-    p_Vid->getNeighbour(currMB, ioff -1 , joff + i , mb_size, &pix_a[i]);
+    p_Vid->getNeighbour(currMB, ioff - 1, joff + i, mb_size, &pix_a[i]);
   }
 
-  p_Vid->getNeighbour(currMB, ioff     , joff -1 , mb_size, &pix_b);
-  p_Vid->getNeighbour(currMB, ioff + 4 , joff -1 , mb_size, &pix_c);
-  p_Vid->getNeighbour(currMB, ioff - 1 , joff -1 , mb_size, &pix_d);
+  p_Vid->getNeighbour(currMB, ioff, joff - 1, mb_size, &pix_b);
+  p_Vid->getNeighbour(currMB, ioff + 4, joff - 1, mb_size, &pix_c);
+  p_Vid->getNeighbour(currMB, ioff - 1, joff - 1, mb_size, &pix_d);
 
-  pix_c.available = pix_c.available && !((ioff==4) && ((joff==4)||(joff==12)));
+  pix_c.available = pix_c.available && !((ioff == 4) && ((joff == 4) || (joff == 12)));
 
   if (p_Inp->UseConstrainedIntraPred)
   {
-    for (i=0, block_available_left=1; i<4;i++)
-      block_available_left  &= pix_a[i].available ? p_Vid->intra_block[pix_a[i].mb_addr]: 0;
-    block_available_up       = pix_b.available ? p_Vid->intra_block [pix_b.mb_addr] : 0;
-    block_available_up_right = pix_c.available ? p_Vid->intra_block [pix_c.mb_addr] : 0;
-    block_available_up_left  = pix_d.available ? p_Vid->intra_block [pix_d.mb_addr] : 0;
+    for (i = 0, block_available_left = 1; i < 4; i++)
+      block_available_left &= pix_a[i].available ? p_Vid->intra_block[pix_a[i].mb_addr] : 0;
+    block_available_up = pix_b.available ? p_Vid->intra_block[pix_b.mb_addr] : 0;
+    block_available_up_right = pix_c.available ? p_Vid->intra_block[pix_c.mb_addr] : 0;
+    block_available_up_left = pix_d.available ? p_Vid->intra_block[pix_d.mb_addr] : 0;
   }
   else
   {
-    block_available_left     = pix_a[0].available;
-    block_available_up       = pix_b.available;
+    block_available_left = pix_a[0].available;
+    block_available_up = pix_b.available;
     block_available_up_right = pix_c.available;
-    block_available_up_left  = pix_d.available;
+    block_available_up_left = pix_d.available;
   }
 
   *left_available = block_available_left;
-  *up_available   = block_available_up;
-  *all_available  = block_available_up && block_available_left && block_available_up_left;
+  *up_available = block_available_up;
+  *all_available = block_available_up && block_available_left && block_available_up_left;
 
   i = (img_x & 15);
 
@@ -368,7 +367,7 @@ void set_intrapred_4x4_mbaff(Macroblock *currMB, ColorPlane pl, int img_x,int im
   }
   else
   {
-    P_A = P_B = P_C = P_D = (imgpel) p_Vid->dc_pred_value;
+    P_A = P_B = P_C = P_D = (imgpel)p_Vid->dc_pred_value;
   }
 
   if (block_available_up_right)
@@ -418,13 +417,13 @@ void set_intrapred_4x4_mbaff(Macroblock *currMB, ColorPlane pl, int img_x,int im
  *      none
  ************************************************************************
  */
-void set_intrapred_4x4(Macroblock *currMB, ColorPlane pl, int img_x,int img_y, int *left_available, int *up_available, int *all_available)
+void set_intrapred_4x4(Macroblock *currMB, ColorPlane pl, int img_x, int img_y, int *left_available, int *up_available, int *all_available)
 {
   VideoParameters *p_Vid = currMB->p_Vid;
   InputParameters *p_Inp = currMB->p_Inp;
 
-  imgpel  *PredPel = currMB->intra4x4_pred[pl];  // array of predictor pels
-  imgpel   **img_enc = p_Vid->enc_picture->p_curr_img;
+  imgpel *PredPel = currMB->intra4x4_pred[pl]; // array of predictor pels
+  imgpel **img_enc = p_Vid->enc_picture->p_curr_img;
 
   int ioff = (img_x & 15);
   int joff = (img_y & 15);
@@ -437,31 +436,31 @@ void set_intrapred_4x4(Macroblock *currMB, ColorPlane pl, int img_x,int img_y, i
   int block_available_up_right;
   int *mb_size = p_Vid->mb_size[IS_LUMA];
 
-  p_Vid->getNeighbour(currMB, ioff - 1, joff    , mb_size, &pix_a);
-  p_Vid->getNeighbour(currMB, ioff    , joff - 1, mb_size, &pix_b);
+  p_Vid->getNeighbour(currMB, ioff - 1, joff, mb_size, &pix_a);
+  p_Vid->getNeighbour(currMB, ioff, joff - 1, mb_size, &pix_b);
   p_Vid->getNeighbour(currMB, ioff + 4, joff - 1, mb_size, &pix_c);
   p_Vid->getNeighbour(currMB, ioff - 1, joff - 1, mb_size, &pix_d);
 
-  pix_c.available = pix_c.available && !((ioff==4) && ((joff==4)||(joff==12)));
+  pix_c.available = pix_c.available && !((ioff == 4) && ((joff == 4) || (joff == 12)));
 
   if (p_Inp->UseConstrainedIntraPred)
   {
-    block_available_left     = pix_a.available ? p_Vid->intra_block [pix_a.mb_addr]: 0;
-    block_available_up       = pix_b.available ? p_Vid->intra_block [pix_b.mb_addr] : 0;
-    block_available_up_right = pix_c.available ? p_Vid->intra_block [pix_c.mb_addr] : 0;
-    block_available_up_left  = pix_d.available ? p_Vid->intra_block [pix_d.mb_addr] : 0;
+    block_available_left = pix_a.available ? p_Vid->intra_block[pix_a.mb_addr] : 0;
+    block_available_up = pix_b.available ? p_Vid->intra_block[pix_b.mb_addr] : 0;
+    block_available_up_right = pix_c.available ? p_Vid->intra_block[pix_c.mb_addr] : 0;
+    block_available_up_left = pix_d.available ? p_Vid->intra_block[pix_d.mb_addr] : 0;
   }
   else
   {
-    block_available_left     = pix_a.available;
-    block_available_up       = pix_b.available;
+    block_available_left = pix_a.available;
+    block_available_up = pix_b.available;
     block_available_up_right = pix_c.available;
-    block_available_up_left  = pix_d.available;
+    block_available_up_left = pix_d.available;
   }
 
   *left_available = block_available_left;
-  *up_available   = block_available_up;
-  *all_available  = block_available_up && block_available_left && block_available_up_left;
+  *up_available = block_available_up;
+  *all_available = block_available_up && block_available_left && block_available_up_left;
 
   // form predictor pels
   if (block_available_up)
@@ -470,7 +469,7 @@ void set_intrapred_4x4(Macroblock *currMB, ColorPlane pl, int img_x,int img_y, i
   }
   else
   {
-    P_A = P_B = P_C = P_D = (imgpel) p_Vid->dc_pred_value;
+    P_A = P_B = P_C = P_D = (imgpel)p_Vid->dc_pred_value;
   }
 
   if (block_available_up_right)
@@ -489,7 +488,7 @@ void set_intrapred_4x4(Macroblock *currMB, ColorPlane pl, int img_x,int img_y, i
     P_I = img_enc[pos_y++][pos_x];
     P_J = img_enc[pos_y++][pos_x];
     P_K = img_enc[pos_y++][pos_x];
-    P_L = img_enc[pos_y  ][pos_x];
+    P_L = img_enc[pos_y][pos_x];
   }
   else
   {
@@ -520,38 +519,38 @@ void set_intrapred_4x4(Macroblock *currMB, ColorPlane pl, int img_x,int img_y, i
  */
 void get_intrapred_4x4(Macroblock *currMB, ColorPlane pl, int i4x4_mode, int img_x, int img_y, int left_available, int up_available)
 {
-  imgpel        *PredPel = currMB->intra4x4_pred[pl];  // array of predictor pels
+  imgpel *PredPel = currMB->intra4x4_pred[pl]; // array of predictor pels
   imgpel ***curr_mpr_4x4 = currMB->p_Slice->mpr_4x4[pl];
 
-  // Note that currently prediction values are always placed starting from (0,0) and not according to block position. 
+  // Note that currently prediction values are always placed starting from (0,0) and not according to block position.
 
   switch (i4x4_mode)
   {
-  case VERT_PRED :    
+  case VERT_PRED:
     get_i4x4_vertical(curr_mpr_4x4[VERT_PRED], PredPel);
     break;
-  case HOR_PRED :
+  case HOR_PRED:
     get_i4x4_horizontal(curr_mpr_4x4[HOR_PRED], PredPel);
     break;
-  case DC_PRED :
+  case DC_PRED:
     get_i4x4_dc(curr_mpr_4x4[DC_PRED], PredPel, left_available, up_available);
     break;
-  case DIAG_DOWN_LEFT_PRED :
+  case DIAG_DOWN_LEFT_PRED:
     get_i4x4_downleft(curr_mpr_4x4[DIAG_DOWN_LEFT_PRED], PredPel);
     break;
-  case DIAG_DOWN_RIGHT_PRED :
+  case DIAG_DOWN_RIGHT_PRED:
     get_i4x4_downright(curr_mpr_4x4[DIAG_DOWN_RIGHT_PRED], PredPel);
     break;
-  case VERT_RIGHT_PRED :
+  case VERT_RIGHT_PRED:
     get_i4x4_vertright(curr_mpr_4x4[VERT_RIGHT_PRED], PredPel);
     break;
-  case HOR_DOWN_PRED :
+  case HOR_DOWN_PRED:
     get_i4x4_hordown(curr_mpr_4x4[HOR_DOWN_PRED], PredPel);
     break;
-  case VERT_LEFT_PRED :
+  case VERT_LEFT_PRED:
     get_i4x4_vertleft(curr_mpr_4x4[VERT_LEFT_PRED], PredPel);
     break;
-  case HOR_UP_PRED :
+  case HOR_UP_PRED:
     get_i4x4_horup(curr_mpr_4x4[HOR_UP_PRED], PredPel);
     break;
   default:

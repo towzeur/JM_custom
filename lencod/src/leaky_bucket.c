@@ -44,23 +44,23 @@ int get_LeakyBucketRate(InputParameters *p_Inp, unsigned long NumberLeakyBuckets
   FILE *f;
   unsigned long i, buf;
 
-  if((f = fopen(p_Inp->LeakyBucketRateFile, "r")) == NULL)
+  if ((f = fopen(p_Inp->LeakyBucketRateFile, "r")) == NULL)
   {
     printf(" LeakyBucketRate File does not exist. Using rate calculated from avg. rate \n");
     return 0;
   }
 
-  for(i=0; i<NumberLeakyBuckets; i++)
+  for (i = 0; i < NumberLeakyBuckets; i++)
   {
-    if(1 != fscanf(f, "%lu", &buf))
+    if (1 != fscanf(f, "%lu", &buf))
     {
       printf(" Leaky BucketRateFile does not have valid entries.\n Using rate calculated from avg. rate \n");
-      fclose (f);
+      fclose(f);
       return 0;
     }
     Rmin[i] = buf;
   }
-  fclose (f);
+  fclose(f);
   return 1;
 }
 /*!
@@ -115,26 +115,25 @@ void PutBigDoubleWord(unsigned long dw, FILE *fp)
  ***********************************************************************
  */
 
-
 void write_buffer(InputParameters *p_Inp, unsigned long NumberLeakyBuckets, unsigned long Rmin[], unsigned long Bmin[], unsigned long Fmin[])
 {
   FILE *outf;
   unsigned long iBucket;
 
-  if ((outf = fopen(p_Inp->LeakyBucketParamFile,"wb"))==NULL)
+  if ((outf = fopen(p_Inp->LeakyBucketParamFile, "wb")) == NULL)
   {
-    snprintf(errortext, ET_SIZE, "Error open file lk %s  \n",p_Inp->LeakyBucketParamFile);
-    error(errortext,1);
+    snprintf(errortext, ET_SIZE, "Error open file lk %s  \n", p_Inp->LeakyBucketParamFile);
+    error(errortext, 1);
   }
 
   PutBigDoubleWord(NumberLeakyBuckets, outf);
   if (p_Inp->Verbose != 0)
     printf(" Number Leaky Buckets: %ld \n     Rmin     Bmin     Fmin \n", NumberLeakyBuckets);
-  for(iBucket =0; iBucket < NumberLeakyBuckets; iBucket++)
+  for (iBucket = 0; iBucket < NumberLeakyBuckets; iBucket++)
   {
-    //assert(Rmin[iBucket]<4294967296); //Overflow should be corrected already.
-    //assert(Bmin[iBucket]<4294967296);
-    //assert(Fmin[iBucket]<4294967296);
+    // assert(Rmin[iBucket]<4294967296); //Overflow should be corrected already.
+    // assert(Bmin[iBucket]<4294967296);
+    // assert(Fmin[iBucket]<4294967296);
     PutBigDoubleWord(Rmin[iBucket], outf);
     PutBigDoubleWord(Bmin[iBucket], outf);
     PutBigDoubleWord(Fmin[iBucket], outf);
@@ -161,16 +160,15 @@ void write_buffer(InputParameters *p_Inp, unsigned long NumberLeakyBuckets, unsi
  ***********************************************************************
  */
 
-
 void Sort(unsigned long NumberLeakyBuckets, unsigned long *Rmin)
 {
   unsigned long i, j;
   unsigned long temp;
-  for(i=0; i< NumberLeakyBuckets-1; i++)
+  for (i = 0; i < NumberLeakyBuckets - 1; i++)
   {
-    for(j=i+1; j<NumberLeakyBuckets; j++)
+    for (j = i + 1; j < NumberLeakyBuckets; j++)
     {
-      if(Rmin[i] > Rmin[j]) 
+      if (Rmin[i] > Rmin[j])
       {
         temp = Rmin[i];
         Rmin[i] = Rmin[j];
@@ -199,83 +197,83 @@ void calc_buffer(VideoParameters *p_Vid, InputParameters *p_Inp)
 {
   unsigned long AvgRate, TotalRate, NumberLeakyBuckets;
   long *buffer_frame, minB;
-  unsigned long iBucket, iFrame,  FrameIndex = 0;
+  unsigned long iBucket, iFrame, FrameIndex = 0;
   long maxBuffer, actualBuffer, InitFullness, iChannelRate;
   unsigned long *Rmin, *Bmin, *Fmin;
 
   switch (p_Inp->Verbose)
   {
-    case 1:
-      fprintf(stdout,"-------------------------------------------------------------------------------\n");
-      break;
-    case 2:
-      fprintf(stdout,"------------------------------------------------------------------------------------------------\n");
-      break;
-    case 3:
-      fprintf(stdout,"-------------------------------------------------------------------------------------------------------\n");
-      break;
-    case 0:
-    default:
-      fprintf(stdout,"\n-------------------------------------------------------------------------------\n");
-      break;
+  case 1:
+    fprintf(stdout, "-------------------------------------------------------------------------------\n");
+    break;
+  case 2:
+    fprintf(stdout, "------------------------------------------------------------------------------------------------\n");
+    break;
+  case 3:
+    fprintf(stdout, "-------------------------------------------------------------------------------------------------------\n");
+    break;
+  case 0:
+  default:
+    fprintf(stdout, "\n-------------------------------------------------------------------------------\n");
+    break;
   }
   printf(" Total Frames:  %ld \n", p_Vid->total_frame_buffer);
-  NumberLeakyBuckets = (unsigned long) p_Inp->NumberLeakyBuckets;
+  NumberLeakyBuckets = (unsigned long)p_Inp->NumberLeakyBuckets;
   buffer_frame = calloc(p_Vid->total_frame_buffer + 1, sizeof(long));
-  if(!buffer_frame)
+  if (!buffer_frame)
     no_mem_exit("init_buffer: buffer_frame");
   Rmin = calloc(NumberLeakyBuckets, sizeof(unsigned long));
-  if(!Rmin)
+  if (!Rmin)
     no_mem_exit("init_buffer: Rmin");
   Bmin = calloc(NumberLeakyBuckets, sizeof(unsigned long));
-  if(!Bmin)
+  if (!Bmin)
     no_mem_exit("init_buffer: Bmin");
   Fmin = calloc(NumberLeakyBuckets, sizeof(unsigned long));
-  if(!Fmin)
+  if (!Fmin)
     no_mem_exit("init_buffer: Fmin");
 
   TotalRate = 0;
-  for(iFrame=0; iFrame < p_Vid->total_frame_buffer; iFrame++)
+  for (iFrame = 0; iFrame < p_Vid->total_frame_buffer; iFrame++)
   {
-    TotalRate += (unsigned long) p_Vid->Bit_Buffer[iFrame];
+    TotalRate += (unsigned long)p_Vid->Bit_Buffer[iFrame];
   }
-  AvgRate = (unsigned long) ((float) TotalRate/ p_Vid->total_frame_buffer);
+  AvgRate = (unsigned long)((float)TotalRate / p_Vid->total_frame_buffer);
 
-  if(1 != get_LeakyBucketRate(p_Inp, NumberLeakyBuckets, Rmin))
+  if (1 != get_LeakyBucketRate(p_Inp, NumberLeakyBuckets, Rmin))
   { /* if rate file is not present, use default calculated from avg.rate */
-    for(iBucket=0; iBucket < NumberLeakyBuckets; iBucket++)
+    for (iBucket = 0; iBucket < NumberLeakyBuckets; iBucket++)
     {
-      if(iBucket == 0)
-        Rmin[iBucket] = (unsigned long)((float) AvgRate * p_Vid->framerate); /* convert bits/frame to bits/second */
+      if (iBucket == 0)
+        Rmin[iBucket] = (unsigned long)((float)AvgRate * p_Vid->framerate); /* convert bits/frame to bits/second */
       else
-        Rmin[iBucket] = (unsigned long) ((float) Rmin[iBucket-1] + (AvgRate/4) * (p_Vid->framerate));
+        Rmin[iBucket] = (unsigned long)((float)Rmin[iBucket - 1] + (AvgRate / 4) * (p_Vid->framerate));
     }
   }
   Sort(NumberLeakyBuckets, Rmin);
 
   maxBuffer = AvgRate * 20; /* any initialization is good. */
-  for(iBucket=0; iBucket< NumberLeakyBuckets; iBucket++)
+  for (iBucket = 0; iBucket < NumberLeakyBuckets; iBucket++)
   {
-    iChannelRate = (long) (Rmin[iBucket] / (p_Vid->framerate)); /* converts bits/second to bits/frame */
+    iChannelRate = (long)(Rmin[iBucket] / (p_Vid->framerate)); /* converts bits/second to bits/frame */
     /* To calculate initial buffer size */
     InitFullness = maxBuffer; /* set Initial Fullness to be buffer size */
     buffer_frame[0] = InitFullness;
     minB = maxBuffer;
 
-    for(iFrame=0; iFrame < p_Vid->total_frame_buffer ; iFrame++)
+    for (iFrame = 0; iFrame < p_Vid->total_frame_buffer; iFrame++)
     {
       buffer_frame[iFrame] = buffer_frame[iFrame] - p_Vid->Bit_Buffer[iFrame];
-      if(buffer_frame[iFrame] < minB)
+      if (buffer_frame[iFrame] < minB)
       {
         minB = buffer_frame[iFrame];
         FrameIndex = iFrame;
       }
 
-      if ( iFrame < p_Vid->total_frame_buffer )
+      if (iFrame < p_Vid->total_frame_buffer)
       {
-        buffer_frame[iFrame+1] = buffer_frame[iFrame] + iChannelRate;
-        if(buffer_frame[iFrame+1] > maxBuffer)
-          buffer_frame[iFrame+1] = maxBuffer;
+        buffer_frame[iFrame + 1] = buffer_frame[iFrame] + iChannelRate;
+        if (buffer_frame[iFrame + 1] > maxBuffer)
+          buffer_frame[iFrame + 1] = maxBuffer;
       }
     }
     actualBuffer = (maxBuffer - minB);
@@ -283,23 +281,23 @@ void calc_buffer(VideoParameters *p_Vid, InputParameters *p_Inp)
     /* To calculate initial buffer Fullness */
     InitFullness = p_Vid->Bit_Buffer[0];
     buffer_frame[0] = InitFullness;
-    for(iFrame=0; iFrame < FrameIndex+1; iFrame++)
+    for (iFrame = 0; iFrame < FrameIndex + 1; iFrame++)
     {
       buffer_frame[iFrame] = buffer_frame[iFrame] - p_Vid->Bit_Buffer[iFrame];
-      if(buffer_frame[iFrame] < 0) 
+      if (buffer_frame[iFrame] < 0)
       {
         InitFullness -= buffer_frame[iFrame];
         buffer_frame[iFrame] = 0;
       }
-      if ( iFrame < p_Vid->total_frame_buffer )
+      if (iFrame < p_Vid->total_frame_buffer)
       {
-        buffer_frame[iFrame+1] = buffer_frame[iFrame] + iChannelRate;
-        if(buffer_frame[iFrame+1] > actualBuffer)
+        buffer_frame[iFrame + 1] = buffer_frame[iFrame] + iChannelRate;
+        if (buffer_frame[iFrame + 1] > actualBuffer)
           break;
       }
     }
-    Bmin[iBucket] = (unsigned long) actualBuffer;
-    Fmin[iBucket] = (unsigned long) InitFullness;
+    Bmin[iBucket] = (unsigned long)actualBuffer;
+    Fmin[iBucket] = (unsigned long)InitFullness;
   }
 
   write_buffer(p_Inp, NumberLeakyBuckets, Rmin, Bmin, Fmin);
@@ -311,4 +309,3 @@ void calc_buffer(VideoParameters *p_Vid, InputParameters *p_Inp)
   return;
 }
 #endif
-

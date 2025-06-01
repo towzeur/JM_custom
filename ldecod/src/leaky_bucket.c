@@ -38,11 +38,11 @@
 unsigned long GetBigDoubleWord(FILE *fp)
 {
   unsigned long dw;
-  dw =  (unsigned long) (fgetc(fp) & 0xFF);
-  dw = ((unsigned long) (fgetc(fp) & 0xFF)) | (dw << 0x08);
-  dw = ((unsigned long) (fgetc(fp) & 0xFF)) | (dw << 0x08);
-  dw = ((unsigned long) (fgetc(fp) & 0xFF)) | (dw << 0x08);
-  return(dw);
+  dw = (unsigned long)(fgetc(fp) & 0xFF);
+  dw = ((unsigned long)(fgetc(fp) & 0xFF)) | (dw << 0x08);
+  dw = ((unsigned long)(fgetc(fp) & 0xFF)) | (dw << 0x08);
+  dw = ((unsigned long)(fgetc(fp) & 0xFF)) | (dw << 0x08);
+  return (dw);
 }
 
 /*!
@@ -69,17 +69,17 @@ unsigned long GetBigDoubleWord(FILE *fp)
 void calc_buffer(InputParameters *p_Inp)
 {
   unsigned long NumberLeakyBuckets, *Rmin, *Bmin, *Fmin;
-  float B_interp,  F_interp;
+  float B_interp, F_interp;
   unsigned long iBucket;
   float dnr, frac1, frac2;
   unsigned long R_decoder, B_decoder, F_decoder;
   FILE *outf;
 
-  if ((outf=fopen(p_Inp->LeakyBucketParamFile,"rb"))==NULL)
-    {
-    snprintf(errortext, ET_SIZE, "Error open file %s \n",p_Inp->LeakyBucketParamFile);
-    error(errortext,1);
-    }
+  if ((outf = fopen(p_Inp->LeakyBucketParamFile, "rb")) == NULL)
+  {
+    snprintf(errortext, ET_SIZE, "Error open file %s \n", p_Inp->LeakyBucketParamFile);
+    error(errortext, 1);
+  }
 
   NumberLeakyBuckets = GetBigDoubleWord(outf);
   printf(" Number Leaky Buckets: %8ld \n\n", NumberLeakyBuckets);
@@ -87,7 +87,7 @@ void calc_buffer(InputParameters *p_Inp)
   Bmin = calloc(NumberLeakyBuckets, sizeof(unsigned long));
   Fmin = calloc(NumberLeakyBuckets, sizeof(unsigned long));
 
-  for(iBucket =0; iBucket < NumberLeakyBuckets; iBucket++)
+  for (iBucket = 0; iBucket < NumberLeakyBuckets; iBucket++)
   {
     Rmin[iBucket] = GetBigDoubleWord(outf);
     Bmin[iBucket] = GetBigDoubleWord(outf);
@@ -100,34 +100,36 @@ void calc_buffer(InputParameters *p_Inp)
   F_decoder = p_Inp->F_decoder;
   B_decoder = p_Inp->B_decoder;
 
-  for( iBucket =0; iBucket < NumberLeakyBuckets; iBucket++)
+  for (iBucket = 0; iBucket < NumberLeakyBuckets; iBucket++)
   {
-    if(R_decoder < Rmin[iBucket])
+    if (R_decoder < Rmin[iBucket])
       break;
   }
 
   printf("\n");
-  if(iBucket > 0 ) 
+  if (iBucket > 0)
   {
-    if(iBucket < NumberLeakyBuckets) 
+    if (iBucket < NumberLeakyBuckets)
     {
-      dnr = (float) (Rmin[iBucket] - Rmin[iBucket-1]);
-      frac1 = (float) (R_decoder - Rmin[iBucket-1]);
-      frac2 = (float) (Rmin[iBucket] - R_decoder);
-      B_interp = (float) (Bmin[iBucket] * frac1 + Bmin[iBucket-1] * frac2) /dnr;
-      F_interp = (float) (Fmin[iBucket] * frac1 + Fmin[iBucket-1] * frac2) /dnr;
+      dnr = (float)(Rmin[iBucket] - Rmin[iBucket - 1]);
+      frac1 = (float)(R_decoder - Rmin[iBucket - 1]);
+      frac2 = (float)(Rmin[iBucket] - R_decoder);
+      B_interp = (float)(Bmin[iBucket] * frac1 + Bmin[iBucket - 1] * frac2) / dnr;
+      F_interp = (float)(Fmin[iBucket] * frac1 + Fmin[iBucket - 1] * frac2) / dnr;
     }
-    else {
-      B_interp = (float) Bmin[iBucket-1];
-      F_interp = (float) Fmin[iBucket-1];
+    else
+    {
+      B_interp = (float)Bmin[iBucket - 1];
+      F_interp = (float)Fmin[iBucket - 1];
     }
     printf(" Min.buffer %8.2f Decoder buffer size %ld \n Minimum Delay %8.2f DecoderDelay %ld \n", B_interp, B_decoder, F_interp, F_decoder);
-    if(B_decoder > B_interp && F_decoder > F_interp)
+    if (B_decoder > B_interp && F_decoder > F_interp)
       printf(" HRD Compliant \n");
     else
       printf(" HRD Non Compliant \n");
   }
-  else { // (iBucket = 0)
+  else
+  { // (iBucket = 0)
     printf(" Decoder Rate is too small; HRD cannot be verified \n");
   }
 

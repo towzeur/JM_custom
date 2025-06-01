@@ -44,9 +44,9 @@ void init_quant_Chroma(Slice *currSlice)
     else
     {
       if (p_Vid->yuv_format == YUV422)
-        currSlice->quant_dc_cr   = quant_dc4x2_normal;
+        currSlice->quant_dc_cr = quant_dc4x2_normal;
       else
-        currSlice->quant_dc_cr   = quant_dc2x2_normal;
+        currSlice->quant_dc_cr = quant_dc2x2_normal;
     }
     if (currSlice->symbol_mode == CABAC)
       currSlice->rdoq_dc_cr = rdoq_dc_cr_CABAC;
@@ -57,18 +57,16 @@ void init_quant_Chroma(Slice *currSlice)
   {
     currSlice->quant_ac4x4cr = quant_ac4x4_normal;
     if (p_Vid->yuv_format == YUV422)
-      currSlice->quant_dc_cr   = quant_dc4x2_normal;
+      currSlice->quant_dc_cr = quant_dc4x2_normal;
     else
-      currSlice->quant_dc_cr   = quant_dc2x2_normal;
+      currSlice->quant_dc_cr = quant_dc2x2_normal;
   }
   else
   {
     currSlice->quant_ac4x4cr = quant_ac4x4_around;
     if (p_Vid->yuv_format == YUV422)
-      currSlice->quant_dc_cr   = quant_dc4x2_around;
+      currSlice->quant_dc_cr = quant_dc4x2_around;
     else
-      currSlice->quant_dc_cr   = quant_dc2x2_around;
+      currSlice->quant_dc_cr = quant_dc2x2_around;
   }
 }
-
-

@@ -7,7 +7,7 @@
  *     implementation of SEI related functions
  *  \author(s)
  *      - Dong Tian                             <tian@cs.tut.fi>
- *      - Athanasios Leontaris                  <aleon@dolby.com>  
+ *      - Athanasios Leontaris                  <aleon@dolby.com>
  *
  ************************************************************************
  */
@@ -20,58 +20,58 @@
 #include "vlc.h"
 #include "header.h"
 
-static void InitRandomAccess           (SEIParameters *p_SEI);
-static void CloseRandomAccess          (SEIParameters *p_SEI);
-static void InitToneMapping            (SEIParameters *p_SEI, InputParameters *p_Inp);
-static void CloseToneMapping           (SEIParameters *p_SEI);
-static void CloseBufferingPeriod       (SEIParameters *p_SEI);
-static void InitPicTiming              (SEIParameters *p_SEI);
-static void ClosePicTiming             (SEIParameters *p_SEI);
-static void InitDRPMRepetition         (SEIParameters *p_SEI);
-static void CloseDRPMRepetition        (SEIParameters *p_SEI);
-static void FinalizeDRPMRepetition     (VideoParameters *p_Vid);
-static void InitSparePicture           (SEIParameters *p_SEI);
-static void CloseSparePicture          (SEIParameters *p_SEI);
-static void FinalizeSpareMBMap         (VideoParameters *p_Vid);
-static void InitSubseqChar             (VideoParameters *p_Vid);
-static void ClearSubseqCharPayload     (SEIParameters *p_SEI);
-static void CloseSubseqChar            (SEIParameters *p_SEI);
-static void InitSubseqLayerInfo        (SEIParameters *p_SEI);
-static void InitPanScanRectInfo        (SEIParameters *p_SEI);
-static void ClosePanScanRectInfo       (SEIParameters *p_SEI);
-static void InitUser_data_unregistered (SEIParameters *p_SEI);
+static void InitRandomAccess(SEIParameters *p_SEI);
+static void CloseRandomAccess(SEIParameters *p_SEI);
+static void InitToneMapping(SEIParameters *p_SEI, InputParameters *p_Inp);
+static void CloseToneMapping(SEIParameters *p_SEI);
+static void CloseBufferingPeriod(SEIParameters *p_SEI);
+static void InitPicTiming(SEIParameters *p_SEI);
+static void ClosePicTiming(SEIParameters *p_SEI);
+static void InitDRPMRepetition(SEIParameters *p_SEI);
+static void CloseDRPMRepetition(SEIParameters *p_SEI);
+static void FinalizeDRPMRepetition(VideoParameters *p_Vid);
+static void InitSparePicture(SEIParameters *p_SEI);
+static void CloseSparePicture(SEIParameters *p_SEI);
+static void FinalizeSpareMBMap(VideoParameters *p_Vid);
+static void InitSubseqChar(VideoParameters *p_Vid);
+static void ClearSubseqCharPayload(SEIParameters *p_SEI);
+static void CloseSubseqChar(SEIParameters *p_SEI);
+static void InitSubseqLayerInfo(SEIParameters *p_SEI);
+static void InitPanScanRectInfo(SEIParameters *p_SEI);
+static void ClosePanScanRectInfo(SEIParameters *p_SEI);
+static void InitUser_data_unregistered(SEIParameters *p_SEI);
 static void InitUser_data_registered_itu_t_t35(SEIParameters *p_SEI);
 static void ClearUser_data_unregistered(SEIParameters *p_SEI);
 static void CloseUser_data_unregistered(SEIParameters *p_SEI);
 static void ClearUser_data_registered_itu_t_t35(SEIParameters *p_SEI);
 static void CloseUser_data_registered_itu_t_t35(SEIParameters *p_SEI);
-static void InitPostFilterHints        (SEIParameters *p_SEI);
-static void ClearPostFilterHints       (SEIParameters *p_SEI);
-static void ClosePostFilterHints       (SEIParameters *p_SEI);
+static void InitPostFilterHints(SEIParameters *p_SEI);
+static void ClearPostFilterHints(SEIParameters *p_SEI);
+static void ClosePostFilterHints(SEIParameters *p_SEI);
 static void InitFramePackingArrangement(VideoParameters *p_Vid);
 static void CloseFramePackingArrangement(SEIParameters *p_SEI);
 
 void init_sei(SEIParameters *p_SEI)
 {
-  p_SEI->seiHasTemporal_reference=FALSE;
-  p_SEI->seiHasClock_timestamp=FALSE;
-  p_SEI->seiHasPanscan_rect=FALSE;
-  p_SEI->seiHasHrd_picture=FALSE;
-  p_SEI->seiHasFiller_payload=FALSE;
-  p_SEI->seiHasUser_data_registered_itu_t_t35=FALSE;
-  p_SEI->seiHasUser_data_unregistered=FALSE;
-  p_SEI->seiHasRecoveryPoint_info=FALSE;
-  p_SEI->seiHasRef_pic_buffer_management_repetition=FALSE;
-  p_SEI->seiHasSpare_picture=FALSE;
-  p_SEI->seiHasBufferingPeriod_info=FALSE;
-  p_SEI->seiHasPicTiming_info=FALSE;
-  p_SEI->seiHasSceneInformation=FALSE;
-  p_SEI->seiHasSubseq_information=FALSE;
-  p_SEI->seiHasSubseq_layer_characteristics=FALSE;
-  p_SEI->seiHasSubseq_characteristics=FALSE;
-  p_SEI->seiHasTone_mapping=FALSE;
-  p_SEI->seiHasPostFilterHints_info=FALSE;
-  p_SEI->seiHasDRPMRepetition_info=FALSE;
+  p_SEI->seiHasTemporal_reference = FALSE;
+  p_SEI->seiHasClock_timestamp = FALSE;
+  p_SEI->seiHasPanscan_rect = FALSE;
+  p_SEI->seiHasHrd_picture = FALSE;
+  p_SEI->seiHasFiller_payload = FALSE;
+  p_SEI->seiHasUser_data_registered_itu_t_t35 = FALSE;
+  p_SEI->seiHasUser_data_unregistered = FALSE;
+  p_SEI->seiHasRecoveryPoint_info = FALSE;
+  p_SEI->seiHasRef_pic_buffer_management_repetition = FALSE;
+  p_SEI->seiHasSpare_picture = FALSE;
+  p_SEI->seiHasBufferingPeriod_info = FALSE;
+  p_SEI->seiHasPicTiming_info = FALSE;
+  p_SEI->seiHasSceneInformation = FALSE;
+  p_SEI->seiHasSubseq_information = FALSE;
+  p_SEI->seiHasSubseq_layer_characteristics = FALSE;
+  p_SEI->seiHasSubseq_characteristics = FALSE;
+  p_SEI->seiHasTone_mapping = FALSE;
+  p_SEI->seiHasPostFilterHints_info = FALSE;
+  p_SEI->seiHasDRPMRepetition_info = FALSE;
   p_SEI->seiHasSparePicture = FALSE;
   p_SEI->seiHasSubseqChar = FALSE;
   p_SEI->seiHasSubseqInfo = FALSE;
@@ -90,17 +90,18 @@ void InitSEIMessages(VideoParameters *p_Vid, InputParameters *p_Inp)
 {
   SEIParameters *p_SEI = p_Vid->p_SEI;
   int i;
-  for (i=0; i<2; i++)
+  for (i = 0; i < 2; i++)
   {
     p_SEI->sei_message[i].data = malloc(MAXRTPPAYLOADLEN);
-    if( p_SEI->sei_message[i].data == NULL ) no_mem_exit("InitSEIMessages: sei_message[i].data");
+    if (p_SEI->sei_message[i].data == NULL)
+      no_mem_exit("InitSEIMessages: sei_message[i].data");
     p_SEI->sei_message[i].subPacketType = SEI_PACKET_TYPE;
     clear_sei_message(p_SEI, i);
   }
 
   // init sei messages
   p_SEI->seiSparePicturePayload.data = NULL;
-  InitSparePicture(p_SEI);  
+  InitSparePicture(p_SEI);
   if (p_Inp->NumFramesInELSubSeq != 0)
   {
     InitSubseqLayerInfo(p_SEI);
@@ -151,10 +152,10 @@ void CloseSEIMessages(VideoParameters *p_Vid, InputParameters *p_Inp)
   CloseDRPMRepetition(p_SEI);
   CloseFramePackingArrangement(p_SEI);
 
-  for (i=0; i<MAX_LAYER_NUMBER; i++)
+  for (i = 0; i < MAX_LAYER_NUMBER; i++)
   {
-    if ( p_SEI->sei_message[i].data ) 
-      free( p_SEI->sei_message[i].data );
+    if (p_SEI->sei_message[i].data)
+      free(p_SEI->sei_message[i].data);
     p_SEI->sei_message[i].data = NULL;
   }
 }
@@ -192,8 +193,8 @@ Boolean HaveAggregationSEI(VideoParameters *p_Vid)
     return TRUE;
 
   return FALSE;
-//  return p_Inp->SparePictureOption && ( seiHasSpare_picture || seiHasSubseq_information ||
-//    seiHasSubseq_layer_characteristics || seiHasSubseq_characteristics );
+  //  return p_Inp->SparePictureOption && ( seiHasSpare_picture || seiHasSubseq_information ||
+  //    seiHasSubseq_layer_characteristics || seiHasSubseq_characteristics );
 }
 
 /*!
@@ -216,7 +217,7 @@ Boolean HaveAggregationSEI(VideoParameters *p_Vid)
  *    the content of the sei message (sei_message[id]) is updated.
  ************************************************************************
  */
-static void write_sei_message(SEIParameters *p_SEI, int id, byte* payload, int payload_size, int payload_type)
+static void write_sei_message(SEIParameters *p_SEI, int id, byte *payload, int payload_size, int payload_type)
 {
   int offset, type, size;
   assert(payload_type >= 0 && payload_type < SEI_MAX_ELEMENTS);
@@ -225,19 +226,19 @@ static void write_sei_message(SEIParameters *p_SEI, int id, byte* payload, int p
   size = payload_size;
   offset = p_SEI->sei_message[id].payloadSize;
 
-  while ( type > 254 )
+  while (type > 254)
   {
     p_SEI->sei_message[id].data[offset++] = 0xFF;
     type = type - 255;
   }
-  p_SEI->sei_message[id].data[offset++] = (byte) type;
+  p_SEI->sei_message[id].data[offset++] = (byte)type;
 
-  while ( size > 254 )
+  while (size > 254)
   {
     p_SEI->sei_message[id].data[offset++] = 0xFF;
     size = size - 255;
   }
-  p_SEI->sei_message[id].data[offset++] = (byte) size;
+  p_SEI->sei_message[id].data[offset++] = (byte)size;
 
   memcpy(p_SEI->sei_message[id].data + offset, payload, payload_size);
   offset += payload_size;
@@ -284,9 +285,9 @@ static void finalize_sei_message(SEIParameters *p_SEI, int id)
  */
 void clear_sei_message(SEIParameters *p_SEI, int id)
 {
-  memset( p_SEI->sei_message[id].data, 0, MAXRTPPAYLOADLEN);
-  p_SEI->sei_message[id].payloadSize       = 0;
-  p_SEI->sei_message[id].available         = FALSE;
+  memset(p_SEI->sei_message[id].data, 0, MAXRTPPAYLOADLEN);
+  p_SEI->sei_message[id].payloadSize = 0;
+  p_SEI->sei_message[id].available = FALSE;
 }
 
 /*!
@@ -301,47 +302,47 @@ void clear_sei_message(SEIParameters *p_SEI, int id)
  *    the content of the dest bitstream is changed.
  ************************************************************************
  */
-void AppendTmpbits2Buf( Bitstream* dest, Bitstream* source )
+void AppendTmpbits2Buf(Bitstream *dest, Bitstream *source)
 {
   int i, j;
   byte mask;
   int bits_in_last_byte;
 
   // copy the first bytes in source buffer
-  for (i=0; i<source->byte_pos; i++)
+  for (i = 0; i < source->byte_pos; i++)
   {
     mask = 0x80;
-    for (j=0; j<8; j++)
+    for (j = 0; j < 8; j++)
     {
       dest->byte_buf <<= 1;
       if (source->streamBuffer[i] & mask)
         dest->byte_buf |= 1;
       dest->bits_to_go--;
       mask >>= 1;
-      if (dest->bits_to_go==0)
+      if (dest->bits_to_go == 0)
       {
         dest->bits_to_go = 8;
-        dest->streamBuffer[dest->byte_pos++]=dest->byte_buf;
+        dest->streamBuffer[dest->byte_pos++] = dest->byte_buf;
         dest->byte_buf = 0;
       }
     }
   }
   // copy the last byte, there are still (8-source->bits_to_go) bits in the source buffer
-  bits_in_last_byte = 8-source->bits_to_go;
-  if ( bits_in_last_byte > 0 )
+  bits_in_last_byte = 8 - source->bits_to_go;
+  if (bits_in_last_byte > 0)
   {
-    mask = (byte) (1 << (bits_in_last_byte-1));
-    for (j=0; j<bits_in_last_byte; j++)
+    mask = (byte)(1 << (bits_in_last_byte - 1));
+    for (j = 0; j < bits_in_last_byte; j++)
     {
       dest->byte_buf <<= 1;
       if (source->byte_buf & mask)
         dest->byte_buf |= 1;
       dest->bits_to_go--;
       mask >>= 1;
-      if (dest->bits_to_go==0)
+      if (dest->bits_to_go == 0)
       {
         dest->bits_to_go = 8;
-        dest->streamBuffer[dest->byte_pos++]=dest->byte_buf;
+        dest->streamBuffer[dest->byte_pos++] = dest->byte_buf;
         dest->byte_buf = 0;
       }
     }
@@ -359,7 +360,6 @@ void AppendTmpbits2Buf( Bitstream* dest, Bitstream* source )
  **++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
 
-
 /*!
  ************************************************************************
  *  \brief
@@ -368,20 +368,22 @@ void AppendTmpbits2Buf( Bitstream* dest, Bitstream* source )
  */
 static void InitSparePicture(SEIParameters *p_SEI)
 {
-  if ( p_SEI->seiSparePicturePayload.data != NULL ) 
+  if (p_SEI->seiSparePicturePayload.data != NULL)
     CloseSparePicture(p_SEI);
 
-  p_SEI->seiSparePicturePayload.data = malloc( sizeof(Bitstream) );
-  if ( p_SEI->seiSparePicturePayload.data == NULL ) no_mem_exit("InitSparePicture: seiSparePicturePayload.data");
+  p_SEI->seiSparePicturePayload.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiSparePicturePayload.data == NULL)
+    no_mem_exit("InitSparePicture: seiSparePicturePayload.data");
   p_SEI->seiSparePicturePayload.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if ( p_SEI->seiSparePicturePayload.data->streamBuffer == NULL ) no_mem_exit("InitSparePicture: seiSparePicturePayload.data->streamBuffer");
-  memset( p_SEI->seiSparePicturePayload.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  if (p_SEI->seiSparePicturePayload.data->streamBuffer == NULL)
+    no_mem_exit("InitSparePicture: seiSparePicturePayload.data->streamBuffer");
+  memset(p_SEI->seiSparePicturePayload.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
   p_SEI->seiSparePicturePayload.num_spare_pics = 0;
   p_SEI->seiSparePicturePayload.target_frame_num = 0;
 
-  p_SEI->seiSparePicturePayload.data->bits_to_go  = 8;
-  p_SEI->seiSparePicturePayload.data->byte_pos    = 0;
-  p_SEI->seiSparePicturePayload.data->byte_buf    = 0;
+  p_SEI->seiSparePicturePayload.data->bits_to_go = 8;
+  p_SEI->seiSparePicturePayload.data->byte_pos = 0;
+  p_SEI->seiSparePicturePayload.data->byte_buf = 0;
 }
 
 /*!
@@ -584,7 +586,7 @@ void CalculateSparePicture()
  *  \brief
  *      compose the spare picture information.
  *  \param p_SEI
- *      SEI message 
+ *      SEI message
  *  \param delta_spare_frame_num
  *      see FCD
  *  \param ref_area_indicator
@@ -609,7 +611,7 @@ void ComposeSparePictureMessage(SEIParameters *p_SEI, int delta_spare_frame_num,
   sym.value1 = ref_area_indicator;
   writeSyntaxElement2Buf_UVLC(&sym, bitstream);
 
-  AppendTmpbits2Buf( bitstream, tmpBitstream );
+  AppendTmpbits2Buf(bitstream, tmpBitstream);
 }
 
 /*!
@@ -637,7 +639,7 @@ Boolean CompressSpareMBMap(VideoParameters *p_Vid, unsigned char **map_sp, Bitst
 
   // this is the size of the uncompressed mb map:
   int size_uncompressed = (p_Vid->height >> 4) * (p_Vid->width >> 4);
-  int size_compressed   = 0;
+  int size_compressed = 0;
   Boolean ret;
 
   // initialization
@@ -648,27 +650,29 @@ Boolean CompressSpareMBMap(VideoParameters *p_Vid, unsigned char **map_sp, Bitst
   bitc = bit0;
 
   // compress the map, the result goes to the temporal bitstream buffer
-  x = ( (p_Vid->width >> 4) - 1 ) / 2;
-  y = ( (p_Vid->height >> 4) - 1 ) / 2;
+  x = ((p_Vid->width >> 4) - 1) / 2;
+  y = ((p_Vid->height >> 4) - 1) / 2;
   left = right = x;
   top = bottom = y;
   directx = 0;
   directy = 1;
-  for (j=0; j<p_Vid->height >> 4; j++)
-    for (k=0; k<p_Vid->width >> 4; k++)
+  for (j = 0; j < p_Vid->height >> 4; j++)
+    for (k = 0; k < p_Vid->width >> 4; k++)
     {
       // check current mb
-      if ( map_sp[y][x] == bitc ) noc++;
+      if (map_sp[y][x] == bitc)
+        noc++;
       else
       {
         sym.value1 = noc;
-        size_compressed += writeSyntaxElement2Buf_UVLC(&sym, bitstream);    // the return value indicate the num of bits written
-        noc=0;
+        size_compressed += writeSyntaxElement2Buf_UVLC(&sym, bitstream); // the return value indicate the num of bits written
+        noc = 0;
       }
       // go to the next mb:
-      if ( directx == -1 && directy == 0 )
+      if (directx == -1 && directy == 0)
       {
-        if (x > left) x--;
+        if (x > left)
+          x--;
         else if (x == 0)
         {
           y = bottom + 1;
@@ -684,9 +688,10 @@ Boolean CompressSpareMBMap(VideoParameters *p_Vid, unsigned char **map_sp, Bitst
           directy = 1;
         }
       }
-      else if ( directx == 1 && directy == 0 )
+      else if (directx == 1 && directy == 0)
       {
-        if (x < right) x++;
+        if (x < right)
+          x++;
         else if (x == (p_Vid->width >> 4) - 1)
         {
           y = top - 1;
@@ -702,9 +707,10 @@ Boolean CompressSpareMBMap(VideoParameters *p_Vid, unsigned char **map_sp, Bitst
           directy = -1;
         }
       }
-      else if ( directx == 0 && directy == -1 )
+      else if (directx == 0 && directy == -1)
       {
-        if ( y > top) y--;
+        if (y > top)
+          y--;
         else if (y == 0)
         {
           x = left - 1;
@@ -720,12 +726,13 @@ Boolean CompressSpareMBMap(VideoParameters *p_Vid, unsigned char **map_sp, Bitst
           directy = 0;
         }
       }
-      else if ( directx == 0 && directy == 1 )
+      else if (directx == 0 && directy == 1)
       {
-        if (y < bottom) y++;
+        if (y < bottom)
+          y++;
         else if (y == (p_Vid->height >> 4) - 1)
         {
-          x = right+1;
+          x = right + 1;
           right++;
           directx = 0;
           directy = -1;
@@ -739,30 +746,31 @@ Boolean CompressSpareMBMap(VideoParameters *p_Vid, unsigned char **map_sp, Bitst
         }
       }
     }
-  if (noc!=0)
+  if (noc != 0)
   {
     sym.value1 = noc;
     size_compressed += writeSyntaxElement2Buf_UVLC(&sym, bitstream);
   }
 
-  ret = (size_compressed<size_uncompressed? TRUE : FALSE);
-  if ( !ret ) // overwrite the streambuffer with the original mb map
+  ret = (size_compressed < size_uncompressed ? TRUE : FALSE);
+  if (!ret) // overwrite the streambuffer with the original mb map
   {
     // write the mb map to payload bit by bit
     bitstream->byte_buf = 0;
     bitstream->bits_to_go = 8;
     bitstream->byte_pos = 0;
-    for (j=0; j<p_Vid->height >> 4; j++)
+    for (j = 0; j < p_Vid->height >> 4; j++)
     {
-      for (k=0; k<p_Vid->width >> 4; k++)
+      for (k = 0; k < p_Vid->width >> 4; k++)
       {
         bitstream->byte_buf <<= 1;
-        if (map_sp[j][k]) bitstream->byte_buf |= 1;
+        if (map_sp[j][k])
+          bitstream->byte_buf |= 1;
         bitstream->bits_to_go--;
-        if (bitstream->bits_to_go==0)
+        if (bitstream->bits_to_go == 0)
         {
           bitstream->bits_to_go = 8;
-          bitstream->streamBuffer[bitstream->byte_pos++]=bitstream->byte_buf;
+          bitstream->streamBuffer[bitstream->byte_pos++] = bitstream->byte_buf;
           bitstream->byte_buf = 0;
         }
       }
@@ -800,17 +808,20 @@ static void FinalizeSpareMBMap(VideoParameters *p_Vid)
 
   source = p_SEI->seiSparePicturePayload.data;
   dest = malloc(sizeof(Bitstream));
-  if ( dest == NULL ) no_mem_exit("FinalizeSpareMBMap: dest");
+  if (dest == NULL)
+    no_mem_exit("FinalizeSpareMBMap: dest");
   dest->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if ( dest->streamBuffer == NULL ) no_mem_exit("FinalizeSpareMBMap: dest->streamBuffer");
-  dest->bits_to_go  = 8;
-  dest->byte_pos    = 0;
-  dest->byte_buf    = 0;
-  memset( dest->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  if (dest->streamBuffer == NULL)
+    no_mem_exit("FinalizeSpareMBMap: dest->streamBuffer");
+  dest->bits_to_go = 8;
+  dest->byte_pos = 0;
+  dest->byte_buf = 0;
+  memset(dest->streamBuffer, 0, MAXRTPPAYLOADLEN);
 
   //    delta_frame_num
   delta_frame_num = CurrFrameNum - p_SEI->seiSparePicturePayload.target_frame_num;
-  if ( delta_frame_num < 0 ) delta_frame_num += MAX_FN;
+  if (delta_frame_num < 0)
+    delta_frame_num += MAX_FN;
   sym.value1 = delta_frame_num;
   writeSyntaxElement2Buf_UVLC(&sym, dest);
 
@@ -819,25 +830,26 @@ static void FinalizeSpareMBMap(VideoParameters *p_Vid)
   writeSyntaxElement2Buf_UVLC(&sym, dest);
 
   // copy the other bits
-  AppendTmpbits2Buf( dest, source);
+  AppendTmpbits2Buf(dest, source);
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( dest->bits_to_go != 8 )
+  if (dest->bits_to_go != 8)
   {
     (dest->byte_buf) <<= 1;
     dest->byte_buf |= 1;
     dest->bits_to_go--;
-    if ( dest->bits_to_go != 0 ) (dest->byte_buf) <<= (dest->bits_to_go);
+    if (dest->bits_to_go != 0)
+      (dest->byte_buf) <<= (dest->bits_to_go);
     dest->bits_to_go = 8;
-    dest->streamBuffer[dest->byte_pos++]=dest->byte_buf;
+    dest->streamBuffer[dest->byte_pos++] = dest->byte_buf;
     dest->byte_buf = 0;
   }
   p_SEI->seiSparePicturePayload.payloadSize = dest->byte_pos;
 
   // the payload is ready now
   p_SEI->seiSparePicturePayload.data = dest;
-  free( source->streamBuffer );
-  free( source );
+  free(source->streamBuffer);
+  free(source);
 }
 
 /*
@@ -849,7 +861,6 @@ static void FinalizeSpareMBMap(VideoParameters *p_Vid)
  *      Dong Tian                 <tian@cs.tut.fi>
  **++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
-
 
 /*!
  ************************************************************************
@@ -865,17 +876,19 @@ void InitSubseqInfo(SEIParameters *p_SEI, int currLayer)
   p_SEI->seiSubseqInfo[currLayer].subseq_layer_num = currLayer;
   p_SEI->seiSubseqInfo[currLayer].subseq_id = id++;
   p_SEI->seiSubseqInfo[currLayer].last_picture_flag = 0;
-  p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt = (unsigned int) -1;
+  p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt = (unsigned int)-1;
   p_SEI->seiSubseqInfo[currLayer].payloadSize = 0;
 
-  p_SEI->seiSubseqInfo[currLayer].data = malloc( sizeof(Bitstream) );
-  if ( p_SEI->seiSubseqInfo[currLayer].data == NULL ) no_mem_exit("InitSubseqInfo: p_SEI->seiSubseqInfo[currLayer].data");
-  p_SEI->seiSubseqInfo[currLayer].data->streamBuffer = malloc( MAXRTPPAYLOADLEN );
-  if ( p_SEI->seiSubseqInfo[currLayer].data->streamBuffer == NULL ) no_mem_exit("InitSubseqInfo: p_SEI->seiSubseqInfo[currLayer].data->streamBuffer");
-  p_SEI->seiSubseqInfo[currLayer].data->bits_to_go  = 8;
-  p_SEI->seiSubseqInfo[currLayer].data->byte_pos    = 0;
-  p_SEI->seiSubseqInfo[currLayer].data->byte_buf    = 0;
-  memset( p_SEI->seiSubseqInfo[currLayer].data->streamBuffer, 0, MAXRTPPAYLOADLEN );
+  p_SEI->seiSubseqInfo[currLayer].data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiSubseqInfo[currLayer].data == NULL)
+    no_mem_exit("InitSubseqInfo: p_SEI->seiSubseqInfo[currLayer].data");
+  p_SEI->seiSubseqInfo[currLayer].data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
+  if (p_SEI->seiSubseqInfo[currLayer].data->streamBuffer == NULL)
+    no_mem_exit("InitSubseqInfo: p_SEI->seiSubseqInfo[currLayer].data->streamBuffer");
+  p_SEI->seiSubseqInfo[currLayer].data->bits_to_go = 8;
+  p_SEI->seiSubseqInfo[currLayer].data->byte_pos = 0;
+  p_SEI->seiSubseqInfo[currLayer].data->byte_buf = 0;
+  memset(p_SEI->seiSubseqInfo[currLayer].data->streamBuffer, 0, MAXRTPPAYLOADLEN);
 }
 
 /*!
@@ -889,22 +902,22 @@ void UpdateSubseqInfo(VideoParameters *p_Vid, InputParameters *p_Inp, int currLa
   SEIParameters *p_SEI = p_Vid->p_SEI;
   if (p_Vid->type != B_SLICE)
   {
-    p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt ++;
+    p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt++;
     p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt = p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt % MAX_FN;
   }
 
-  if ( currLayer == 0 )
+  if (currLayer == 0)
   {
-    if ( p_Vid->number == p_Inp->no_frames - 1 )
+    if (p_Vid->number == p_Inp->no_frames - 1)
       p_SEI->seiSubseqInfo[currLayer].last_picture_flag = 1;
     else
       p_SEI->seiSubseqInfo[currLayer].last_picture_flag = 0;
   }
-  if ( currLayer == 1 )
+  if (currLayer == 1)
   {
-    if ( (((p_Vid->curr_frm_idx - p_Vid->last_idr_code_order) % (p_Inp->NumFramesInELSubSeq + 1) == 0) && (p_Inp->NumberBFrames != 0) && ((p_Vid->curr_frm_idx - p_Vid->last_idr_code_order) > 0)) || // there are B frames
-      (((p_Vid->curr_frm_idx - p_Vid->last_idr_code_order) % (p_Inp->NumFramesInELSubSeq + 1) == p_Inp->NumFramesInELSubSeq) && (p_Inp->NumberBFrames==0))  // there are no B frames
-      )
+    if ((((p_Vid->curr_frm_idx - p_Vid->last_idr_code_order) % (p_Inp->NumFramesInELSubSeq + 1) == 0) && (p_Inp->NumberBFrames != 0) && ((p_Vid->curr_frm_idx - p_Vid->last_idr_code_order) > 0)) || // there are B frames
+        (((p_Vid->curr_frm_idx - p_Vid->last_idr_code_order) % (p_Inp->NumFramesInELSubSeq + 1) == p_Inp->NumFramesInELSubSeq) && (p_Inp->NumberBFrames == 0))                                       // there are no B frames
+    )
       p_SEI->seiSubseqInfo[currLayer].last_picture_flag = 1;
     else
       p_SEI->seiSubseqInfo[currLayer].last_picture_flag = 0;
@@ -936,19 +949,20 @@ static void FinalizeSubseqInfo(SEIParameters *p_SEI, int currLayer)
   writeSyntaxElement2Buf_UVLC(&sym, dest);
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( dest->bits_to_go != 8 )
+  if (dest->bits_to_go != 8)
   {
     (dest->byte_buf) <<= 1;
     dest->byte_buf |= 1;
     dest->bits_to_go--;
-    if ( dest->bits_to_go != 0 ) (dest->byte_buf) <<= (dest->bits_to_go);
+    if (dest->bits_to_go != 0)
+      (dest->byte_buf) <<= (dest->bits_to_go);
     dest->bits_to_go = 8;
-    dest->streamBuffer[dest->byte_pos++]=dest->byte_buf;
+    dest->streamBuffer[dest->byte_pos++] = dest->byte_buf;
     dest->byte_buf = 0;
   }
   p_SEI->seiSubseqInfo[currLayer].payloadSize = dest->byte_pos;
 
-//  printf("layer %d, last picture %d, stored_cnt %d\n", currLayer, p_SEI->seiSubseqInfo[currLayer].last_picture_flag, p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt );
+  //  printf("layer %d, last picture %d, stored_cnt %d\n", currLayer, p_SEI->seiSubseqInfo[currLayer].last_picture_flag, p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt );
 }
 
 /*!
@@ -959,10 +973,10 @@ static void FinalizeSubseqInfo(SEIParameters *p_SEI, int currLayer)
  */
 static void ClearSubseqInfoPayload(SEIParameters *p_SEI, int currLayer)
 {
-  p_SEI->seiSubseqInfo[currLayer].data->bits_to_go  = 8;
-  p_SEI->seiSubseqInfo[currLayer].data->byte_pos    = 0;
-  p_SEI->seiSubseqInfo[currLayer].data->byte_buf    = 0;
-  memset( p_SEI->seiSubseqInfo[currLayer].data->streamBuffer, 0, MAXRTPPAYLOADLEN );
+  p_SEI->seiSubseqInfo[currLayer].data->bits_to_go = 8;
+  p_SEI->seiSubseqInfo[currLayer].data->byte_pos = 0;
+  p_SEI->seiSubseqInfo[currLayer].data->byte_buf = 0;
+  memset(p_SEI->seiSubseqInfo[currLayer].data->streamBuffer, 0, MAXRTPPAYLOADLEN);
   p_SEI->seiSubseqInfo[currLayer].payloadSize = 0;
 }
 
@@ -974,11 +988,11 @@ static void ClearSubseqInfoPayload(SEIParameters *p_SEI, int currLayer)
  */
 void CloseSubseqInfo(SEIParameters *p_SEI, int currLayer)
 {
-  p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt = (unsigned int) -1;
+  p_SEI->seiSubseqInfo[currLayer].stored_frame_cnt = (unsigned int)-1;
   p_SEI->seiSubseqInfo[currLayer].payloadSize = 0;
 
-  free( p_SEI->seiSubseqInfo[currLayer].data->streamBuffer );
-  free( p_SEI->seiSubseqInfo[currLayer].data );
+  free(p_SEI->seiSubseqInfo[currLayer].data->streamBuffer);
+  free(p_SEI->seiSubseqInfo[currLayer].data);
 }
 
 /*
@@ -1002,7 +1016,7 @@ static void InitSubseqLayerInfo(SEIParameters *p_SEI)
   int i;
   p_SEI->seiHasSubseqLayerInfo = TRUE;
   p_SEI->seiSubseqLayerInfo.layer_number = 0;
-  for (i=0; i<MAX_LAYER_NUMBER; i++)
+  for (i = 0; i < MAX_LAYER_NUMBER; i++)
   {
     p_SEI->seiSubseqLayerInfo.bit_rate[i] = 0;
     p_SEI->seiSubseqLayerInfo.frame_rate[i] = 0;
@@ -1031,11 +1045,11 @@ static void FinalizeSubseqLayerInfo(SEIParameters *p_SEI)
   int i, pos;
   pos = 0;
   p_SEI->seiSubseqLayerInfo.payloadSize = 0;
-  for (i=0; i<p_SEI->seiSubseqLayerInfo.layer_number; i++)
+  for (i = 0; i < p_SEI->seiSubseqLayerInfo.layer_number; i++)
   {
-    *((uint16*)&(p_SEI->seiSubseqLayerInfo.data[pos])) = p_SEI->seiSubseqLayerInfo.bit_rate[i];
+    *((uint16 *)&(p_SEI->seiSubseqLayerInfo.data[pos])) = p_SEI->seiSubseqLayerInfo.bit_rate[i];
     pos += 2;
-    *((uint16*)&(p_SEI->seiSubseqLayerInfo.data[pos])) = p_SEI->seiSubseqLayerInfo.frame_rate[i];
+    *((uint16 *)&(p_SEI->seiSubseqLayerInfo.data[pos])) = p_SEI->seiSubseqLayerInfo.frame_rate[i];
     pos += 2;
     p_SEI->seiSubseqLayerInfo.payloadSize += 4;
   }
@@ -1054,10 +1068,12 @@ static void FinalizeSubseqLayerInfo(SEIParameters *p_SEI)
 void InitSubseqChar(VideoParameters *p_Vid)
 {
   SEIParameters *p_SEI = p_Vid->p_SEI;
-  p_SEI->seiSubseqChar.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiSubseqChar.data == NULL ) no_mem_exit("InitSubseqChar: p_SEI->seiSubseqChar.data");
+  p_SEI->seiSubseqChar.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiSubseqChar.data == NULL)
+    no_mem_exit("InitSubseqChar: p_SEI->seiSubseqChar.data");
   p_SEI->seiSubseqChar.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiSubseqChar.data->streamBuffer == NULL ) no_mem_exit("InitSubseqChar: p_SEI->seiSubseqChar.data->streamBuffer");
+  if (p_SEI->seiSubseqChar.data->streamBuffer == NULL)
+    no_mem_exit("InitSubseqChar: p_SEI->seiSubseqChar.data->streamBuffer");
   ClearSubseqCharPayload(p_SEI);
 
   p_SEI->seiSubseqChar.subseq_layer_num = p_Vid->layer;
@@ -1069,11 +1085,11 @@ void InitSubseqChar(VideoParameters *p_Vid)
 
 static void ClearSubseqCharPayload(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiSubseqChar.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
-  p_SEI->seiSubseqChar.data->bits_to_go  = 8;
-  p_SEI->seiSubseqChar.data->byte_pos    = 0;
-  p_SEI->seiSubseqChar.data->byte_buf    = 0;
-  p_SEI->seiSubseqChar.payloadSize       = 0;
+  memset(p_SEI->seiSubseqChar.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  p_SEI->seiSubseqChar.data->bits_to_go = 8;
+  p_SEI->seiSubseqChar.data->byte_pos = 0;
+  p_SEI->seiSubseqChar.data->byte_buf = 0;
+  p_SEI->seiSubseqChar.payloadSize = 0;
 
   p_SEI->seiHasSubseqChar = FALSE;
 }
@@ -1113,7 +1129,7 @@ static void FinalizeSubseqChar(SEIParameters *p_SEI)
   sym.bitpattern = p_SEI->seiSubseqChar.duration_flag;
   sym.len = 1;
   writeSyntaxElement2Buf_Fixed(&sym, dest);
-  if ( p_SEI->seiSubseqChar.duration_flag )
+  if (p_SEI->seiSubseqChar.duration_flag)
   {
     sym.bitpattern = p_SEI->seiSubseqChar.subseq_duration;
     sym.len = 32;
@@ -1122,7 +1138,7 @@ static void FinalizeSubseqChar(SEIParameters *p_SEI)
   sym.bitpattern = p_SEI->seiSubseqChar.average_rate_flag;
   sym.len = 1;
   writeSyntaxElement2Buf_Fixed(&sym, dest);
-  if ( p_SEI->seiSubseqChar.average_rate_flag )
+  if (p_SEI->seiSubseqChar.average_rate_flag)
   {
     sym.bitpattern = p_SEI->seiSubseqChar.average_bit_rate;
     sym.len = 16;
@@ -1133,7 +1149,7 @@ static void FinalizeSubseqChar(SEIParameters *p_SEI)
   }
   sym.value1 = p_SEI->seiSubseqChar.num_referenced_subseqs;
   writeSyntaxElement2Buf_UVLC(&sym, dest);
-  for (i=0; i<p_SEI->seiSubseqChar.num_referenced_subseqs; i++)
+  for (i = 0; i < p_SEI->seiSubseqChar.num_referenced_subseqs; i++)
   {
     sym.value1 = p_SEI->seiSubseqChar.ref_subseq_layer_num[i];
     writeSyntaxElement2Buf_UVLC(&sym, dest);
@@ -1142,14 +1158,15 @@ static void FinalizeSubseqChar(SEIParameters *p_SEI)
   }
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( dest->bits_to_go != 8 )
+  if (dest->bits_to_go != 8)
   {
     (dest->byte_buf) <<= 1;
     dest->byte_buf |= 1;
     dest->bits_to_go--;
-    if ( dest->bits_to_go != 0 ) (dest->byte_buf) <<= (dest->bits_to_go);
+    if (dest->bits_to_go != 0)
+      (dest->byte_buf) <<= (dest->bits_to_go);
     dest->bits_to_go = 8;
-    dest->streamBuffer[dest->byte_pos++]=dest->byte_buf;
+    dest->streamBuffer[dest->byte_pos++] = dest->byte_buf;
     dest->byte_buf = 0;
   }
   p_SEI->seiSubseqChar.payloadSize = dest->byte_pos;
@@ -1164,7 +1181,6 @@ static void CloseSubseqChar(SEIParameters *p_SEI)
   }
   p_SEI->seiSubseqChar.data = NULL;
 }
-
 
 // JVT-D099
 /*
@@ -1184,14 +1200,16 @@ void InitSceneInformation(SEIParameters *p_SEI)
   p_SEI->seiSceneInformation.scene_transition_type = 0;
   p_SEI->seiSceneInformation.second_scene_id = -1;
 
-  p_SEI->seiSceneInformation.data = malloc( sizeof(Bitstream) );
-  if(p_SEI-> seiSceneInformation.data == NULL ) no_mem_exit("InitSceneInformation: seiSceneInformation.data");
-  p_SEI->seiSceneInformation.data->streamBuffer = malloc( MAXRTPPAYLOADLEN );
-  if( p_SEI->seiSceneInformation.data->streamBuffer == NULL ) no_mem_exit("InitSceneInformation: seiSceneInformation.data->streamBuffer");
-  p_SEI->seiSceneInformation.data->bits_to_go  = 8;
-  p_SEI->seiSceneInformation.data->byte_pos    = 0;
-  p_SEI->seiSceneInformation.data->byte_buf    = 0;
-  memset( p_SEI->seiSceneInformation.data->streamBuffer, 0, MAXRTPPAYLOADLEN );
+  p_SEI->seiSceneInformation.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiSceneInformation.data == NULL)
+    no_mem_exit("InitSceneInformation: seiSceneInformation.data");
+  p_SEI->seiSceneInformation.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
+  if (p_SEI->seiSceneInformation.data->streamBuffer == NULL)
+    no_mem_exit("InitSceneInformation: seiSceneInformation.data->streamBuffer");
+  p_SEI->seiSceneInformation.data->bits_to_go = 8;
+  p_SEI->seiSceneInformation.data->byte_pos = 0;
+  p_SEI->seiSceneInformation.data->byte_buf = 0;
+  memset(p_SEI->seiSceneInformation.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
 }
 
 void CloseSceneInformation(SEIParameters *p_SEI)
@@ -1219,7 +1237,7 @@ void FinalizeSceneInformation(SEIParameters *p_SEI)
   sym.value1 = p_SEI->seiSceneInformation.scene_transition_type;
   writeSyntaxElement2Buf_UVLC(&sym, dest);
 
-  if(p_SEI->seiSceneInformation.scene_transition_type > 3)
+  if (p_SEI->seiSceneInformation.scene_transition_type > 3)
   {
     sym.bitpattern = p_SEI->seiSceneInformation.second_scene_id;
     sym.len = 8;
@@ -1227,14 +1245,15 @@ void FinalizeSceneInformation(SEIParameters *p_SEI)
   }
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( dest->bits_to_go != 8 )
+  if (dest->bits_to_go != 8)
   {
     (dest->byte_buf) <<= 1;
     dest->byte_buf |= 1;
     dest->bits_to_go--;
-    if ( dest->bits_to_go != 0 ) (dest->byte_buf) <<= (dest->bits_to_go);
+    if (dest->bits_to_go != 0)
+      (dest->byte_buf) <<= (dest->bits_to_go);
     dest->bits_to_go = 8;
-    dest->streamBuffer[dest->byte_pos++]=dest->byte_buf;
+    dest->streamBuffer[dest->byte_pos++] = dest->byte_buf;
     dest->byte_buf = 0;
   }
   p_SEI->seiSceneInformation.payloadSize = dest->byte_pos;
@@ -1247,20 +1266,19 @@ void UpdateSceneInformation(SEIParameters *p_SEI, Boolean HasSceneInformation, i
 {
   p_SEI->seiHasSceneInformation = HasSceneInformation;
 
-  assert (sceneID < 256);
+  assert(sceneID < 256);
   p_SEI->seiSceneInformation.scene_id = sceneID;
 
-  assert (sceneTransType <= 6 );
+  assert(sceneTransType <= 6);
   p_SEI->seiSceneInformation.scene_transition_type = sceneTransType;
 
-  if(sceneTransType > 3)
+  if (sceneTransType > 3)
   {
-    assert (secondSceneID < 256);
+    assert(secondSceneID < 256);
     p_SEI->seiSceneInformation.second_scene_id = secondSceneID;
   }
 }
 // End JVT-D099
-
 
 /*
  **++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1272,38 +1290,38 @@ void UpdateSceneInformation(SEIParameters *p_SEI, Boolean HasSceneInformation, i
  **++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
  */
 
-
 static void InitPanScanRectInfo(SEIParameters *p_SEI)
 {
-  p_SEI->seiPanScanRectInfo.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiPanScanRectInfo.data == NULL ) no_mem_exit("InitPanScanRectInfo: p_SEI->seiPanScanRectInfo.data");
+  p_SEI->seiPanScanRectInfo.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiPanScanRectInfo.data == NULL)
+    no_mem_exit("InitPanScanRectInfo: p_SEI->seiPanScanRectInfo.data");
   p_SEI->seiPanScanRectInfo.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiPanScanRectInfo.data->streamBuffer == NULL ) no_mem_exit("InitPanScanRectInfo: p_SEI->seiPanScanRectInfo.data->streamBuffer");
+  if (p_SEI->seiPanScanRectInfo.data->streamBuffer == NULL)
+    no_mem_exit("InitPanScanRectInfo: p_SEI->seiPanScanRectInfo.data->streamBuffer");
   ClearPanScanRectInfoPayload(p_SEI);
 
   p_SEI->seiPanScanRectInfo.pan_scan_rect_id = 0;
   p_SEI->seiPanScanRectInfo.pan_scan_rect_cancel_flag = 0;
   p_SEI->seiPanScanRectInfo.pan_scan_cnt_minus1 = 0;
-  memset( p_SEI->seiPanScanRectInfo.pan_scan_rect_left_offset, 0, 3 * sizeof ( int ) );
-  memset( p_SEI->seiPanScanRectInfo.pan_scan_rect_right_offset, 0, 3 * sizeof ( int ) );
-  memset( p_SEI->seiPanScanRectInfo.pan_scan_rect_top_offset, 0, 3 * sizeof ( int ) );
-  memset( p_SEI->seiPanScanRectInfo.pan_scan_rect_bottom_offset, 0, 3 * sizeof ( int ) );
+  memset(p_SEI->seiPanScanRectInfo.pan_scan_rect_left_offset, 0, 3 * sizeof(int));
+  memset(p_SEI->seiPanScanRectInfo.pan_scan_rect_right_offset, 0, 3 * sizeof(int));
+  memset(p_SEI->seiPanScanRectInfo.pan_scan_rect_top_offset, 0, 3 * sizeof(int));
+  memset(p_SEI->seiPanScanRectInfo.pan_scan_rect_bottom_offset, 0, 3 * sizeof(int));
   p_SEI->seiPanScanRectInfo.pac_scan_rect_repetition_period = 0;
 }
 
-
 void ClearPanScanRectInfoPayload(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiPanScanRectInfo.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
-  p_SEI->seiPanScanRectInfo.data->bits_to_go  = 8;
-  p_SEI->seiPanScanRectInfo.data->byte_pos    = 0;
-  p_SEI->seiPanScanRectInfo.data->byte_buf    = 0;
-  p_SEI->seiPanScanRectInfo.payloadSize       = 0;
+  memset(p_SEI->seiPanScanRectInfo.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  p_SEI->seiPanScanRectInfo.data->bits_to_go = 8;
+  p_SEI->seiPanScanRectInfo.data->byte_pos = 0;
+  p_SEI->seiPanScanRectInfo.data->byte_buf = 0;
+  p_SEI->seiPanScanRectInfo.payloadSize = 0;
 
   p_SEI->seiHasPanScanRectInfo = FALSE;
 }
 
-void UpdatePanScanRectInfo( VideoParameters *p_Vid )
+void UpdatePanScanRectInfo(VideoParameters *p_Vid)
 {
   SEIParameters *p_SEI = p_Vid->p_SEI;
 
@@ -1326,36 +1344,35 @@ void FinalizePanScanRectInfo(SEIParameters *p_SEI)
   int i;
   Bitstream *bitstream = p_SEI->seiPanScanRectInfo.data;
 
-  write_ue_v( "SEI: pan_scan_rect_id", p_SEI->seiPanScanRectInfo.pan_scan_rect_id, bitstream );
-  write_u_1( "SEI: pan_scan_rect_cancel_flag", p_SEI->seiPanScanRectInfo.pan_scan_rect_cancel_flag, bitstream );
-  if ( !(p_SEI->seiPanScanRectInfo.pan_scan_rect_cancel_flag) )
+  write_ue_v("SEI: pan_scan_rect_id", p_SEI->seiPanScanRectInfo.pan_scan_rect_id, bitstream);
+  write_u_1("SEI: pan_scan_rect_cancel_flag", p_SEI->seiPanScanRectInfo.pan_scan_rect_cancel_flag, bitstream);
+  if (!(p_SEI->seiPanScanRectInfo.pan_scan_rect_cancel_flag))
   {
-    write_ue_v( "SEI: pan_scan_cnt_minus1", p_SEI->seiPanScanRectInfo.pan_scan_cnt_minus1, bitstream );
-    for ( i = 0; i <= p_SEI->seiPanScanRectInfo.pan_scan_cnt_minus1; i++ )
+    write_ue_v("SEI: pan_scan_cnt_minus1", p_SEI->seiPanScanRectInfo.pan_scan_cnt_minus1, bitstream);
+    for (i = 0; i <= p_SEI->seiPanScanRectInfo.pan_scan_cnt_minus1; i++)
     {
-      write_se_v( "SEI: pan_scan_rect_left_offset[X]", p_SEI->seiPanScanRectInfo.pan_scan_rect_left_offset[i], bitstream );
-      write_se_v( "SEI: pan_scan_rect_right_offset[X]", p_SEI->seiPanScanRectInfo.pan_scan_rect_right_offset[i], bitstream );
-      write_se_v( "SEI: pan_scan_rect_top_offset[X]", p_SEI->seiPanScanRectInfo.pan_scan_rect_top_offset[i], bitstream );
-      write_se_v( "SEI: pan_scan_rect_bottom_offset[X]", p_SEI->seiPanScanRectInfo.pan_scan_rect_bottom_offset[i], bitstream );
+      write_se_v("SEI: pan_scan_rect_left_offset[X]", p_SEI->seiPanScanRectInfo.pan_scan_rect_left_offset[i], bitstream);
+      write_se_v("SEI: pan_scan_rect_right_offset[X]", p_SEI->seiPanScanRectInfo.pan_scan_rect_right_offset[i], bitstream);
+      write_se_v("SEI: pan_scan_rect_top_offset[X]", p_SEI->seiPanScanRectInfo.pan_scan_rect_top_offset[i], bitstream);
+      write_se_v("SEI: pan_scan_rect_bottom_offset[X]", p_SEI->seiPanScanRectInfo.pan_scan_rect_bottom_offset[i], bitstream);
     }
-    write_ue_v( "SEI: pac_scan_rect_repetition_period", p_SEI->seiPanScanRectInfo.pac_scan_rect_repetition_period, bitstream );
+    write_ue_v("SEI: pac_scan_rect_repetition_period", p_SEI->seiPanScanRectInfo.pac_scan_rect_repetition_period, bitstream);
   }
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( bitstream->bits_to_go != 8 )
+  if (bitstream->bits_to_go != 8)
   {
     (bitstream->byte_buf) <<= 1;
     bitstream->byte_buf |= 1;
     bitstream->bits_to_go--;
-    if ( bitstream->bits_to_go != 0 )
+    if (bitstream->bits_to_go != 0)
       (bitstream->byte_buf) <<= (bitstream->bits_to_go);
     bitstream->bits_to_go = 8;
-    bitstream->streamBuffer[bitstream->byte_pos++]=bitstream->byte_buf;
+    bitstream->streamBuffer[bitstream->byte_pos++] = bitstream->byte_buf;
     bitstream->byte_buf = 0;
   }
   p_SEI->seiPanScanRectInfo.payloadSize = bitstream->byte_pos;
 }
-
 
 void ClosePanScanRectInfo(SEIParameters *p_SEI)
 {
@@ -1379,26 +1396,27 @@ void ClosePanScanRectInfo(SEIParameters *p_SEI)
 static void InitUser_data_unregistered(SEIParameters *p_SEI)
 {
 
-  p_SEI->seiUser_data_unregistered.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiUser_data_unregistered.data == NULL ) no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_unregistered.data");
+  p_SEI->seiUser_data_unregistered.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiUser_data_unregistered.data == NULL)
+    no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_unregistered.data");
   p_SEI->seiUser_data_unregistered.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiUser_data_unregistered.data->streamBuffer == NULL ) no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_unregistered.data->streamBuffer");
+  if (p_SEI->seiUser_data_unregistered.data->streamBuffer == NULL)
+    no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_unregistered.data->streamBuffer");
   p_SEI->seiUser_data_unregistered.byte = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiUser_data_unregistered.byte == NULL ) no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_unregistered.byte");
+  if (p_SEI->seiUser_data_unregistered.byte == NULL)
+    no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_unregistered.byte");
   ClearUser_data_unregistered(p_SEI);
-
 }
-
 
 static void ClearUser_data_unregistered(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiUser_data_unregistered.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
-  p_SEI->seiUser_data_unregistered.data->bits_to_go  = 8;
-  p_SEI->seiUser_data_unregistered.data->byte_pos    = 0;
-  p_SEI->seiUser_data_unregistered.data->byte_buf    = 0;
-  p_SEI->seiUser_data_unregistered.payloadSize       = 0;
+  memset(p_SEI->seiUser_data_unregistered.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  p_SEI->seiUser_data_unregistered.data->bits_to_go = 8;
+  p_SEI->seiUser_data_unregistered.data->byte_pos = 0;
+  p_SEI->seiUser_data_unregistered.data->byte_buf = 0;
+  p_SEI->seiUser_data_unregistered.payloadSize = 0;
 
-  memset( p_SEI->seiUser_data_unregistered.byte, 0, MAXRTPPAYLOADLEN);
+  memset(p_SEI->seiUser_data_unregistered.byte, 0, MAXRTPPAYLOADLEN);
   p_SEI->seiUser_data_unregistered.total_byte = 0;
 
   p_SEI->seiHasUser_data_unregistered_info = FALSE;
@@ -1409,12 +1427,11 @@ void UpdateUser_data_unregistered(SEIParameters *p_SEI)
   int i, temp_data;
   int total_byte;
 
-
   total_byte = 7;
-  for(i = 0; i < total_byte; i++)
+  for (i = 0; i < total_byte; i++)
   {
     temp_data = i * 4;
-    p_SEI->seiUser_data_unregistered.byte[i] = (char) iClip3(0, 255, temp_data);
+    p_SEI->seiUser_data_unregistered.byte[i] = (char)iClip3(0, 255, temp_data);
   }
   p_SEI->seiUser_data_unregistered.total_byte = total_byte;
 }
@@ -1428,8 +1445,8 @@ static void FinalizeUser_data_unregistered(SEIParameters *p_SEI)
   sym.type = SE_HEADER;
   sym.mapping = ue_linfo;
 
-// #define PRINT_USER_DATA_UNREGISTERED_INFO
-  for( i = 0; i < p_SEI->seiUser_data_unregistered.total_byte; i++)
+  // #define PRINT_USER_DATA_UNREGISTERED_INFO
+  for (i = 0; i < p_SEI->seiUser_data_unregistered.total_byte; i++)
   {
     sym.bitpattern = p_SEI->seiUser_data_unregistered.byte[i];
     sym.len = 8; // b (8)
@@ -1442,14 +1459,15 @@ static void FinalizeUser_data_unregistered(SEIParameters *p_SEI)
 #undef PRINT_USER_DATA_UNREGISTERED_INFO
 #endif
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( dest->bits_to_go != 8 )
+  if (dest->bits_to_go != 8)
   {
     (dest->byte_buf) <<= 1;
     dest->byte_buf |= 1;
     dest->bits_to_go--;
-    if ( dest->bits_to_go != 0 ) (dest->byte_buf) <<= (dest->bits_to_go);
+    if (dest->bits_to_go != 0)
+      (dest->byte_buf) <<= (dest->bits_to_go);
     dest->bits_to_go = 8;
-    dest->streamBuffer[dest->byte_pos++]=dest->byte_buf;
+    dest->streamBuffer[dest->byte_pos++] = dest->byte_buf;
     dest->byte_buf = 0;
   }
   p_SEI->seiUser_data_unregistered.payloadSize = dest->byte_pos;
@@ -1463,12 +1481,11 @@ static void CloseUser_data_unregistered(SEIParameters *p_SEI)
     free(p_SEI->seiUser_data_unregistered.data);
   }
   p_SEI->seiUser_data_unregistered.data = NULL;
-  if(p_SEI->seiUser_data_unregistered.byte)
+  if (p_SEI->seiUser_data_unregistered.byte)
   {
     free(p_SEI->seiUser_data_unregistered.byte);
   }
 }
-
 
 /*
  **++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -1482,26 +1499,27 @@ static void CloseUser_data_unregistered(SEIParameters *p_SEI)
 void InitUser_data_registered_itu_t_t35(SEIParameters *p_SEI)
 {
 
-  p_SEI->seiUser_data_registered_itu_t_t35.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiUser_data_registered_itu_t_t35.data == NULL ) no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_registered_itu_t_t35.data");
+  p_SEI->seiUser_data_registered_itu_t_t35.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiUser_data_registered_itu_t_t35.data == NULL)
+    no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_registered_itu_t_t35.data");
   p_SEI->seiUser_data_registered_itu_t_t35.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiUser_data_registered_itu_t_t35.data->streamBuffer == NULL ) no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_registered_itu_t_t35.data->streamBuffer");
+  if (p_SEI->seiUser_data_registered_itu_t_t35.data->streamBuffer == NULL)
+    no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_registered_itu_t_t35.data->streamBuffer");
   p_SEI->seiUser_data_registered_itu_t_t35.byte = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiUser_data_registered_itu_t_t35.data == NULL ) no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_registered_itu_t_t35.byte");
+  if (p_SEI->seiUser_data_registered_itu_t_t35.data == NULL)
+    no_mem_exit("InitUser_data_unregistered: p_SEI->seiUser_data_registered_itu_t_t35.byte");
   ClearUser_data_registered_itu_t_t35(p_SEI);
-
 }
-
 
 static void ClearUser_data_registered_itu_t_t35(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiUser_data_registered_itu_t_t35.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
-  p_SEI->seiUser_data_registered_itu_t_t35.data->bits_to_go  = 8;
-  p_SEI->seiUser_data_registered_itu_t_t35.data->byte_pos    = 0;
-  p_SEI->seiUser_data_registered_itu_t_t35.data->byte_buf    = 0;
-  p_SEI->seiUser_data_registered_itu_t_t35.payloadSize       = 0;
+  memset(p_SEI->seiUser_data_registered_itu_t_t35.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  p_SEI->seiUser_data_registered_itu_t_t35.data->bits_to_go = 8;
+  p_SEI->seiUser_data_registered_itu_t_t35.data->byte_pos = 0;
+  p_SEI->seiUser_data_registered_itu_t_t35.data->byte_buf = 0;
+  p_SEI->seiUser_data_registered_itu_t_t35.payloadSize = 0;
 
-  memset( p_SEI->seiUser_data_registered_itu_t_t35.byte, 0, MAXRTPPAYLOADLEN);
+  memset(p_SEI->seiUser_data_registered_itu_t_t35.byte, 0, MAXRTPPAYLOADLEN);
   p_SEI->seiUser_data_registered_itu_t_t35.total_byte = 0;
   p_SEI->seiUser_data_registered_itu_t_t35.itu_t_t35_country_code = 0;
   p_SEI->seiUser_data_registered_itu_t_t35.itu_t_t35_country_code_extension_byte = 0;
@@ -1515,7 +1533,7 @@ void UpdateUser_data_registered_itu_t_t35(SEIParameters *p_SEI)
   int total_byte;
   int country_code = 82; // Country_code for India
 
-  if(country_code < 0xFF)
+  if (country_code < 0xFF)
   {
     p_SEI->seiUser_data_registered_itu_t_t35.itu_t_t35_country_code = country_code;
   }
@@ -1526,10 +1544,10 @@ void UpdateUser_data_registered_itu_t_t35(SEIParameters *p_SEI)
   }
 
   total_byte = 7;
-  for(i = 0; i < total_byte; i++)
+  for (i = 0; i < total_byte; i++)
   {
     temp_data = i * 3;
-    p_SEI->seiUser_data_registered_itu_t_t35.byte[i] = (char) iClip3(0, 255, temp_data);
+    p_SEI->seiUser_data_registered_itu_t_t35.byte[i] = (char)iClip3(0, 255, temp_data);
   }
   p_SEI->seiUser_data_registered_itu_t_t35.total_byte = total_byte;
 }
@@ -1552,7 +1570,7 @@ static void FinalizeUser_data_registered_itu_t_t35(SEIParameters *p_SEI)
   printf(" ITU_T_T35_COUNTRTY_CODE %d \n", p_SEI->seiUser_data_registered_itu_t_t35.itu_t_t35_country_code);
 #endif
 
-  if(p_SEI->seiUser_data_registered_itu_t_t35.itu_t_t35_country_code == 0xFF)
+  if (p_SEI->seiUser_data_registered_itu_t_t35.itu_t_t35_country_code == 0xFF)
   {
     sym.bitpattern = p_SEI->seiUser_data_registered_itu_t_t35.itu_t_t35_country_code_extension_byte;
     sym.len = 8;
@@ -1562,7 +1580,7 @@ static void FinalizeUser_data_registered_itu_t_t35(SEIParameters *p_SEI)
 #endif
   }
 
-  for( i = 0; i < p_SEI->seiUser_data_registered_itu_t_t35.total_byte; i++)
+  for (i = 0; i < p_SEI->seiUser_data_registered_itu_t_t35.total_byte; i++)
   {
     sym.bitpattern = p_SEI->seiUser_data_registered_itu_t_t35.byte[i];
     sym.len = 8; // b (8)
@@ -1575,14 +1593,15 @@ static void FinalizeUser_data_registered_itu_t_t35(SEIParameters *p_SEI)
 #undef PRINT_USER_DATA_REGISTERED_ITU_T_T35_INFO
 #endif
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( dest->bits_to_go != 8 )
+  if (dest->bits_to_go != 8)
   {
     (dest->byte_buf) <<= 1;
     dest->byte_buf |= 1;
     dest->bits_to_go--;
-    if ( dest->bits_to_go != 0 ) (dest->byte_buf) <<= (dest->bits_to_go);
+    if (dest->bits_to_go != 0)
+      (dest->byte_buf) <<= (dest->bits_to_go);
     dest->bits_to_go = 8;
-    dest->streamBuffer[dest->byte_pos++]=dest->byte_buf;
+    dest->streamBuffer[dest->byte_pos++] = dest->byte_buf;
     dest->byte_buf = 0;
   }
   p_SEI->seiUser_data_registered_itu_t_t35.payloadSize = dest->byte_pos;
@@ -1596,7 +1615,7 @@ void CloseUser_data_registered_itu_t_t35(SEIParameters *p_SEI)
     free(p_SEI->seiUser_data_registered_itu_t_t35.data);
   }
   p_SEI->seiUser_data_registered_itu_t_t35.data = NULL;
-  if(p_SEI->seiUser_data_registered_itu_t_t35.byte)
+  if (p_SEI->seiUser_data_registered_itu_t_t35.byte)
   {
     free(p_SEI->seiUser_data_registered_itu_t_t35.byte);
   }
@@ -1613,21 +1632,22 @@ void CloseUser_data_registered_itu_t_t35(SEIParameters *p_SEI)
  */
 static void InitRandomAccess(SEIParameters *p_SEI)
 {
-  p_SEI->seiRecoveryPoint.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiRecoveryPoint.data == NULL ) no_mem_exit("InitRandomAccess: seiRandomAccess.data");
+  p_SEI->seiRecoveryPoint.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiRecoveryPoint.data == NULL)
+    no_mem_exit("InitRandomAccess: seiRandomAccess.data");
   p_SEI->seiRecoveryPoint.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiRecoveryPoint.data->streamBuffer == NULL ) no_mem_exit("InitRandomAccess: seiRandomAccess.data->streamBuffer");
+  if (p_SEI->seiRecoveryPoint.data->streamBuffer == NULL)
+    no_mem_exit("InitRandomAccess: seiRandomAccess.data->streamBuffer");
   ClearRandomAccess(p_SEI);
 }
 
-
 void ClearRandomAccess(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiRecoveryPoint.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
-  p_SEI->seiRecoveryPoint.data->bits_to_go  = 8;
-  p_SEI->seiRecoveryPoint.data->byte_pos    = 0;
-  p_SEI->seiRecoveryPoint.data->byte_buf    = 0;
-  p_SEI->seiRecoveryPoint.payloadSize       = 0;
+  memset(p_SEI->seiRecoveryPoint.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  p_SEI->seiRecoveryPoint.data->bits_to_go = 8;
+  p_SEI->seiRecoveryPoint.data->byte_pos = 0;
+  p_SEI->seiRecoveryPoint.data->byte_buf = 0;
+  p_SEI->seiRecoveryPoint.payloadSize = 0;
 
   p_SEI->seiRecoveryPoint.recovery_frame_cnt = 0;
   p_SEI->seiRecoveryPoint.broken_link_flag = 0;
@@ -1640,7 +1660,7 @@ void ClearRandomAccess(SEIParameters *p_SEI)
 void UpdateRandomAccess(VideoParameters *p_Vid)
 {
   SEIParameters *p_SEI = p_Vid->p_SEI;
-  if(p_Vid->type == I_SLICE)
+  if (p_Vid->type == I_SLICE)
   {
     p_SEI->seiRecoveryPoint.recovery_frame_cnt = 0;
     p_SEI->seiRecoveryPoint.exact_match_flag = 1;
@@ -1658,32 +1678,31 @@ static void FinalizeRandomAccess(SEIParameters *p_SEI)
 {
   Bitstream *bitstream = p_SEI->seiRecoveryPoint.data;
 
-  write_ue_v(   "SEI: recovery_frame_cnt",       p_SEI->seiRecoveryPoint.recovery_frame_cnt,       bitstream);
-  write_u_1 (   "SEI: exact_match_flag",         p_SEI->seiRecoveryPoint.exact_match_flag,         bitstream);
-  write_u_1 (   "SEI: broken_link_flag",         p_SEI->seiRecoveryPoint.broken_link_flag,         bitstream);
-  write_u_v (2, "SEI: changing_slice_group_idc", p_SEI->seiRecoveryPoint.changing_slice_group_idc, bitstream);
-
+  write_ue_v("SEI: recovery_frame_cnt", p_SEI->seiRecoveryPoint.recovery_frame_cnt, bitstream);
+  write_u_1("SEI: exact_match_flag", p_SEI->seiRecoveryPoint.exact_match_flag, bitstream);
+  write_u_1("SEI: broken_link_flag", p_SEI->seiRecoveryPoint.broken_link_flag, bitstream);
+  write_u_v(2, "SEI: changing_slice_group_idc", p_SEI->seiRecoveryPoint.changing_slice_group_idc, bitstream);
 
 // #define PRINT_RECOVERY_POINT
 #ifdef PRINT_RECOVERY_POINT
-  printf(" recovery_frame_cnt %d \n",       p_SEI->seiRecoveryPoint.recovery_frame_cnt);
-  printf(" exact_match_flag %d \n",         p_SEI->seiRecoveryPoint.exact_match_flag);
-  printf(" broken_link_flag %d \n",         p_SEI->seiRecoveryPoint.broken_link_flag);
+  printf(" recovery_frame_cnt %d \n", p_SEI->seiRecoveryPoint.recovery_frame_cnt);
+  printf(" exact_match_flag %d \n", p_SEI->seiRecoveryPoint.exact_match_flag);
+  printf(" broken_link_flag %d \n", p_SEI->seiRecoveryPoint.broken_link_flag);
   printf(" changing_slice_group_idc %d \n", p_SEI->seiRecoveryPoint.changing_slice_group_idc);
   printf(" %d %d \n", bitstream->byte_pos, bitstream->bits_to_go);
 
 #undef PRINT_RECOVERY_POINT
 #endif
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( bitstream->bits_to_go != 8 )
+  if (bitstream->bits_to_go != 8)
   {
     (bitstream->byte_buf) <<= 1;
     bitstream->byte_buf |= 1;
     bitstream->bits_to_go--;
-    if ( bitstream->bits_to_go != 0 )
+    if (bitstream->bits_to_go != 0)
       (bitstream->byte_buf) <<= (bitstream->bits_to_go);
     bitstream->bits_to_go = 8;
-    bitstream->streamBuffer[bitstream->byte_pos++]=bitstream->byte_buf;
+    bitstream->streamBuffer[bitstream->byte_pos++] = bitstream->byte_buf;
     bitstream->byte_buf = 0;
   }
   p_SEI->seiRecoveryPoint.payloadSize = bitstream->byte_pos;
@@ -1712,135 +1731,135 @@ static int ParseToneMappingConfigFile(SEIParameters *p_SEI, InputParameters *p_I
 {
   int i;
   int ret;
-  FILE* fp;
+  FILE *fp;
   char buf[1024];
   unsigned int tmp;
 
-  printf ("Parsing Tone mapping cfg file %s ..........\n\n", p_Inp->ToneMappingFile);
-  if ((fp = fopen(p_Inp->ToneMappingFile, "r")) == NULL) 
+  printf("Parsing Tone mapping cfg file %s ..........\n\n", p_Inp->ToneMappingFile);
+  if ((fp = fopen(p_Inp->ToneMappingFile, "r")) == NULL)
   {
     fprintf(stderr, "Tone mapping config file %s is not found, disable tone mapping SEI\n", p_Inp->ToneMappingFile);
-    p_SEI->seiHasTone_mapping=FALSE;
+    p_SEI->seiHasTone_mapping = FALSE;
 
     return 1;
   }
 
-  //read the tone mapping config file
-  while (fscanf(fp, "%s", buf)!=EOF) 
+  // read the tone mapping config file
+  while (fscanf(fp, "%s", buf) != EOF)
   {
     ret = 1;
-    if (strcmp(buf, "tone_map_id")==0) 
+    if (strcmp(buf, "tone_map_id") == 0)
     {
       ret = fscanf(fp, " = %ud\n", &(pSeiToneMapping->tone_map_id));
     }
-    else if (strcmp(buf, "tone_map_cancel_flag")==0) 
+    else if (strcmp(buf, "tone_map_cancel_flag") == 0)
     {
       ret = fscanf(fp, " = %ud\n", &tmp);
-      pSeiToneMapping->tone_map_cancel_flag = (unsigned char) (tmp ? 1 : 0);
+      pSeiToneMapping->tone_map_cancel_flag = (unsigned char)(tmp ? 1 : 0);
     }
-    else if (strcmp(buf, "tone_map_repetition_period")==0) 
+    else if (strcmp(buf, "tone_map_repetition_period") == 0)
     {
       ret = fscanf(fp, " = %ud\n", &(pSeiToneMapping->tone_map_repetition_period));
     }
-    else if (strcmp(buf, "coded_data_bit_depth")==0) 
+    else if (strcmp(buf, "coded_data_bit_depth") == 0)
     {
       ret = fscanf(fp, " = %ud\n", &tmp);
-      pSeiToneMapping->coded_data_bit_depth = (unsigned char) tmp;
+      pSeiToneMapping->coded_data_bit_depth = (unsigned char)tmp;
     }
-    else if (strcmp(buf, "sei_bit_depth")==0) 
+    else if (strcmp(buf, "sei_bit_depth") == 0)
     {
       ret = fscanf(fp, " = %ud\n", &tmp);
-      pSeiToneMapping->sei_bit_depth =  (unsigned char) tmp;
+      pSeiToneMapping->sei_bit_depth = (unsigned char)tmp;
     }
-    else if (strcmp(buf, "model_id")==0) 
+    else if (strcmp(buf, "model_id") == 0)
     {
       ret = fscanf(fp, " = %ud\n", &(pSeiToneMapping->model_id));
     }
-    //else if (model_id ==0) 
-    else if (strcmp(buf, "min_value")==0) 
+    // else if (model_id ==0)
+    else if (strcmp(buf, "min_value") == 0)
     {
       ret = fscanf(fp, " = %d\n", &(pSeiToneMapping->min_value));
     }
-    else if (strcmp(buf, "max_value")==0) 
+    else if (strcmp(buf, "max_value") == 0)
     {
       ret = fscanf(fp, " = %d\n", &(pSeiToneMapping->max_value));
     }
     //(model_id == 1)
-    else if (strcmp(buf, "sigmoid_midpoint")==0) 
+    else if (strcmp(buf, "sigmoid_midpoint") == 0)
     {
       ret = fscanf(fp, " = %d\n", &(pSeiToneMapping->sigmoid_midpoint));
     }
-    else if (strcmp(buf, "sigmoid_width")==0) 
+    else if (strcmp(buf, "sigmoid_width") == 0)
     {
       ret = fscanf(fp, " = %d\n", &(pSeiToneMapping->sigmoid_width));
     }
-    // (model_id == 2) 
-    else if (strcmp(buf, "start_of_coded_interval")==0) 
+    // (model_id == 2)
+    else if (strcmp(buf, "start_of_coded_interval") == 0)
     {
-      int max_output_num = 1<<(pSeiToneMapping->sei_bit_depth);
+      int max_output_num = 1 << (pSeiToneMapping->sei_bit_depth);
       ret = fscanf(fp, " = ");
-      if (ret!=0)
+      if (ret != 0)
       {
-        error ("ParseToneMappingConfigFile: error parsing tone mapping config file",500);
+        error("ParseToneMappingConfigFile: error parsing tone mapping config file", 500);
       }
-      for (i=0; i < max_output_num; i++)
+      for (i = 0; i < max_output_num; i++)
       {
         ret = fscanf(fp, "%d\n", &(pSeiToneMapping->start_of_coded_interval[i]));
-        if (ret!=1)
+        if (ret != 1)
         {
-          error ("ParseToneMappingConfigFile: error parsing tone mapping config file",500);
+          error("ParseToneMappingConfigFile: error parsing tone mapping config file", 500);
         }
       }
     }
     //(model_id == 3)
-    else if (strcmp(buf, "num_pivots")==0) 
+    else if (strcmp(buf, "num_pivots") == 0)
     {
       ret = fscanf(fp, " = %d\n", &(pSeiToneMapping->num_pivots));
     }
 
-    else if (strcmp(buf, "coded_pivot_value")==0) 
+    else if (strcmp(buf, "coded_pivot_value") == 0)
     {
       ret = fscanf(fp, " = ");
-      if (ret!=0)
+      if (ret != 0)
       {
-        error ("ParseToneMappingConfigFile: error parsing tone mapping config file",500);
+        error("ParseToneMappingConfigFile: error parsing tone mapping config file", 500);
       }
-      for (i=0; i < pSeiToneMapping->num_pivots; i++)
+      for (i = 0; i < pSeiToneMapping->num_pivots; i++)
       {
         ret = fscanf(fp, "%d\n", &(pSeiToneMapping->coded_pivot_value[i]));
-        if (ret!=1)
+        if (ret != 1)
         {
-          error ("ParseToneMappingConfigFile: error parsing tone mapping config file",500);
+          error("ParseToneMappingConfigFile: error parsing tone mapping config file", 500);
         }
       }
     }
-    else if (strcmp(buf, "sei_pivot_value")==0) 
+    else if (strcmp(buf, "sei_pivot_value") == 0)
     {
       ret = fscanf(fp, " = ");
-      if (ret!=0)
+      if (ret != 0)
       {
-        error ("ParseToneMappingConfigFile: error parsing tone mapping config file",500);
+        error("ParseToneMappingConfigFile: error parsing tone mapping config file", 500);
       }
-      for (i=0; i < pSeiToneMapping->num_pivots; i++)
+      for (i = 0; i < pSeiToneMapping->num_pivots; i++)
       {
         ret = fscanf(fp, "%d\n", &(pSeiToneMapping->sei_pivot_value[i]));
-        if (ret!=1)
+        if (ret != 1)
         {
-          error ("ParseToneMappingConfigFile: error parsing tone mapping config file",500);
+          error("ParseToneMappingConfigFile: error parsing tone mapping config file", 500);
         }
       }
     }
     else
     {
-      // read till the line end 
+      // read till the line end
       if (NULL == fgets(buf, sizeof(buf), fp))
       {
-        error ("ParseToneMappingConfigFile: error parsing tone mapping config file",500);
+        error("ParseToneMappingConfigFile: error parsing tone mapping config file", 500);
       }
     }
-    if (ret!=1)
+    if (ret != 1)
     {
-      error ("ParseToneMappingConfigFile: error parsing tone mapping config file",500);
+      error("ParseToneMappingConfigFile: error parsing tone mapping config file", 500);
     }
   }
 
@@ -1849,7 +1868,7 @@ static int ParseToneMappingConfigFile(SEIParameters *p_SEI, InputParameters *p_I
   return 0;
 }
 
-static void InitToneMapping(SEIParameters *p_SEI, InputParameters *p_Inp) 
+static void InitToneMapping(SEIParameters *p_SEI, InputParameters *p_Inp)
 {
   if (p_Inp->ToneMappingSEIPresentFlag == 0)
   {
@@ -1859,15 +1878,17 @@ static void InitToneMapping(SEIParameters *p_SEI, InputParameters *p_Inp)
   else
     p_SEI->seiHasTone_mapping = TRUE;
 
-  p_SEI->seiToneMapping.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiToneMapping.data == NULL ) no_mem_exit("InitToneMapping: seiToneMapping.data");
+  p_SEI->seiToneMapping.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiToneMapping.data == NULL)
+    no_mem_exit("InitToneMapping: seiToneMapping.data");
   p_SEI->seiToneMapping.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiToneMapping.data->streamBuffer == NULL ) no_mem_exit("InitToneMapping: seiToneMapping.data->streamBuffer");
-  memset( p_SEI->seiToneMapping.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
-  p_SEI->seiToneMapping.data->bits_to_go  = 8;
-  p_SEI->seiToneMapping.data->byte_pos    = 0;
-  p_SEI->seiToneMapping.data->byte_buf    = 0;
-  p_SEI->seiToneMapping.payloadSize       = 0;
+  if (p_SEI->seiToneMapping.data->streamBuffer == NULL)
+    no_mem_exit("InitToneMapping: seiToneMapping.data->streamBuffer");
+  memset(p_SEI->seiToneMapping.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  p_SEI->seiToneMapping.data->bits_to_go = 8;
+  p_SEI->seiToneMapping.data->byte_pos = 0;
+  p_SEI->seiToneMapping.data->byte_buf = 0;
+  p_SEI->seiToneMapping.payloadSize = 0;
 
   // read tone mapping config from file
   ParseToneMappingConfigFile(p_SEI, p_Inp, &p_SEI->seiToneMapping);
@@ -1877,23 +1898,23 @@ static void FinalizeToneMapping(VideoParameters *p_Vid)
 {
   SEIParameters *p_SEI = p_Vid->p_SEI;
 
-  Bitstream *bitstream = p_SEI->seiToneMapping.data;  
+  Bitstream *bitstream = p_SEI->seiToneMapping.data;
   int i;
 
-  write_ue_v("SEI: tone_map_id"               , p_SEI->seiToneMapping.tone_map_id,             bitstream);
-  write_u_1("SEI: tone_map_cancel_flag"       , p_SEI->seiToneMapping.tone_map_cancel_flag,    bitstream);
+  write_ue_v("SEI: tone_map_id", p_SEI->seiToneMapping.tone_map_id, bitstream);
+  write_u_1("SEI: tone_map_cancel_flag", p_SEI->seiToneMapping.tone_map_cancel_flag, bitstream);
 
 #ifdef PRINT_TONE_MAPPING
   printf("frame %d: Tone-mapping SEI message\n", p_Vid->frame_num);
   printf("tone_map_id = %d\n", p_SEI->seiToneMapping.tone_map_id);
   printf("tone_map_cancel_flag = %d\n", p_SEI->seiToneMapping.tone_map_cancel_flag);
 #endif
-  if (!p_SEI->seiToneMapping.tone_map_cancel_flag) 
+  if (!p_SEI->seiToneMapping.tone_map_cancel_flag)
   {
-    write_ue_v(  "SEI: tone_map_repetition_period", p_SEI->seiToneMapping.tone_map_repetition_period, bitstream);
-    write_u_v (8,"SEI: coded_data_bit_depth"      , p_SEI->seiToneMapping.coded_data_bit_depth,       bitstream);
-    write_u_v (8,"SEI: sei_bit_depth"             , p_SEI->seiToneMapping.sei_bit_depth,              bitstream);
-    write_ue_v(  "SEI: model_id"                  , p_SEI->seiToneMapping.model_id,                   bitstream);
+    write_ue_v("SEI: tone_map_repetition_period", p_SEI->seiToneMapping.tone_map_repetition_period, bitstream);
+    write_u_v(8, "SEI: coded_data_bit_depth", p_SEI->seiToneMapping.coded_data_bit_depth, bitstream);
+    write_u_v(8, "SEI: sei_bit_depth", p_SEI->seiToneMapping.sei_bit_depth, bitstream);
+    write_ue_v("SEI: model_id", p_SEI->seiToneMapping.model_id, bitstream);
 
 #ifdef PRINT_TONE_MAPPING
     printf("tone_map_repetition_period = %d\n", p_SEI->seiToneMapping.tone_map_repetition_period);
@@ -1901,43 +1922,43 @@ static void FinalizeToneMapping(VideoParameters *p_Vid)
     printf("sei_bit_depth = %d\n", p_SEI->seiToneMapping.sei_bit_depth);
     printf("model_id = %d\n", p_SEI->seiToneMapping.model_id);
 #endif
-    if (p_SEI->seiToneMapping.model_id == 0) 
+    if (p_SEI->seiToneMapping.model_id == 0)
     { // linear mapping
-      write_u_v (32,"SEI: min_value", p_SEI->seiToneMapping.min_value, bitstream);
-      write_u_v (32,"SEI: min_value", p_SEI->seiToneMapping.max_value, bitstream);
+      write_u_v(32, "SEI: min_value", p_SEI->seiToneMapping.min_value, bitstream);
+      write_u_v(32, "SEI: min_value", p_SEI->seiToneMapping.max_value, bitstream);
 #ifdef PRINT_TONE_MAPPING
       printf("min_value = %d, max_value = %d\n", p_SEI->seiToneMapping.min_value, p_SEI->seiToneMapping.max_value);
 #endif
     }
-    else if (p_SEI->seiToneMapping.model_id == 1) 
+    else if (p_SEI->seiToneMapping.model_id == 1)
     { // sigmoidal mapping
-      write_u_v (32,"SEI: sigmoid_midpoint", p_SEI->seiToneMapping.sigmoid_midpoint,   bitstream);
-      write_u_v (32,"SEI: sigmoid_width", p_SEI->seiToneMapping.sigmoid_width,         bitstream);
+      write_u_v(32, "SEI: sigmoid_midpoint", p_SEI->seiToneMapping.sigmoid_midpoint, bitstream);
+      write_u_v(32, "SEI: sigmoid_width", p_SEI->seiToneMapping.sigmoid_width, bitstream);
 #ifdef PRINT_TONE_MAPPING
       printf("sigmoid_midpoint = %d, sigmoid_width = %d\n", p_SEI->seiToneMapping.sigmoid_midpoint, p_SEI->seiToneMapping.sigmoid_width);
 #endif
     }
-    else if (p_SEI->seiToneMapping.model_id == 2) 
+    else if (p_SEI->seiToneMapping.model_id == 2)
     { // user defined table mapping
       int bit_depth_val = 1 << p_SEI->seiToneMapping.sei_bit_depth;
-      for (i=0; i<bit_depth_val; i++) 
+      for (i = 0; i < bit_depth_val; i++)
       {
-        write_u_v((((p_SEI->seiToneMapping.coded_data_bit_depth+7)>>3)<<3), "SEI: start_of_coded_interval", p_SEI->seiToneMapping.start_of_coded_interval[i], bitstream);
+        write_u_v((((p_SEI->seiToneMapping.coded_data_bit_depth + 7) >> 3) << 3), "SEI: start_of_coded_interval", p_SEI->seiToneMapping.start_of_coded_interval[i], bitstream);
 #ifdef PRINT_TONE_MAPPING
-        //printf("start_of_coded_interval[%d] = %d\n", i, p_SEI->seiToneMapping.start_of_coded_interval[i]);
+        // printf("start_of_coded_interval[%d] = %d\n", i, p_SEI->seiToneMapping.start_of_coded_interval[i]);
 #endif
       }
     }
-    else if (p_SEI->seiToneMapping.model_id == 3) 
-    {  // piece-wise linear mapping
-      write_u_v (16,"SEI: num_pivots", p_SEI->seiToneMapping.num_pivots, bitstream);
+    else if (p_SEI->seiToneMapping.model_id == 3)
+    { // piece-wise linear mapping
+      write_u_v(16, "SEI: num_pivots", p_SEI->seiToneMapping.num_pivots, bitstream);
 #ifdef PRINT_TONE_MAPPING
       printf("num_pivots = %d\n", p_SEI->seiToneMapping.num_pivots);
 #endif
-      for (i=0; i < p_SEI->seiToneMapping.num_pivots; i++) 
+      for (i = 0; i < p_SEI->seiToneMapping.num_pivots; i++)
       {
-        write_u_v( (((p_SEI->seiToneMapping.coded_data_bit_depth+7)>>3)<<3), "SEI: coded_pivot_value",  p_SEI->seiToneMapping.coded_pivot_value[i], bitstream);
-        write_u_v( (((p_SEI->seiToneMapping.sei_bit_depth+7)>>3)<<3), "SEI: sei_pivot_value",           p_SEI->seiToneMapping.sei_pivot_value[i],   bitstream);
+        write_u_v((((p_SEI->seiToneMapping.coded_data_bit_depth + 7) >> 3) << 3), "SEI: coded_pivot_value", p_SEI->seiToneMapping.coded_pivot_value[i], bitstream);
+        write_u_v((((p_SEI->seiToneMapping.sei_bit_depth + 7) >> 3) << 3), "SEI: sei_pivot_value", p_SEI->seiToneMapping.sei_pivot_value[i], bitstream);
 #ifdef PRINT_TONE_MAPPING
         printf("coded_pivot_value[%d] = %d, sei_pivot_value[%d] = %d\n", i, p_SEI->seiToneMapping.coded_pivot_value[i], i, p_SEI->seiToneMapping.sei_pivot_value[i]);
 #endif
@@ -1946,40 +1967,39 @@ static void FinalizeToneMapping(VideoParameters *p_Vid)
   } // end !tone_map_cancel_flag
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( bitstream->bits_to_go != 8 )
+  if (bitstream->bits_to_go != 8)
   {
     (bitstream->byte_buf) <<= 1;
     bitstream->byte_buf |= 1;
     bitstream->bits_to_go--;
-    if ( bitstream->bits_to_go != 0 ) 
+    if (bitstream->bits_to_go != 0)
       (bitstream->byte_buf) <<= (bitstream->bits_to_go);
     bitstream->bits_to_go = 8;
-    bitstream->streamBuffer[bitstream->byte_pos++]=bitstream->byte_buf;
+    bitstream->streamBuffer[bitstream->byte_pos++] = bitstream->byte_buf;
     bitstream->byte_buf = 0;
   }
   p_SEI->seiToneMapping.payloadSize = bitstream->byte_pos;
 }
 
-
-void UpdateToneMapping(SEIParameters *p_SEI) 
+void UpdateToneMapping(SEIParameters *p_SEI)
 {
   // return;
 
   // you may manually generate some test case here
 }
 
-static void ClearToneMapping(SEIParameters *p_SEI) 
+static void ClearToneMapping(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiToneMapping.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
-  p_SEI->seiToneMapping.data->bits_to_go  = 8;
-  p_SEI->seiToneMapping.data->byte_pos    = 0;
-  p_SEI->seiToneMapping.data->byte_buf    = 0;
-  p_SEI->seiToneMapping.payloadSize       = 0;
+  memset(p_SEI->seiToneMapping.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  p_SEI->seiToneMapping.data->bits_to_go = 8;
+  p_SEI->seiToneMapping.data->byte_pos = 0;
+  p_SEI->seiToneMapping.data->byte_buf = 0;
+  p_SEI->seiToneMapping.payloadSize = 0;
 
-  p_SEI->seiHasTone_mapping=FALSE;
+  p_SEI->seiHasTone_mapping = FALSE;
 }
 
-static void CloseToneMapping(SEIParameters *p_SEI) 
+static void CloseToneMapping(SEIParameters *p_SEI)
 {
 
   if (p_SEI->seiToneMapping.data)
@@ -2002,38 +2022,40 @@ static void CloseToneMapping(SEIParameters *p_SEI)
  */
 static void InitPostFilterHints(SEIParameters *p_SEI)
 {
-  p_SEI->seiPostFilterHints.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiPostFilterHints.data == NULL ) no_mem_exit("InitPostFilterHints: p_SEI->seiPostFilterHints.data");
+  p_SEI->seiPostFilterHints.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiPostFilterHints.data == NULL)
+    no_mem_exit("InitPostFilterHints: p_SEI->seiPostFilterHints.data");
   p_SEI->seiPostFilterHints.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiPostFilterHints.data->streamBuffer == NULL ) no_mem_exit("InitPostFilterHints: p_SEI->seiPostFilterHints.data->streamBuffer");
+  if (p_SEI->seiPostFilterHints.data->streamBuffer == NULL)
+    no_mem_exit("InitPostFilterHints: p_SEI->seiPostFilterHints.data->streamBuffer");
   ClearPostFilterHints(p_SEI);
 }
 
 static void ClearPostFilterHints(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiPostFilterHints.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
-  p_SEI->seiPostFilterHints.data->bits_to_go  = 8;
-  p_SEI->seiPostFilterHints.data->byte_pos    = 0;
-  p_SEI->seiPostFilterHints.data->byte_buf    = 0;
-  p_SEI->seiPostFilterHints.payloadSize       = 0;
+  memset(p_SEI->seiPostFilterHints.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  p_SEI->seiPostFilterHints.data->bits_to_go = 8;
+  p_SEI->seiPostFilterHints.data->byte_pos = 0;
+  p_SEI->seiPostFilterHints.data->byte_buf = 0;
+  p_SEI->seiPostFilterHints.payloadSize = 0;
 
-  p_SEI->seiPostFilterHints.filter_hint_size_y        = 0;
-  p_SEI->seiPostFilterHints.filter_hint_size_x        = 0;
-  p_SEI->seiPostFilterHints.filter_hint_type          = 0;
+  p_SEI->seiPostFilterHints.filter_hint_size_y = 0;
+  p_SEI->seiPostFilterHints.filter_hint_size_x = 0;
+  p_SEI->seiPostFilterHints.filter_hint_type = 0;
   p_SEI->seiPostFilterHints.additional_extension_flag = 0;
 }
 
 void UpdatePostFilterHints(SEIParameters *p_SEI)
 {
   unsigned int color_component, cx, cy;
-  p_SEI->seiPostFilterHints.filter_hint_type = 0; //define filter_hint_type here
-  p_SEI->seiPostFilterHints.filter_hint_size_y = p_SEI->seiPostFilterHints.filter_hint_size_x = 5; //define filter_hint_size here
+  p_SEI->seiPostFilterHints.filter_hint_type = 0;                                                  // define filter_hint_type here
+  p_SEI->seiPostFilterHints.filter_hint_size_y = p_SEI->seiPostFilterHints.filter_hint_size_x = 5; // define filter_hint_size here
   get_mem3Dint(&p_SEI->seiPostFilterHints.filter_hint, 3, p_SEI->seiPostFilterHints.filter_hint_size_y, p_SEI->seiPostFilterHints.filter_hint_size_x);
 
-  for (color_component = 0; color_component < 3; color_component ++)
-    for (cy = 0; cy < p_SEI->seiPostFilterHints.filter_hint_size_y; cy ++)
-      for (cx = 0; cx < p_SEI->seiPostFilterHints.filter_hint_size_x; cx ++)
-        p_SEI->seiPostFilterHints.filter_hint[color_component][cy][cx] = 1; //define filter_hint here
+  for (color_component = 0; color_component < 3; color_component++)
+    for (cy = 0; cy < p_SEI->seiPostFilterHints.filter_hint_size_y; cy++)
+      for (cx = 0; cx < p_SEI->seiPostFilterHints.filter_hint_size_x; cx++)
+        p_SEI->seiPostFilterHints.filter_hint[color_component][cy][cx] = 1; // define filter_hint here
 
   p_SEI->seiPostFilterHints.additional_extension_flag = 0;
 }
@@ -2043,25 +2065,25 @@ static void FinalizePostFilterHints(SEIParameters *p_SEI)
   Bitstream *bitstream = p_SEI->seiPostFilterHints.data;
   unsigned int color_component, cx, cy;
 
-  write_ue_v(  "SEI: post_filter_hint_size_y", p_SEI->seiPostFilterHints.filter_hint_size_y, bitstream);
-  write_ue_v(  "SEI: post_filter_hint_size_x", p_SEI->seiPostFilterHints.filter_hint_size_x, bitstream);
-  write_u_v (2,"SEI: post_filter_hint_type",   p_SEI->seiPostFilterHints.filter_hint_type,   bitstream);
+  write_ue_v("SEI: post_filter_hint_size_y", p_SEI->seiPostFilterHints.filter_hint_size_y, bitstream);
+  write_ue_v("SEI: post_filter_hint_size_x", p_SEI->seiPostFilterHints.filter_hint_size_x, bitstream);
+  write_u_v(2, "SEI: post_filter_hint_type", p_SEI->seiPostFilterHints.filter_hint_type, bitstream);
 
-  for (color_component = 0; color_component < 3; color_component ++)
-    for (cy = 0; cy < p_SEI->seiPostFilterHints.filter_hint_size_y; cy ++)
-      for (cx = 0; cx < p_SEI->seiPostFilterHints.filter_hint_size_x; cx ++)
+  for (color_component = 0; color_component < 3; color_component++)
+    for (cy = 0; cy < p_SEI->seiPostFilterHints.filter_hint_size_y; cy++)
+      for (cx = 0; cx < p_SEI->seiPostFilterHints.filter_hint_size_x; cx++)
         write_se_v("SEI: post_filter_hints", p_SEI->seiPostFilterHints.filter_hint[color_component][cy][cx], bitstream);
 
-  write_u_1 ("SEI: post_filter_additional_extension_flag", p_SEI->seiPostFilterHints.additional_extension_flag, bitstream);
+  write_u_1("SEI: post_filter_additional_extension_flag", p_SEI->seiPostFilterHints.additional_extension_flag, bitstream);
 
 // #define PRINT_POST_FILTER_HINTS
 #ifdef PRINT_POST_FILTER_HINTS
   printf(" post_filter_hint_size_y %d \n", p_SEI->seiPostFilterHints.filter_hint_size_y);
   printf(" post_filter_hint_size_x %d \n", p_SEI->seiPostFilterHints.filter_hint_size_x);
-  printf(" post_filter_hint_type %d \n",   p_SEI->seiPostFilterHints.filter_hint_type);
-  for (color_component = 0; color_component < 3; color_component ++)
-    for (cy = 0; cy < p_SEI->seiPostFilterHints.filter_hint_size_y; cy ++)
-      for (cx = 0; cx < p_SEI->seiPostFilterHints.filter_hint_size_x; cx ++)
+  printf(" post_filter_hint_type %d \n", p_SEI->seiPostFilterHints.filter_hint_type);
+  for (color_component = 0; color_component < 3; color_component++)
+    for (cy = 0; cy < p_SEI->seiPostFilterHints.filter_hint_size_y; cy++)
+      for (cx = 0; cx < p_SEI->seiPostFilterHints.filter_hint_size_x; cx++)
         printf(" post_filter_hint[%d][%d][%d] %d \n", color_component, cy, cx, filter_hint[color_component][cy][cx]);
 
   printf(" additional_extension_flag %d \n", p_SEI->seiPostFilterHints.additional_extension_flag);
@@ -2069,15 +2091,15 @@ static void FinalizePostFilterHints(SEIParameters *p_SEI)
 #undef PRINT_POST_FILTER_HINTS
 #endif
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( bitstream->bits_to_go != 8 )
+  if (bitstream->bits_to_go != 8)
   {
     (bitstream->byte_buf) <<= 1;
     bitstream->byte_buf |= 1;
     bitstream->bits_to_go--;
-    if ( bitstream->bits_to_go != 0 ) 
+    if (bitstream->bits_to_go != 0)
       (bitstream->byte_buf) <<= (bitstream->bits_to_go);
     bitstream->bits_to_go = 8;
-    bitstream->streamBuffer[bitstream->byte_pos++]=bitstream->byte_buf;
+    bitstream->streamBuffer[bitstream->byte_pos++] = bitstream->byte_buf;
     bitstream->byte_buf = 0;
   }
   p_SEI->seiPostFilterHints.payloadSize = bitstream->byte_pos;
@@ -2088,7 +2110,7 @@ static void ClosePostFilterHints(SEIParameters *p_SEI)
   if (p_SEI->seiPostFilterHints.data)
   {
     free(p_SEI->seiPostFilterHints.data->streamBuffer);
-    free(p_SEI->seiPostFilterHints.data);  
+    free(p_SEI->seiPostFilterHints.data);
     if (p_SEI->seiPostFilterHints.filter_hint)
       free_mem3Dint(p_SEI->seiPostFilterHints.filter_hint);
   }
@@ -2098,11 +2120,11 @@ static void ClosePostFilterHints(SEIParameters *p_SEI)
 /*
 **++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 *  \functions to write SEI message into NAL
-*  \brief     
+*  \brief
 **++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 */
 int Write_SEI_NALU(VideoParameters *p_Vid, int len)
-{  
+{
   NALU_t *nalu = NULL;
   int RBSPlen = 0;
   byte *rbsp;
@@ -2114,12 +2136,12 @@ int Write_SEI_NALU(VideoParameters *p_Vid, int len)
     nalu = AllocNALU(MAXNALUSIZE);
     rbsp = p_SEI->sei_message[AGGREGATION_SEI].data;
     RBSPlen = p_SEI->sei_message[AGGREGATION_SEI].payloadSize;
-    RBSPtoNALU (rbsp, nalu, RBSPlen, NALU_TYPE_SEI, NALU_PRIORITY_DISPOSABLE, 1);
+    RBSPtoNALU(rbsp, nalu, RBSPlen, NALU_TYPE_SEI, NALU_PRIORITY_DISPOSABLE, 1);
     nalu->startcodeprefix_len = 4;
 
-    len += p_Vid->WriteNALU (p_Vid, nalu, p_Vid->f_out);
-    FreeNALU (nalu);
-  }  
+    len += p_Vid->WriteNALU(p_Vid, nalu, p_Vid->f_out);
+    FreeNALU(nalu);
+  }
 
   return len;
 }
@@ -2134,12 +2156,12 @@ int Write_SEI_NALU(VideoParameters *p_Vid, int len)
 void InitBufferingPeriod(VideoParameters *p_Vid)
 {
   SEIParameters *p_SEI = p_Vid->p_SEI;
-  p_SEI->seiBufferingPeriod.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiBufferingPeriod.data == NULL ) 
+  p_SEI->seiBufferingPeriod.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiBufferingPeriod.data == NULL)
     no_mem_exit("InitBufferingPeriod: seiBufferingPeriod.data");
 
   p_SEI->seiBufferingPeriod.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiBufferingPeriod.data->streamBuffer == NULL ) 
+  if (p_SEI->seiBufferingPeriod.data->streamBuffer == NULL)
     no_mem_exit("InitBufferingPeriod: seiBufferingPeriod.data->streamBuffer");
 
   ClearBufferingPeriod(p_SEI, p_Vid->active_sps);
@@ -2148,25 +2170,25 @@ void InitBufferingPeriod(VideoParameters *p_Vid)
 void ClearBufferingPeriod(SEIParameters *p_SEI, seq_parameter_set_rbsp_t *active_sps)
 {
   unsigned int SchedSelIdx;
-  memset( p_SEI->seiBufferingPeriod.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  memset(p_SEI->seiBufferingPeriod.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
 
-  p_SEI->seiBufferingPeriod.data->bits_to_go  = 8;
-  p_SEI->seiBufferingPeriod.data->byte_pos    = 0;
-  p_SEI->seiBufferingPeriod.data->byte_buf    = 0;
-  p_SEI->seiBufferingPeriod.payloadSize       = 0;
+  p_SEI->seiBufferingPeriod.data->bits_to_go = 8;
+  p_SEI->seiBufferingPeriod.data->byte_pos = 0;
+  p_SEI->seiBufferingPeriod.data->byte_buf = 0;
+  p_SEI->seiBufferingPeriod.payloadSize = 0;
 
   p_SEI->seiBufferingPeriod.seq_parameter_set_id = active_sps->seq_parameter_set_id;
-  if ( active_sps->vui_seq_parameters.nal_hrd_parameters_present_flag )
+  if (active_sps->vui_seq_parameters.nal_hrd_parameters_present_flag)
   {
-    for ( SchedSelIdx = 0; SchedSelIdx <= active_sps->vui_seq_parameters.nal_hrd_parameters.cpb_cnt_minus1; SchedSelIdx++ )
+    for (SchedSelIdx = 0; SchedSelIdx <= active_sps->vui_seq_parameters.nal_hrd_parameters.cpb_cnt_minus1; SchedSelIdx++)
     {
       p_SEI->seiBufferingPeriod.nal_initial_cpb_removal_delay[SchedSelIdx] = 0;
       p_SEI->seiBufferingPeriod.nal_initial_cpb_removal_delay_offset[SchedSelIdx] = 0;
     }
   }
-  if ( active_sps->vui_seq_parameters.vcl_hrd_parameters_present_flag )
+  if (active_sps->vui_seq_parameters.vcl_hrd_parameters_present_flag)
   {
-    for ( SchedSelIdx = 0; SchedSelIdx <= active_sps->vui_seq_parameters.vcl_hrd_parameters.cpb_cnt_minus1; SchedSelIdx++ )
+    for (SchedSelIdx = 0; SchedSelIdx <= active_sps->vui_seq_parameters.vcl_hrd_parameters.cpb_cnt_minus1; SchedSelIdx++)
     {
       p_SEI->seiBufferingPeriod.vcl_initial_cpb_removal_delay[SchedSelIdx] = 0;
       p_SEI->seiBufferingPeriod.vcl_initial_cpb_removal_delay_offset[SchedSelIdx] = 0;
@@ -2187,38 +2209,38 @@ static void FinalizeBufferingPeriod(SEIParameters *p_SEI, seq_parameter_set_rbsp
   unsigned int SchedSelIdx;
   Bitstream *bitstream = p_SEI->seiBufferingPeriod.data;
 
-  write_ue_v(   "SEI: seq_parameter_set_id",     p_SEI->seiBufferingPeriod.seq_parameter_set_id,   bitstream);
-  if ( active_sps->vui_seq_parameters.nal_hrd_parameters_present_flag )
+  write_ue_v("SEI: seq_parameter_set_id", p_SEI->seiBufferingPeriod.seq_parameter_set_id, bitstream);
+  if (active_sps->vui_seq_parameters.nal_hrd_parameters_present_flag)
   {
-    for ( SchedSelIdx = 0; SchedSelIdx <= active_sps->vui_seq_parameters.nal_hrd_parameters.cpb_cnt_minus1; SchedSelIdx++ )
+    for (SchedSelIdx = 0; SchedSelIdx <= active_sps->vui_seq_parameters.nal_hrd_parameters.cpb_cnt_minus1; SchedSelIdx++)
     {
-      write_u_v( active_sps->vui_seq_parameters.nal_hrd_parameters.initial_cpb_removal_delay_length_minus1 + 1,
-        "SEI: initial_cpb_removal_delay",     p_SEI->seiBufferingPeriod.nal_initial_cpb_removal_delay[SchedSelIdx],   bitstream);
-      write_u_v( active_sps->vui_seq_parameters.nal_hrd_parameters.initial_cpb_removal_delay_length_minus1 + 1,
-        "SEI: initial_cpb_removal_delay_offset",     p_SEI->seiBufferingPeriod.nal_initial_cpb_removal_delay_offset[SchedSelIdx],   bitstream);
+      write_u_v(active_sps->vui_seq_parameters.nal_hrd_parameters.initial_cpb_removal_delay_length_minus1 + 1,
+                "SEI: initial_cpb_removal_delay", p_SEI->seiBufferingPeriod.nal_initial_cpb_removal_delay[SchedSelIdx], bitstream);
+      write_u_v(active_sps->vui_seq_parameters.nal_hrd_parameters.initial_cpb_removal_delay_length_minus1 + 1,
+                "SEI: initial_cpb_removal_delay_offset", p_SEI->seiBufferingPeriod.nal_initial_cpb_removal_delay_offset[SchedSelIdx], bitstream);
     }
   }
-  if ( active_sps->vui_seq_parameters.vcl_hrd_parameters_present_flag )
+  if (active_sps->vui_seq_parameters.vcl_hrd_parameters_present_flag)
   {
-    for ( SchedSelIdx = 0; SchedSelIdx <= active_sps->vui_seq_parameters.vcl_hrd_parameters.cpb_cnt_minus1; SchedSelIdx++ )
+    for (SchedSelIdx = 0; SchedSelIdx <= active_sps->vui_seq_parameters.vcl_hrd_parameters.cpb_cnt_minus1; SchedSelIdx++)
     {
-      write_u_v( active_sps->vui_seq_parameters.vcl_hrd_parameters.initial_cpb_removal_delay_length_minus1 + 1,
-        "SEI: initial_cpb_removal_delay",     p_SEI->seiBufferingPeriod.vcl_initial_cpb_removal_delay[SchedSelIdx],   bitstream);
-      write_u_v( active_sps->vui_seq_parameters.vcl_hrd_parameters.initial_cpb_removal_delay_length_minus1 + 1,
-        "SEI: initial_cpb_removal_delay_offset",     p_SEI->seiBufferingPeriod.vcl_initial_cpb_removal_delay_offset[SchedSelIdx],   bitstream);
+      write_u_v(active_sps->vui_seq_parameters.vcl_hrd_parameters.initial_cpb_removal_delay_length_minus1 + 1,
+                "SEI: initial_cpb_removal_delay", p_SEI->seiBufferingPeriod.vcl_initial_cpb_removal_delay[SchedSelIdx], bitstream);
+      write_u_v(active_sps->vui_seq_parameters.vcl_hrd_parameters.initial_cpb_removal_delay_length_minus1 + 1,
+                "SEI: initial_cpb_removal_delay_offset", p_SEI->seiBufferingPeriod.vcl_initial_cpb_removal_delay_offset[SchedSelIdx], bitstream);
     }
   }
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( bitstream->bits_to_go != 8 )
+  if (bitstream->bits_to_go != 8)
   {
     (bitstream->byte_buf) <<= 1;
     bitstream->byte_buf |= 1;
     bitstream->bits_to_go--;
-    if ( bitstream->bits_to_go != 0 )
+    if (bitstream->bits_to_go != 0)
       (bitstream->byte_buf) <<= (bitstream->bits_to_go);
     bitstream->bits_to_go = 8;
-    bitstream->streamBuffer[bitstream->byte_pos++]=bitstream->byte_buf;
+    bitstream->streamBuffer[bitstream->byte_pos++] = bitstream->byte_buf;
     bitstream->byte_buf = 0;
   }
   p_SEI->seiBufferingPeriod.payloadSize = bitstream->byte_pos;
@@ -2237,17 +2259,17 @@ static void CloseBufferingPeriod(SEIParameters *p_SEI)
 /*
  ************************************************************************
  * \brief
- *    Initialize Picture Timing SEI data 
+ *    Initialize Picture Timing SEI data
  ************************************************************************
  */
 void InitPicTiming(SEIParameters *p_SEI)
 {
-  p_SEI->seiPicTiming.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiPicTiming.data == NULL ) 
+  p_SEI->seiPicTiming.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiPicTiming.data == NULL)
     no_mem_exit("InitPicTiming: seiPicTiming.data");
 
   p_SEI->seiPicTiming.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiPicTiming.data->streamBuffer == NULL ) 
+  if (p_SEI->seiPicTiming.data->streamBuffer == NULL)
     no_mem_exit("InitPicTiming: seiPicTiming.data->streamBuffer");
 
   ClearPicTiming(p_SEI);
@@ -2261,18 +2283,18 @@ void InitPicTiming(SEIParameters *p_SEI)
  */
 void ClearPicTiming(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiPicTiming.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  memset(p_SEI->seiPicTiming.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
 
-  p_SEI->seiPicTiming.data->bits_to_go  = 8;
-  p_SEI->seiPicTiming.data->byte_pos    = 0;
-  p_SEI->seiPicTiming.data->byte_buf    = 0;
-  p_SEI->seiPicTiming.payloadSize       = 0;
+  p_SEI->seiPicTiming.data->bits_to_go = 8;
+  p_SEI->seiPicTiming.data->byte_pos = 0;
+  p_SEI->seiPicTiming.data->byte_buf = 0;
+  p_SEI->seiPicTiming.payloadSize = 0;
 
   // initialization
   p_SEI->seiPicTiming.cpb_removal_delay = 0;
   p_SEI->seiPicTiming.dpb_output_delay = 0;
   p_SEI->seiPicTiming.pic_struct = 0;
-  memset(p_SEI->seiPicTiming.clock_timestamp_flag, 0, MAX_PIC_STRUCT_VALUE * sizeof(Boolean) ); // 0 == FALSE
+  memset(p_SEI->seiPicTiming.clock_timestamp_flag, 0, MAX_PIC_STRUCT_VALUE * sizeof(Boolean)); // 0 == FALSE
   p_SEI->seiPicTiming.ct_type = 0;
   p_SEI->seiPicTiming.nuit_field_based_flag = FALSE;
   p_SEI->seiPicTiming.counting_type = 0;
@@ -2286,7 +2308,7 @@ void ClearPicTiming(SEIParameters *p_SEI)
   p_SEI->seiPicTiming.seconds_flag = FALSE;
   p_SEI->seiPicTiming.minutes_flag = FALSE;
   p_SEI->seiPicTiming.hours_flag = FALSE;
-  p_SEI->seiPicTiming.time_offset = 0;  
+  p_SEI->seiPicTiming.time_offset = 0;
 
   p_SEI->seiHasPicTiming_info = FALSE;
 }
@@ -2297,13 +2319,13 @@ void ClearPicTiming(SEIParameters *p_SEI)
  *    Derive pic_struct flag (Table D-1)
  ************************************************************************
  */
-static int get_pic_struct( VideoParameters *p_Vid, int frame_no, int field_pic_flag, int top )
+static int get_pic_struct(VideoParameters *p_Vid, int frame_no, int field_pic_flag, int top)
 {
   InputParameters *p_Inp = p_Vid->p_Inp;
 
-  if ( field_pic_flag )
+  if (field_pic_flag)
   {
-    if ( top )
+    if (top)
     {
       return 1;
     }
@@ -2314,20 +2336,20 @@ static int get_pic_struct( VideoParameters *p_Vid, int frame_no, int field_pic_f
   }
   else
   {
-    if ( !p_Inp->SEIVUI32Pulldown )
+    if (!p_Inp->SEIVUI32Pulldown)
     {
       return 0;
     }
     else
     {
       int order = (frame_no % 4);
-      int pic_struct_a[4] = {0,5,6,0};
-      int pic_struct_b[4] = {0,0,7,0};
-      int pic_struct_c[4] = {3,5,6,3};
-      int pic_struct_d[4] = {0,5,4,6};
-      int pic_struct_e[4] = {3,5,4,6};
+      int pic_struct_a[4] = {0, 5, 6, 0};
+      int pic_struct_b[4] = {0, 0, 7, 0};
+      int pic_struct_c[4] = {3, 5, 6, 3};
+      int pic_struct_d[4] = {0, 5, 4, 6};
+      int pic_struct_e[4] = {3, 5, 4, 6};
 
-      switch( p_Inp->SEIVUI32Pulldown )
+      switch (p_Inp->SEIVUI32Pulldown)
       {
       default:
       case 1:
@@ -2350,7 +2372,6 @@ static int get_pic_struct( VideoParameters *p_Vid, int frame_no, int field_pic_f
   }
 }
 
-
 /*
  ************************************************************************
  * \brief
@@ -2363,89 +2384,89 @@ void UpdatePicTiming(VideoParameters *p_Vid, InputParameters *p_Inp)
   seq_parameter_set_rbsp_t *active_sps = p_Vid->active_sps;
 
   // initialize the values
-  if ( p_Inp->SEIVUI32Pulldown )
+  if (p_Inp->SEIVUI32Pulldown)
   {
     int fld_flag = p_Vid->fld_flag;
     // pic_struct
-    p_Vid->pic_struct = get_pic_struct( p_Vid, p_Vid->frm_no_in_file, fld_flag, (p_Vid->structure == TOP_FIELD) ? 1 : 0 );
+    p_Vid->pic_struct = get_pic_struct(p_Vid, p_Vid->frm_no_in_file, fld_flag, (p_Vid->structure == TOP_FIELD) ? 1 : 0);
 
-    if ( active_sps->vui_seq_parameters.pic_struct_present_flag )
+    if (active_sps->vui_seq_parameters.pic_struct_present_flag)
     {
       int NumClockTS = 0, i;
       int bottom_field_flag = (p_Vid->structure == BOTTOM_FIELD);
       p_SEI->seiPicTiming.pic_struct = p_Vid->pic_struct;
       // interpret pic_struct
-      switch( p_SEI->seiPicTiming.pic_struct )
+      switch (p_SEI->seiPicTiming.pic_struct)
       {
       case 0:
       default:
         // frame
-        assert( fld_flag == FALSE );
+        assert(fld_flag == FALSE);
         NumClockTS = 1;
         break;
       case 1:
         // top field
-        assert( (p_Vid->fld_flag == TRUE) && (bottom_field_flag == FALSE) );
+        assert((p_Vid->fld_flag == TRUE) && (bottom_field_flag == FALSE));
         NumClockTS = 1;
         break;
       case 2:
         // bottom field
-        assert( (p_Vid->fld_flag == TRUE) && (bottom_field_flag == TRUE) );
+        assert((p_Vid->fld_flag == TRUE) && (bottom_field_flag == TRUE));
         NumClockTS = 1;
         break;
       case 3:
         // top field, bottom field, in that order
       case 4:
         // bottom field, top field, in that order
-        assert( p_Vid->fld_flag == FALSE );
+        assert(p_Vid->fld_flag == FALSE);
         NumClockTS = 2;
         break;
       case 5:
         // top field, bottom field, top field repeated, in that order
       case 6:
         // bottom field, top field, bottom field repeated, in that order
-        assert( p_Vid->fld_flag == FALSE );
+        assert(p_Vid->fld_flag == FALSE);
         NumClockTS = 3;
       case 7:
         // frame doubling
-        assert( (p_Vid->fld_flag == FALSE) && active_sps->vui_seq_parameters.fixed_frame_rate_flag == 1 );
+        assert((p_Vid->fld_flag == FALSE) && active_sps->vui_seq_parameters.fixed_frame_rate_flag == 1);
         NumClockTS = 2;
         break;
       case 8:
         // frame tripling
-        assert( (p_Vid->fld_flag == FALSE) && active_sps->vui_seq_parameters.fixed_frame_rate_flag == 1 );
+        assert((p_Vid->fld_flag == FALSE) && active_sps->vui_seq_parameters.fixed_frame_rate_flag == 1);
         NumClockTS = 3;
         break;
       }
-      for ( i = 0; i < NumClockTS; i++ )
+      for (i = 0; i < NumClockTS; i++)
       {
         p_SEI->seiPicTiming.clock_timestamp_flag[i] = FALSE;
-        if ( p_SEI->seiPicTiming.clock_timestamp_flag[i] )
+        if (p_SEI->seiPicTiming.clock_timestamp_flag[i])
         {
           int seconds = 0;
           int minutes = 0;
           int hours = 0;
           int time_offset_length;
-          assert( seconds >= 0 && seconds <= 59 );
-          assert( minutes >= 0 && minutes <= 59 );
-          assert( hours >= 0 && hours <= 23 );
+          assert(seconds >= 0 && seconds <= 59);
+          assert(minutes >= 0 && minutes <= 59);
+          assert(hours >= 0 && hours <= 23);
 
-          p_SEI->seiPicTiming.ct_type               = 0;
+          p_SEI->seiPicTiming.ct_type = 0;
           p_SEI->seiPicTiming.nuit_field_based_flag = FALSE;
-          p_SEI->seiPicTiming.counting_type         = 0;
-          p_SEI->seiPicTiming.full_timestamp_flag   = FALSE;
-          p_SEI->seiPicTiming.discontinuity_flag    = FALSE;
-          p_SEI->seiPicTiming.cnt_dropped_flag      = FALSE;
-          p_SEI->seiPicTiming.n_frames              = 0;
+          p_SEI->seiPicTiming.counting_type = 0;
+          p_SEI->seiPicTiming.full_timestamp_flag = FALSE;
+          p_SEI->seiPicTiming.discontinuity_flag = FALSE;
+          p_SEI->seiPicTiming.cnt_dropped_flag = FALSE;
+          p_SEI->seiPicTiming.n_frames = 0;
 
-          if ( p_SEI->seiPicTiming.full_timestamp_flag )
-          {      
+          if (p_SEI->seiPicTiming.full_timestamp_flag)
+          {
             p_SEI->seiPicTiming.seconds_value = seconds;
             p_SEI->seiPicTiming.minutes_value = minutes;
-            p_SEI->seiPicTiming.hours_value   = hours;
+            p_SEI->seiPicTiming.hours_value = hours;
           }
           else
-          {            
+          {
             p_SEI->seiPicTiming.seconds_flag = FALSE;
             if (p_SEI->seiPicTiming.seconds_flag)
             {
@@ -2457,7 +2478,7 @@ void UpdatePicTiming(VideoParameters *p_Vid, InputParameters *p_Inp)
                 p_SEI->seiPicTiming.hours_flag = FALSE;
                 if (p_SEI->seiPicTiming.hours_flag)
                 {
-                  p_SEI->seiPicTiming.hours_value   = hours;
+                  p_SEI->seiPicTiming.hours_value = hours;
                 }
               }
             }
@@ -2468,7 +2489,7 @@ void UpdatePicTiming(VideoParameters *p_Vid, InputParameters *p_Inp)
             time_offset_length = active_sps->vui_seq_parameters.nal_hrd_parameters.time_offset_length;
           else
             time_offset_length = 24;
-          if ( time_offset_length )
+          if (time_offset_length)
           {
             p_SEI->seiPicTiming.time_offset = 0;
           }
@@ -2496,9 +2517,7 @@ static void FinalizePicTiming(VideoParameters *p_Vid)
 
   Bitstream *bitstream = p_SEI->seiPicTiming.data;
   // CpbDpbDelaysPresentFlag can also be set "by some means not specified in this Recommendation | International Standard"
-  Boolean CpbDpbDelaysPresentFlag =  (Boolean) (active_sps->vui_parameters_present_flag
-                              && (   (active_sps->vui_seq_parameters.nal_hrd_parameters_present_flag != 0)
-                                   ||(active_sps->vui_seq_parameters.vcl_hrd_parameters_present_flag != 0)));
+  Boolean CpbDpbDelaysPresentFlag = (Boolean)(active_sps->vui_parameters_present_flag && ((active_sps->vui_seq_parameters.nal_hrd_parameters_present_flag != 0) || (active_sps->vui_seq_parameters.vcl_hrd_parameters_present_flag != 0)));
   hrd_parameters_t *hrd = NULL;
 
   if (active_sps->vui_seq_parameters.vcl_hrd_parameters_present_flag)
@@ -2514,120 +2533,120 @@ static void FinalizePicTiming(VideoParameters *p_Vid)
     hrd = NULL;
   }
 
-  if ( CpbDpbDelaysPresentFlag )
+  if (CpbDpbDelaysPresentFlag)
   {
-    write_u_v( hrd->cpb_removal_delay_length_minus1 + 1, "SEI: cpb_removal_delay", p_SEI->seiPicTiming.cpb_removal_delay, bitstream);
-    write_u_v( hrd->dpb_output_delay_length_minus1  + 1, "SEI: dpb_output_delay",  p_SEI->seiPicTiming.dpb_output_delay,  bitstream);
+    write_u_v(hrd->cpb_removal_delay_length_minus1 + 1, "SEI: cpb_removal_delay", p_SEI->seiPicTiming.cpb_removal_delay, bitstream);
+    write_u_v(hrd->dpb_output_delay_length_minus1 + 1, "SEI: dpb_output_delay", p_SEI->seiPicTiming.dpb_output_delay, bitstream);
   }
-  if ( active_sps->vui_seq_parameters.pic_struct_present_flag )
+  if (active_sps->vui_seq_parameters.pic_struct_present_flag)
   {
     int NumClockTS = 0, i;
     int bottom_field_flag = (p_Vid->structure == BOTTOM_FIELD);
 
-    write_u_v( 4, "SEI: pic_struct", p_SEI->seiPicTiming.pic_struct, bitstream);
+    write_u_v(4, "SEI: pic_struct", p_SEI->seiPicTiming.pic_struct, bitstream);
     // interpret pic_struct
-    switch( p_SEI->seiPicTiming.pic_struct )
+    switch (p_SEI->seiPicTiming.pic_struct)
     {
     case 0:
     default:
       // frame
-      assert( p_Vid->fld_flag == FALSE );
+      assert(p_Vid->fld_flag == FALSE);
       NumClockTS = 1;
       break;
     case 1:
       // top field
-      assert( (p_Vid->fld_flag == TRUE) && (bottom_field_flag == FALSE) );
+      assert((p_Vid->fld_flag == TRUE) && (bottom_field_flag == FALSE));
       NumClockTS = 1;
       break;
     case 2:
       // bottom field
-      assert( (p_Vid->fld_flag == TRUE) && (bottom_field_flag == TRUE) );
+      assert((p_Vid->fld_flag == TRUE) && (bottom_field_flag == TRUE));
       NumClockTS = 1;
       break;
     case 3:
       // top field, bottom field, in that order
     case 4:
       // bottom field, top field, in that order
-      assert( p_Vid->fld_flag == FALSE );
+      assert(p_Vid->fld_flag == FALSE);
       NumClockTS = 2;
       break;
     case 5:
       // top field, bottom field, top field repeated, in that order
     case 6:
       // bottom field, top field, bottom field repeated, in that order
-      assert( p_Vid->fld_flag == FALSE );
+      assert(p_Vid->fld_flag == FALSE);
       NumClockTS = 3;
       break;
     case 7:
       // frame doubling
-      assert( (p_Vid->fld_flag == FALSE) && active_sps->vui_seq_parameters.fixed_frame_rate_flag == 1 );
+      assert((p_Vid->fld_flag == FALSE) && active_sps->vui_seq_parameters.fixed_frame_rate_flag == 1);
       NumClockTS = 2;
       break;
     case 8:
       // frame tripling
-      assert( (p_Vid->fld_flag == FALSE) && active_sps->vui_seq_parameters.fixed_frame_rate_flag == 1 );
+      assert((p_Vid->fld_flag == FALSE) && active_sps->vui_seq_parameters.fixed_frame_rate_flag == 1);
       NumClockTS = 3;
       break;
     }
-    for ( i = 0; i < NumClockTS; i++ )
+    for (i = 0; i < NumClockTS; i++)
     {
-      write_u_1( "SEI: clock_timestamp_flag", p_SEI->seiPicTiming.clock_timestamp_flag[i], bitstream);
-      if ( p_SEI->seiPicTiming.clock_timestamp_flag[i] )
+      write_u_1("SEI: clock_timestamp_flag", p_SEI->seiPicTiming.clock_timestamp_flag[i], bitstream);
+      if (p_SEI->seiPicTiming.clock_timestamp_flag[i])
       {
-        write_u_v( 2, "SEI: ct_type", p_SEI->seiPicTiming.ct_type, bitstream);
-        write_u_1( "SEI: nuit_field_based_flag", p_SEI->seiPicTiming.nuit_field_based_flag, bitstream);
-        write_u_v( 5, "SEI: counting_type", p_SEI->seiPicTiming.counting_type, bitstream);
-        write_u_1( "SEI: full_timestamp_flag", p_SEI->seiPicTiming.full_timestamp_flag, bitstream);
-        write_u_1( "SEI: discontinuity_flag", p_SEI->seiPicTiming.discontinuity_flag, bitstream);
-        write_u_1( "SEI: cnt_dropped_flag", p_SEI->seiPicTiming.cnt_dropped_flag, bitstream);
-        write_u_v( 8, "SEI: n_frames", p_SEI->seiPicTiming.n_frames, bitstream);
+        write_u_v(2, "SEI: ct_type", p_SEI->seiPicTiming.ct_type, bitstream);
+        write_u_1("SEI: nuit_field_based_flag", p_SEI->seiPicTiming.nuit_field_based_flag, bitstream);
+        write_u_v(5, "SEI: counting_type", p_SEI->seiPicTiming.counting_type, bitstream);
+        write_u_1("SEI: full_timestamp_flag", p_SEI->seiPicTiming.full_timestamp_flag, bitstream);
+        write_u_1("SEI: discontinuity_flag", p_SEI->seiPicTiming.discontinuity_flag, bitstream);
+        write_u_1("SEI: cnt_dropped_flag", p_SEI->seiPicTiming.cnt_dropped_flag, bitstream);
+        write_u_v(8, "SEI: n_frames", p_SEI->seiPicTiming.n_frames, bitstream);
 
-        if ( p_SEI->seiPicTiming.full_timestamp_flag )
-        {      
-          write_u_v( 6, "SEI: seconds_value", p_SEI->seiPicTiming.seconds_value, bitstream);
-          write_u_v( 6, "SEI: minutes_value", p_SEI->seiPicTiming.minutes_value, bitstream);
-          write_u_v( 5, "SEI: hours_value",   p_SEI->seiPicTiming.hours_value, bitstream);
+        if (p_SEI->seiPicTiming.full_timestamp_flag)
+        {
+          write_u_v(6, "SEI: seconds_value", p_SEI->seiPicTiming.seconds_value, bitstream);
+          write_u_v(6, "SEI: minutes_value", p_SEI->seiPicTiming.minutes_value, bitstream);
+          write_u_v(5, "SEI: hours_value", p_SEI->seiPicTiming.hours_value, bitstream);
         }
         else
-        {            
-          write_u_1( "SEI: seconds_flag", p_SEI->seiPicTiming.seconds_flag, bitstream);
+        {
+          write_u_1("SEI: seconds_flag", p_SEI->seiPicTiming.seconds_flag, bitstream);
           if (p_SEI->seiPicTiming.seconds_flag)
           {
-            write_u_v( 6, "SEI: seconds_value", p_SEI->seiPicTiming.seconds_value, bitstream);
-            write_u_1( "SEI: minutes_flag", p_SEI->seiPicTiming.minutes_flag, bitstream);
+            write_u_v(6, "SEI: seconds_value", p_SEI->seiPicTiming.seconds_value, bitstream);
+            write_u_1("SEI: minutes_flag", p_SEI->seiPicTiming.minutes_flag, bitstream);
             if (p_SEI->seiPicTiming.minutes_flag)
             {
-              write_u_v( 6, "SEI: minutes_value", p_SEI->seiPicTiming.minutes_value, bitstream);
-              write_u_1( "SEI: hours_flag", p_SEI->seiPicTiming.hours_flag, bitstream);
+              write_u_v(6, "SEI: minutes_value", p_SEI->seiPicTiming.minutes_value, bitstream);
+              write_u_1("SEI: hours_flag", p_SEI->seiPicTiming.hours_flag, bitstream);
               if (p_SEI->seiPicTiming.hours_flag)
               {
-                write_u_v( 5, "SEI: hours_value",   p_SEI->seiPicTiming.hours_value, bitstream);
+                write_u_v(5, "SEI: hours_value", p_SEI->seiPicTiming.hours_value, bitstream);
               }
             }
           }
         }
-        if ( hrd == NULL )
+        if (hrd == NULL)
         {
-          write_u_v( 24, "SEI: time_offset", p_SEI->seiPicTiming.time_offset, bitstream);
+          write_u_v(24, "SEI: time_offset", p_SEI->seiPicTiming.time_offset, bitstream);
         }
         else
         {
-          write_u_v( hrd->time_offset_length, "SEI: time_offset", p_SEI->seiPicTiming.time_offset, bitstream);
+          write_u_v(hrd->time_offset_length, "SEI: time_offset", p_SEI->seiPicTiming.time_offset, bitstream);
         }
       }
     }
   }
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( bitstream->bits_to_go != 8 )
+  if (bitstream->bits_to_go != 8)
   {
     (bitstream->byte_buf) <<= 1;
     bitstream->byte_buf |= 1;
     bitstream->bits_to_go--;
-    if ( bitstream->bits_to_go != 0 )
+    if (bitstream->bits_to_go != 0)
       (bitstream->byte_buf) <<= (bitstream->bits_to_go);
     bitstream->bits_to_go = 8;
-    bitstream->streamBuffer[bitstream->byte_pos++]=bitstream->byte_buf;
+    bitstream->streamBuffer[bitstream->byte_pos++] = bitstream->byte_buf;
     bitstream->byte_buf = 0;
   }
   p_SEI->seiPicTiming.payloadSize = bitstream->byte_pos;
@@ -2662,12 +2681,12 @@ static void InitFramePackingArrangement(VideoParameters *p_Vid)
 {
   SEIParameters *p_SEI = p_Vid->p_SEI;
 
-  p_SEI->seiFramePackingArrangement.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiFramePackingArrangement.data == NULL ) 
+  p_SEI->seiFramePackingArrangement.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiFramePackingArrangement.data == NULL)
     no_mem_exit("InitFramePackingArrangement: seiFramePackingArrangement.data");
 
   p_SEI->seiFramePackingArrangement.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiFramePackingArrangement.data->streamBuffer == NULL ) 
+  if (p_SEI->seiFramePackingArrangement.data->streamBuffer == NULL)
     no_mem_exit("InitFramePackingArrangement: seiFramePackingArrangement.data->streamBuffer");
 
   ClearFramePackingArrangement(p_SEI);
@@ -2675,12 +2694,12 @@ static void InitFramePackingArrangement(VideoParameters *p_Vid)
 
 void ClearFramePackingArrangement(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiFramePackingArrangement.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  memset(p_SEI->seiFramePackingArrangement.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
 
-  p_SEI->seiFramePackingArrangement.data->bits_to_go  = 8;
-  p_SEI->seiFramePackingArrangement.data->byte_pos    = 0;
-  p_SEI->seiFramePackingArrangement.data->byte_buf    = 0;
-  p_SEI->seiFramePackingArrangement.payloadSize       = 0;
+  p_SEI->seiFramePackingArrangement.data->bits_to_go = 8;
+  p_SEI->seiFramePackingArrangement.data->byte_pos = 0;
+  p_SEI->seiFramePackingArrangement.data->byte_buf = 0;
+  p_SEI->seiFramePackingArrangement.payloadSize = 0;
 
   p_SEI->seiFramePackingArrangement.frame_packing_arrangement_id = 0;
   p_SEI->seiFramePackingArrangement.frame_packing_arrangement_cancel_flag = FALSE;
@@ -2709,7 +2728,7 @@ void UpdateFramePackingArrangement(VideoParameters *p_Vid, InputParameters *p_In
   SEIParameters *p_SEI = p_Vid->p_SEI;
 
   p_SEI->seiHasFramePackingArrangement_info = FALSE;
-  if ( p_Inp->SEIFPAType != -1 )
+  if (p_Inp->SEIFPAType != -1)
   {
     p_SEI->seiHasFramePackingArrangement_info = TRUE;
     p_SEI->seiFramePackingArrangement.frame_packing_arrangement_type = p_Inp->SEIFPAType;
@@ -2720,43 +2739,42 @@ static void FinalizeFramePackingArrangement(SEIParameters *p_SEI, InputParameter
 {
   Bitstream *bitstream = p_SEI->seiFramePackingArrangement.data;
 
-  write_ue_v( "SEI: frame_packing_arrangement_id", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_id, bitstream );
-  write_u_1( "SEI: frame_packing_arrangement_cancel_flag", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_cancel_flag, bitstream );
-  if ( p_SEI->seiFramePackingArrangement.frame_packing_arrangement_cancel_flag == FALSE )
+  write_ue_v("SEI: frame_packing_arrangement_id", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_id, bitstream);
+  write_u_1("SEI: frame_packing_arrangement_cancel_flag", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_cancel_flag, bitstream);
+  if (p_SEI->seiFramePackingArrangement.frame_packing_arrangement_cancel_flag == FALSE)
   {
-    write_u_v( 7, "SEI: frame_packing_arrangement_type", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_type, bitstream );
-    write_u_1( "SEI: quincunx_sampling_flag", (int)p_SEI->seiFramePackingArrangement.quincunx_sampling_flag, bitstream );
-    write_u_v( 6, "SEI: content_interpretation_type", (int)p_SEI->seiFramePackingArrangement.content_interpretation_type, bitstream );
-    write_u_1( "SEI: spatial_flipping_flag", (int)p_SEI->seiFramePackingArrangement.spatial_flipping_flag, bitstream );
-    write_u_1( "SEI: frame0_flipped_flag", (int)p_SEI->seiFramePackingArrangement.frame0_flipped_flag, bitstream );
-    write_u_1( "SEI: field_views_flag", (int)p_SEI->seiFramePackingArrangement.field_views_flag, bitstream );
-    write_u_1( "SEI: current_frame_is_frame0_flag", (int)p_SEI->seiFramePackingArrangement.current_frame_is_frame0_flag, bitstream );
-    write_u_1( "SEI: frame0_self_contained_flag", (int)p_SEI->seiFramePackingArrangement.frame0_self_contained_flag, bitstream );
-    write_u_1( "SEI: frame1_self_contained_flag", (int)p_SEI->seiFramePackingArrangement.frame1_self_contained_flag, bitstream );
-    if ( p_SEI->seiFramePackingArrangement.quincunx_sampling_flag == FALSE && p_SEI->seiFramePackingArrangement.frame_packing_arrangement_type != 5 )
+    write_u_v(7, "SEI: frame_packing_arrangement_type", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_type, bitstream);
+    write_u_1("SEI: quincunx_sampling_flag", (int)p_SEI->seiFramePackingArrangement.quincunx_sampling_flag, bitstream);
+    write_u_v(6, "SEI: content_interpretation_type", (int)p_SEI->seiFramePackingArrangement.content_interpretation_type, bitstream);
+    write_u_1("SEI: spatial_flipping_flag", (int)p_SEI->seiFramePackingArrangement.spatial_flipping_flag, bitstream);
+    write_u_1("SEI: frame0_flipped_flag", (int)p_SEI->seiFramePackingArrangement.frame0_flipped_flag, bitstream);
+    write_u_1("SEI: field_views_flag", (int)p_SEI->seiFramePackingArrangement.field_views_flag, bitstream);
+    write_u_1("SEI: current_frame_is_frame0_flag", (int)p_SEI->seiFramePackingArrangement.current_frame_is_frame0_flag, bitstream);
+    write_u_1("SEI: frame0_self_contained_flag", (int)p_SEI->seiFramePackingArrangement.frame0_self_contained_flag, bitstream);
+    write_u_1("SEI: frame1_self_contained_flag", (int)p_SEI->seiFramePackingArrangement.frame1_self_contained_flag, bitstream);
+    if (p_SEI->seiFramePackingArrangement.quincunx_sampling_flag == FALSE && p_SEI->seiFramePackingArrangement.frame_packing_arrangement_type != 5)
     {
-      write_u_v( 4, "SEI: frame0_grid_position_x", (int)p_SEI->seiFramePackingArrangement.frame0_grid_position_x, bitstream );
-      write_u_v( 4, "SEI: frame0_grid_position_y", (int)p_SEI->seiFramePackingArrangement.frame0_grid_position_y, bitstream );
-      write_u_v( 4, "SEI: frame1_grid_position_x", (int)p_SEI->seiFramePackingArrangement.frame1_grid_position_x, bitstream );
-      write_u_v( 4, "SEI: frame1_grid_position_y", (int)p_SEI->seiFramePackingArrangement.frame1_grid_position_y, bitstream );
+      write_u_v(4, "SEI: frame0_grid_position_x", (int)p_SEI->seiFramePackingArrangement.frame0_grid_position_x, bitstream);
+      write_u_v(4, "SEI: frame0_grid_position_y", (int)p_SEI->seiFramePackingArrangement.frame0_grid_position_y, bitstream);
+      write_u_v(4, "SEI: frame1_grid_position_x", (int)p_SEI->seiFramePackingArrangement.frame1_grid_position_x, bitstream);
+      write_u_v(4, "SEI: frame1_grid_position_y", (int)p_SEI->seiFramePackingArrangement.frame1_grid_position_y, bitstream);
     }
 
-    
-    write_u_v( 8, "SEI: frame_packing_arrangement_reserved_byte", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_reserved_byte, bitstream );
-    write_ue_v( "SEI: frame_packing_arrangement_repetition_period", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_repetition_period, bitstream );
+    write_u_v(8, "SEI: frame_packing_arrangement_reserved_byte", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_reserved_byte, bitstream);
+    write_ue_v("SEI: frame_packing_arrangement_repetition_period", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_repetition_period, bitstream);
   }
-  write_u_1( "SEI: frame_packing_arrangement_extension_flag", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_extension_flag, bitstream );
+  write_u_1("SEI: frame_packing_arrangement_extension_flag", (int)p_SEI->seiFramePackingArrangement.frame_packing_arrangement_extension_flag, bitstream);
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( bitstream->bits_to_go != 8 )
+  if (bitstream->bits_to_go != 8)
   {
     (bitstream->byte_buf) <<= 1;
     bitstream->byte_buf |= 1;
     bitstream->bits_to_go--;
-    if ( bitstream->bits_to_go != 0 )
+    if (bitstream->bits_to_go != 0)
       (bitstream->byte_buf) <<= (bitstream->bits_to_go);
     bitstream->bits_to_go = 8;
-    bitstream->streamBuffer[bitstream->byte_pos++]=bitstream->byte_buf;
+    bitstream->streamBuffer[bitstream->byte_pos++] = bitstream->byte_buf;
     bitstream->byte_buf = 0;
   }
   p_SEI->seiFramePackingArrangement.payloadSize = bitstream->byte_pos;
@@ -2775,17 +2793,17 @@ static void CloseFramePackingArrangement(SEIParameters *p_SEI)
 /*
  ************************************************************************
  * \brief
- *    Initialize dec_ref_pic_marking Repetition SEI data 
+ *    Initialize dec_ref_pic_marking Repetition SEI data
  ************************************************************************
  */
 static void InitDRPMRepetition(SEIParameters *p_SEI)
 {
-  p_SEI->seiDRPMRepetition.data = malloc( sizeof(Bitstream) );
-  if( p_SEI->seiDRPMRepetition.data == NULL ) 
+  p_SEI->seiDRPMRepetition.data = malloc(sizeof(Bitstream));
+  if (p_SEI->seiDRPMRepetition.data == NULL)
     no_mem_exit("InitDRPMRepetition: p_SEI->seiDRPMRepetition.data");
 
   p_SEI->seiDRPMRepetition.data->streamBuffer = malloc(MAXRTPPAYLOADLEN);
-  if( p_SEI->seiDRPMRepetition.data->streamBuffer == NULL ) 
+  if (p_SEI->seiDRPMRepetition.data->streamBuffer == NULL)
     no_mem_exit("InitDRPMRepetition: p_SEI->seiDRPMRepetition.data->streamBuffer");
 
   ClearDRPMRepetition(p_SEI);
@@ -2799,20 +2817,20 @@ static void InitDRPMRepetition(SEIParameters *p_SEI)
  */
 void ClearDRPMRepetition(SEIParameters *p_SEI)
 {
-  memset( p_SEI->seiDRPMRepetition.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
+  memset(p_SEI->seiDRPMRepetition.data->streamBuffer, 0, MAXRTPPAYLOADLEN);
 
   p_SEI->seiDRPMRepetition.data->bits_to_go = 8;
-  p_SEI->seiDRPMRepetition.data->byte_pos   = 0;
-  p_SEI->seiDRPMRepetition.data->byte_buf   = 0;
-  p_SEI->seiDRPMRepetition.payloadSize      = 0;
+  p_SEI->seiDRPMRepetition.data->byte_pos = 0;
+  p_SEI->seiDRPMRepetition.data->byte_buf = 0;
+  p_SEI->seiDRPMRepetition.payloadSize = 0;
 
   p_SEI->seiDRPMRepetition.original_bottom_field_flag = FALSE;
-  p_SEI->seiDRPMRepetition.original_field_pic_flag    = FALSE;
-  p_SEI->seiDRPMRepetition.original_frame_num         = 0;
-  p_SEI->seiDRPMRepetition.original_idr_flag          = FALSE;
-  if ( p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved != NULL )
+  p_SEI->seiDRPMRepetition.original_field_pic_flag = FALSE;
+  p_SEI->seiDRPMRepetition.original_frame_num = 0;
+  p_SEI->seiDRPMRepetition.original_idr_flag = FALSE;
+  if (p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved != NULL)
   {
-    free_drpm_buffer( p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved );
+    free_drpm_buffer(p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved);
     p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved = NULL;
   }
 
@@ -2827,7 +2845,7 @@ void ClearDRPMRepetition(SEIParameters *p_SEI)
  */
 void UpdateDRPMRepetition(SEIParameters *p_SEI)
 {
-  if ( p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved != NULL )
+  if (p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved != NULL)
   {
     p_SEI->seiHasDRPMRepetition_info = TRUE;
   }
@@ -2851,31 +2869,31 @@ static void FinalizeDRPMRepetition(VideoParameters *p_Vid)
   Bitstream *bitstream = p_SEI->seiDRPMRepetition.data;
 
   // SEI message bits
-  write_u_1( "SEI: original_idr_flag", p_SEI->seiDRPMRepetition.original_idr_flag, bitstream);
-  write_ue_v( "SEI: original_frame_num", p_SEI->seiDRPMRepetition.original_frame_num, bitstream);
-  if ( !active_sps->frame_mbs_only_flag )
+  write_u_1("SEI: original_idr_flag", p_SEI->seiDRPMRepetition.original_idr_flag, bitstream);
+  write_ue_v("SEI: original_frame_num", p_SEI->seiDRPMRepetition.original_frame_num, bitstream);
+  if (!active_sps->frame_mbs_only_flag)
   {
-    write_u_1( "SEI: original_field_pic_flag", p_SEI->seiDRPMRepetition.original_field_pic_flag, bitstream);
-    if ( p_SEI->seiDRPMRepetition.original_field_pic_flag )
+    write_u_1("SEI: original_field_pic_flag", p_SEI->seiDRPMRepetition.original_field_pic_flag, bitstream);
+    if (p_SEI->seiDRPMRepetition.original_field_pic_flag)
     {
-      write_u_1( "SEI: original_bottom_field_flag", p_SEI->seiDRPMRepetition.original_bottom_field_flag, bitstream);
+      write_u_1("SEI: original_bottom_field_flag", p_SEI->seiDRPMRepetition.original_bottom_field_flag, bitstream);
     }
   }
   // now repeat dec_ref_pic_marking_buffer info
-  dec_ref_pic_marking( bitstream, 
-    p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved, 
-    p_SEI->seiDRPMRepetition.original_idr_flag, 0, 0);
+  dec_ref_pic_marking(bitstream,
+                      p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved,
+                      p_SEI->seiDRPMRepetition.original_idr_flag, 0, 0);
 
   // make sure the payload is byte aligned, stuff bits are 10..0
-  if ( bitstream->bits_to_go != 8 )
+  if (bitstream->bits_to_go != 8)
   {
     (bitstream->byte_buf) <<= 1;
     bitstream->byte_buf |= 1;
     bitstream->bits_to_go--;
-    if ( bitstream->bits_to_go != 0 )
+    if (bitstream->bits_to_go != 0)
       (bitstream->byte_buf) <<= (bitstream->bits_to_go);
     bitstream->bits_to_go = 8;
-    bitstream->streamBuffer[bitstream->byte_pos++]=bitstream->byte_buf;
+    bitstream->streamBuffer[bitstream->byte_pos++] = bitstream->byte_buf;
     bitstream->byte_buf = 0;
   }
   p_SEI->seiDRPMRepetition.payloadSize = bitstream->byte_pos;
@@ -2895,9 +2913,9 @@ static void CloseDRPMRepetition(SEIParameters *p_SEI)
     free(p_SEI->seiDRPMRepetition.data);
   }
   p_SEI->seiDRPMRepetition.data = NULL;
-  if ( p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved != NULL )
+  if (p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved != NULL)
   {
-    free_drpm_buffer( p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved );
+    free_drpm_buffer(p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved);
     p_SEI->seiDRPMRepetition.dec_ref_pic_marking_buffer_saved = NULL;
   }
 }
@@ -2976,7 +2994,7 @@ void PrepareAggregationSEIMessage(VideoParameters *p_Vid)
     write_sei_message(p_SEI, AGGREGATION_SEI, p_SEI->seiUser_data_registered_itu_t_t35.data->streamBuffer, p_SEI->seiUser_data_registered_itu_t_t35.payloadSize, SEI_USER_DATA_REGISTERED_ITU_T_T35);
     ClearUser_data_registered_itu_t_t35(p_SEI);
     has_aggregation_sei_message = TRUE;
-  }  
+  }
   // more aggregation sei payload is written here...
 
   // write the scene information SEI payload
@@ -3052,19 +3070,18 @@ void PrepareAggregationSEIMessage(VideoParameters *p_Vid)
  *    Free dec_ref_pic_marking_bufffer structure
  ************************************************************************
  */
-void free_drpm_buffer( DecRefPicMarking_t *pDRPM )
+void free_drpm_buffer(DecRefPicMarking_t *pDRPM)
 {
   DecRefPicMarking_t *pTmp = pDRPM, *pPrev;
 
   if (pTmp == NULL)
     return;
 
-  while( pTmp->Next != NULL )
+  while (pTmp->Next != NULL)
   {
     pPrev = pTmp;
     pTmp = pTmp->Next;
-    free( pPrev );
+    free(pPrev);
   }
-  free( pTmp );
+  free(pTmp);
 }
-

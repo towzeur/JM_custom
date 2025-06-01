@@ -18,7 +18,7 @@
 
 #define YUV2RGB_YOFFSET
 
-//YUV to RGB conversion
+// YUV to RGB conversion
 #ifdef YUV2RGB_YOFFSET
 #define OFFSET_Y 16
 static const float K0 = 1.164f;
@@ -38,40 +38,40 @@ int create_RGB_memory(VideoParameters *p_Vid)
 {
   int memory_size = 0;
   int j;
-  for( j = 0; j < 3; j++ )
+  for (j = 0; j < 3; j++)
   {
-    memory_size += get_mem2Dpel (&p_Vid->imgRGB_src.data[j], p_Vid->height, p_Vid->width);
+    memory_size += get_mem2Dpel(&p_Vid->imgRGB_src.data[j], p_Vid->height, p_Vid->width);
   }
-  for( j = 0; j < 3; j++ )
+  for (j = 0; j < 3; j++)
   {
-    memory_size += get_mem2Dpel (&p_Vid->imgRGB_ref.data[j], p_Vid->height, p_Vid->width);
+    memory_size += get_mem2Dpel(&p_Vid->imgRGB_ref.data[j], p_Vid->height, p_Vid->width);
   }
-  
+
   return memory_size;
 }
 
 void delete_RGB_memory(VideoParameters *p_Vid)
 {
   int i;
-  for( i = 0; i < 3; i++ )
+  for (i = 0; i < 3; i++)
   {
     free_mem2Dpel(p_Vid->imgRGB_src.data[i]);
   }
-  for( i = 0; i < 3; i++ )
+  for (i = 0; i < 3; i++)
   {
     free_mem2Dpel(p_Vid->imgRGB_ref.data[i]);
   }
 }
 
 void init_YUVtoRGB(VideoParameters *p_Vid, InputParameters *p_Inp)
-{ 
-  float conv_scale = (float) (65536.0f);
+{
+  float conv_scale = (float)(65536.0f);
 
-  p_Vid->wka0 = float2int(  conv_scale * K0);
-  p_Vid->wka1 = float2int(  conv_scale * K1);
-  p_Vid->wka2 = float2int( -conv_scale * K2);
-  p_Vid->wka3 = float2int( -conv_scale * K3);
-  p_Vid->wka4 = float2int(  conv_scale * K4);
+  p_Vid->wka0 = float2int(conv_scale * K0);
+  p_Vid->wka1 = float2int(conv_scale * K1);
+  p_Vid->wka2 = float2int(-conv_scale * K2);
+  p_Vid->wka3 = float2int(-conv_scale * K3);
+  p_Vid->wka4 = float2int(conv_scale * K4);
 
 #ifdef YUV2RGB_YOFFSET
   p_Vid->offset_y = OFFSET_Y << (p_Inp->output.bit_depth[0] - 8);
@@ -79,7 +79,7 @@ void init_YUVtoRGB(VideoParameters *p_Vid, InputParameters *p_Inp)
 #endif
 }
 
-/*! 
+/*!
 *************************************************************************************
 * \brief
 *    YUV to RGB conversion
@@ -127,23 +127,23 @@ void YUVtoRGB(VideoParameters *p_Vid, ImageStructure *YUV, ImageStructure *RGB)
       sy = p_Vid->wka0 * Y[i];
 #endif
 
-      R[i] = (imgpel) iClip1( max_value, rshift_rnd(sy + wruv, 16));
-      G[i] = (imgpel) iClip1( max_value, rshift_rnd(sy + wguv, 16));
-      B[i] = (imgpel) iClip1( max_value, rshift_rnd(sy + wbuv, 16));
+      R[i] = (imgpel)iClip1(max_value, rshift_rnd(sy + wruv, 16));
+      G[i] = (imgpel)iClip1(max_value, rshift_rnd(sy + wguv, 16));
+      B[i] = (imgpel)iClip1(max_value, rshift_rnd(sy + wbuv, 16));
     }
   }
   // Setting RGB FrameFormat
-  RGB->format = format;  // copy format information from YUV to RGB
-  RGB->format.yuv_format  = YUV444;
+  RGB->format = format; // copy format information from YUV to RGB
+  RGB->format.yuv_format = YUV444;
   RGB->format.color_model = CM_RGB;
   RGB->format.pixel_format = BGR;
-  RGB->format.height[1]   = format.height[0];
-  RGB->format.width[1]    = format.width[0];
+  RGB->format.height[1] = format.height[0];
+  RGB->format.width[1] = format.width[0];
   for (i = 1; i < 3; i++)
   {
-    RGB->format.size_cmp[i]     = format.size_cmp[0];
-    RGB->format.bit_depth[i]    = format.bit_depth[0];
-    RGB->format.max_value[i]    = max_value;
+    RGB->format.size_cmp[i] = format.size_cmp[0];
+    RGB->format.bit_depth[i] = format.bit_depth[0];
+    RGB->format.max_value[i] = max_value;
     RGB->format.max_value_sq[i] = format.max_value_sq[0];
   }
 }
