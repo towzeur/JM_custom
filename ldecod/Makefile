@@ -42,7 +42,13 @@ else
 STATIC= 
 endif
 
-LIBS=   -lm $(STATIC)
+ifeq ($(OS),Windows_NT)
+    WINLIBS = -lws2_32
+else
+    WINLIBS =
+endif
+LIBS = -lm $(WINLIBS) $(STATIC)
+
 CFLAGS+=  -std=gnu99 -pedantic -ffloat-store -fno-strict-aliasing -fsigned-char $(STATIC)
 FLAGS=  $(CFLAGS) -Wall -I$(INCDIR) -I$(ADDINCDIR) -D __USE_LARGEFILE64 -D _FILE_OFFSET_BITS=64
 
