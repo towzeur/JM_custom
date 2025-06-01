@@ -1,0 +1,40 @@
+name: MSYS2 Windows Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup MSYS2
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: git mingw-w64-ucrt-x86_64-gcc make
+
+      - name: Build ldecod
+        run: |
+          cd ldecod
+          make
+
+      - name: Rename output binary
+        run: |
+          mv bin/ldecod.exe ldecod-${{ github.ref_name }}.exe
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ldecod-${{ github.ref_name }}.exe
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
