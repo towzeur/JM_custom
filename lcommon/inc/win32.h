@@ -30,11 +30,13 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <windows.h>
-#if defined(_MSC_VER) && (_MSC_VER < 1400)
-typedef int intptr_t;
-#else
-#include <stdint.h> // ou crtdefs.h si MSVC
-#endif
+// ** PATCH MSYS ** //
+// #if (_MSC_VER < 1400)
+// typedef int intptr_t;
+// #else
+// #include <crtdefs.h>
+// #endif
+// ** END PATCH MSYS ** //
 #if defined(OPENMP)
 #include <omp.h>
 #endif
@@ -47,9 +49,12 @@ typedef int intptr_t;
 #define close _close
 #define read _read
 #define write _write
+// ** PATCH MSYS ** //
+// #define lseek _lseeki64
 #ifndef lseek
 #define lseek _lseeki64
 #endif
+// ** END PATCH MSYS ** //
 #define fsync _commit
 #define tell _telli64
 #define TIMEB _timeb

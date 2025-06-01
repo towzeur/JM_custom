@@ -42,7 +42,26 @@ else
 STATIC= 
 endif
 
-ifeq ($(OS),Windows_NT)
+# -----
+_OS_TYPE_RAW := Unknown
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+    _OS_TYPE_RAW := Linux
+else ifeq ($(UNAME_S),Darwin) # macOS
+    _OS_TYPE_RAW := Darwin
+else ifneq (,$(findstring CYGWIN,$(UNAME_S)))
+    _OS_TYPE_RAW := Windows
+else ifneq (,$(findstring MINGW,$(UNAME_S)))
+    _OS_TYPE_RAW := Windows
+else ifneq (,$(findstring MSYS,$(UNAME_S)))
+    _OS_TYPE_RAW := Windows
+else ifeq ($(OS),Windows_NT) # Fallback for environment variable
+    _OS_TYPE_RAW := Windows
+endif
+OS_TYPE := $(strip $(_OS_TYPE_RAW))
+
+
+ifeq ($(OS_TYPE),Windows)
     WINLIBS = -lws2_32
 else
     WINLIBS =
@@ -50,7 +69,7 @@ endif
 LIBS = -lm $(WINLIBS) $(STATIC)
 
 CFLAGS+=  -std=gnu99 -pedantic -ffloat-store -fno-strict-aliasing -fsigned-char $(STATIC)
-FLAGS=  $(CFLAGS) -Wall -I$(INCDIR) -I$(ADDINCDIR) -D __USE_LARGEFILE64 -D _FILE_OFFSET_BITS=64
+FLAGS=  $(CFLAGS) -Wall -I$(INCDIR) -I$(ADDINCDIR) -D__USE_LARGEFILE64 -D_FILE_OFFSET_BITS=64
 
 ifeq ($(M32),1)
 FLAGS+=-m32
@@ -81,6 +100,9 @@ BIN=    $(BINDIR)/$(NAME)$(SUFFIX).exe
 default: messages objdir_mk depend bin 
 
 messages:
+	@echo 'OS Type: $(OS_TYPE)'
+	@echo 'os = $(OS)'
+	@echo 'Compiling with libraries: $(LIBS)'
 ifeq ($(M32),1)
 	@echo 'Compiling with M32 support...'
 endif
@@ -110,14 +132,14 @@ tags:
 bin:    $(OBJ)
 	@echo
 	@echo 'creating binary "$(BIN)"'
-	@$(CC) $(FLAGS) -o $(BIN) $(OBJ) $(LIBS)
+	$(CC) $(FLAGS) -o $(BIN) $(OBJ) $(LIBS)
 	@echo '... done'
 	@echo
 
 depend:
 	@echo
 	@echo 'checking dependencies'
-	@$(SHELL) -ec '$(CC) $(FLAGS) -MM $(CFLAGS) -I$(INCDIR) -I$(ADDINCDIR) $(SRC) $(ADDSRC)                  \
+	@$(SHELL) -ec '$(CC) $(FLAGS) -MM $(CFLAGS) -I$(INCDIR) -I$(ADDINCDIR) $(SRC) $(ADDSRC)                   \
          | sed '\''s@\(.*\)\.o[ :]@$(OBJDIR)/\1.o$(SUFFIX):@g'\''               \
          >$(DEPEND)'
 	@echo
@@ -135,4 +157,3 @@ objdir_mk:
 	@mkdir -p $(OBJDIR)
 
 -include $(DEPEND)
-
