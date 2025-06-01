@@ -235,7 +235,7 @@ typedef enum
 } I8x8PredModes;
 
 // Color components
-enum
+typedef enum
 {
   Y_COMP = 0, // Y Component
   U_COMP = 1, // U Component

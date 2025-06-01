@@ -96,6 +96,16 @@ void itrans8x8(Macroblock *currMB, //!< current macroblock
     inverse8x8(&m7[joff], &m7[joff], ioff);
     recon8x8(&m7[joff], &currSlice->mb_rec[pl][joff], &currSlice->mb_pred[pl][joff], currMB->p_Vid->max_pel_value_comp[pl], ioff);
   }
+
+  /*int mb_x = currMB->block_x * MB_BLOCK_SIZE;
+  int mb_y = currMB->block_y * MB_BLOCK_SIZE;
+
+  printf("%s", "Macroblocco (");
+  printf("%i", mb_x);
+  printf("%s", ",");
+  printf("%i", mb_y);
+  printf("%s", "): ");
+  printf("%i\n", &m7[joff][ioff]);*/
 }
 
 /*!

@@ -17,7 +17,7 @@
 // #define PROFILE_IDC     88
 // #define LEVEL_IDC       21
 
-InputParameters cfgparams;
+extern InputParameters cfgparams;
 
 #ifdef INCLUDED_BY_CONFIGFILE_C
 // Mapping_Map Syntax:
@@ -55,6 +55,25 @@ Mapping Map[] = {
         0.0,
         0.0,
         FILE_NAME_SIZE,
+    },
+    {
+        "XMLFile",
+        &cfgparams.xmlfile,
+        1,
+        0.0,
+        0,
+        0.0,
+        0.0,
+        FILE_NAME_SIZE,
+    },
+    {
+        "XMLLogLevel",
+        &cfgparams.xml_log_level,
+        0,
+        2.0,
+        1,
+        0.0,
+        5.0,
     },
     {
         "WriteUV",

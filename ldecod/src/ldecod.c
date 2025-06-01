@@ -42,6 +42,10 @@
  ***********************************************************************
  */
 
+/***** XML_TRACE_BEGIN ****/
+#include "xmltracefile.h"
+/****** XML_TRACE_END *****/
+
 #include "contributors.h"
 
 // #include <sys/stat.h>
@@ -1209,6 +1213,30 @@ int OpenDecoder(InputParameters *p_Inp)
 
   init_old_slice(pDecoder->p_Vid->old_slice);
 
+  /***** XML_TRACE_BEGIN *****/
+  if (xml_gen_trace_file())
+  {
+    switch (xml_open_trace_file())
+    {
+    case -2:
+      printf("No filename specified for the XML trace file!\n");
+      exit(-200);
+      break;
+    case -1:
+      printf("An error has occurred while trying to create the XML tracefile '%s'!\n", xml_get_trace_filename());
+      exit(-100);
+      break;
+    default:
+      break;
+    }
+
+    /*xml_write_start_element("AVCTrace");
+
+    xml_write_string_attribute("version", XML_TRACE_VERSION);*/
+    binary_write_start_element("Inizio");
+  }
+  /****** XML_TRACE_END ******/
+
   init(pDecoder->p_Vid);
 
   init_out_buffer(pDecoder->p_Vid);
@@ -1319,6 +1347,13 @@ int CloseDecoder()
     close(pDecoder->p_Vid->p_out);
 #endif
 
+  /***** XML_TRACE_BEGIN *****/
+  if (xml_gen_trace_file())
+  {
+    // xml_write_end_element();
+    xml_close_trace_file();
+  }
+  /****** XML_TRACE_END ******/
   if (pDecoder->p_Vid->p_ref != -1)
     close(pDecoder->p_Vid->p_ref);
 
@@ -1360,6 +1395,8 @@ int CloseDecoder()
 #if (MVC_EXTENSION_ENABLE)
 void OpenOutputFiles(VideoParameters *p_Vid, int view0_id, int view1_id)
 {
+  /* we do not need the output file, so this is disabled, remove the following line to enable it again */
+  return;
   InputParameters *p_Inp = p_Vid->p_Inp;
   char out_ViewFileName[2][FILE_NAME_SIZE], chBuf[FILE_NAME_SIZE], *pch;
   if ((strcasecmp(p_Inp->outfile, "\"\"") != 0) && (strlen(p_Inp->outfile) > 0))

@@ -45,6 +45,10 @@ typedef struct storable_picture
 {
   PictureStructure structure;
 
+  /***** XML_TRACE_BEGIN *****/
+  int frame_id;
+  /****** XML_TRACE_END ******/
+
   int poc;
   int top_poc;
   int bottom_poc;
