@@ -2,8 +2,8 @@ name: MSYS2 Windows Build
 
 on:
   push:
-    tags:
-      - 'v*'
+    #tags:
+    #  - 'v*'
 
 jobs:
   build:
