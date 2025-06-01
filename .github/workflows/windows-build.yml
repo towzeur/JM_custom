@@ -2,11 +2,11 @@ name: MSYS2 Windows Build
 
 on:
   push:
-    #tags:
-    #  - 'v*'
+    branches:
+      - main
 
 jobs:
-  build:
+  build_and_artifact:
     runs-on: windows-latest
     defaults:
       run:
@@ -28,13 +28,13 @@ jobs:
           cd ldecod
           make
 
-      - name: Rename output binary
+      - name: Prepare artifact
         run: |
-          mv bin/ldecod.exe ldecod-${{ github.ref_name }}.exe
+          # You can still rename it if you like
+          mv bin/ldecod.exe ldecod-main-latest.exe
 
-      - name: Upload release asset
-        uses: softprops/action-gh-release@v1
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v3
         with:
-          files: ldecod-${{ github.ref_name }}.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          name: ldecod-latest-build # Name of the artifact bundle
+          path: ldecod-main-latest.exe # Path to the file to upload
