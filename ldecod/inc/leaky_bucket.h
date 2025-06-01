@@ -23,4 +23,3 @@ void calc_buffer(InputParameters *p_Inp);
 #endif
 
 #endif
-

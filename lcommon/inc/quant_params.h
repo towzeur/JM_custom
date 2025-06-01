@@ -14,13 +14,15 @@
 #ifndef _QUANT_PARAMS_H_
 #define _QUANT_PARAMS_H_
 
-typedef struct level_quant_params {
-  int   OffsetComp;
-  int    ScaleComp;
+typedef struct level_quant_params
+{
+  int OffsetComp;
+  int ScaleComp;
   int InvScaleComp;
 } LevelQuantParams;
 
-typedef struct quant_params {
+typedef struct quant_params
+{
   int AdaptRndWeight;
   int AdaptRndCrWeight;
 
@@ -36,13 +38,14 @@ typedef struct quant_params {
   short ***OffsetList8x8;
 } QuantParameters;
 
-typedef struct quant_methods {
-  int   block_y; 
-  int   block_x;
-  int   qp; 
-  int*  ACLevel;
-  int*  ACRun;
-  int **fadjust; 
+typedef struct quant_methods
+{
+  int block_y;
+  int block_x;
+  int qp;
+  int *ACLevel;
+  int *ACRun;
+  int **fadjust;
   LevelQuantParams **q_params;
   int *coeff_cost;
   const byte (*pos_scan)[2];
@@ -51,4 +54,3 @@ typedef struct quant_methods {
 } QuantMethods;
 
 #endif
-

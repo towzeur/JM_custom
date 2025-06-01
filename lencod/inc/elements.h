@@ -50,7 +50,6 @@
  *      outlined in document Q15-J-23.
  */
 
-
 // A note on this table:
 //
 // While the assignment of values in enum data types is specified in C, it is not
@@ -77,13 +76,12 @@ typedef enum {
 16  SE_DELTA_QUANT,
 18  SE_BFRAME,
 19  SE_EOS,
-20  SE_MAX_ELEMENTS */ // number of maximum syntax elements
+20  SE_MAX_ELEMENTS */
+// number of maximum syntax elements
 //} SE_type;
 
-
-extern const int * assignSE2partition[2];
+extern const int *assignSE2partition[2];
 extern const int assignSE2partition_NoDP[SE_MAX_ELEMENTS];
 extern const int assignSE2partition_DP[SE_MAX_ELEMENTS];
 
 #endif
-

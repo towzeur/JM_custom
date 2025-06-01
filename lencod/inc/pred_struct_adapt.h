@@ -4,7 +4,7 @@
  *    pred_struct_adapt.h
  *
  * \author
- *    Athanasios Leontaris           <aleon@dolby.com>   
+ *    Athanasios Leontaris           <aleon@dolby.com>
  *
  * \date
  *    July 21, 2009
@@ -18,6 +18,5 @@
 #define _PRED_STRUCT_ADAPT_H_
 
 #include "global.h"
-
 
 #endif

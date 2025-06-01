@@ -15,7 +15,8 @@
 #ifndef _Q_MATRIX_H_
 #define _Q_MATRIX_H_
 
-struct scaling_list {
+struct scaling_list
+{
   short ScalingList4x4input[6][16];
   short ScalingList8x8input[6][64];
   short ScalingList4x4[6][16];
@@ -25,9 +26,9 @@ struct scaling_list {
   short UseDefaultScalingMatrix8x8Flag[6];
 };
 
-extern void init_qmatrix (VideoParameters *p_Vid, InputParameters *p_Inp);
-extern void CalculateQuant4x4Param (VideoParameters *p_Vid);
-extern void CalculateQuant8x8Param (VideoParameters *p_Vid);
+extern void init_qmatrix(VideoParameters *p_Vid, InputParameters *p_Inp);
+extern void CalculateQuant4x4Param(VideoParameters *p_Vid);
+extern void CalculateQuant8x8Param(VideoParameters *p_Vid);
 extern void free_QMatrix(QuantParameters *p_Quant);
 
 #endif

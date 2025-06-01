@@ -4,7 +4,7 @@
  *    pred_struct_types.h
  *
  * \author
- *    Athanasios Leontaris           <aleon@dolby.com>   
+ *    Athanasios Leontaris           <aleon@dolby.com>
  *
  * \date
  *    June 8, 2009
@@ -19,12 +19,12 @@
 
 // default coding structures
 // these are utilized to compress the current sequence when they are not pre-defined
-// sizes are 1 to 4 frames: if a length 4 structure does not *fit* then we try a length 3, 2, or 1 structure. 
-// One can define also structures > length 4. If these structures do not fit then we attempt to replace them 4, 3, 2, or 1. 
-// We do not define default structures > 4 since the coding gains are questionable and the increase in memory and 
+// sizes are 1 to 4 frames: if a length 4 structure does not *fit* then we try a length 3, 2, or 1 structure.
+// One can define also structures > length 4. If these structures do not fit then we attempt to replace them 4, 3, 2, or 1.
+// We do not define default structures > 4 since the coding gains are questionable and the increase in memory and
 // computational compleity is usually prohibitive (e.g. Blu-Ray can do up to length 4 in HD resolution).
 
-// After a prediction structure atom has been coded and the coding order of next frame to code is "code_order" 
+// After a prediction structure atom has been coded and the coding order of next frame to code is "code_order"
 // then all frames with frame_no lesser or equal to "code_order" times (frame_skip + 1) have been coded.
 
 // non idr atoms
@@ -46,7 +46,7 @@ typedef struct pred_struct_frm
   int layer; // the lower the higher the priority
   int slice_qp_off;
   int random_access;
-  int temporal_layer; 
+  int temporal_layer;
 } PredStructFrm;
 
 // prediction structure
@@ -85,13 +85,13 @@ typedef struct frame_struct
   int nal_ref_idc;
   int frame_no;
   int field_pic_flag;
-  int mod_qp;             // QP modifier with respect to the slice type default QP
-  int qp;                 // QP used to code this frame unit
+  int mod_qp; // QP modifier with respect to the slice type default QP
+  int qp;     // QP used to code this frame unit
   int layer;
   int num_refs;
-  int random_access;      // random access point (IDR or Intra-coded picture that precludes future pictures in display order to reference pictures decoded prior to this picture)
-  int atom_idx;           // index in the prediction structure pointed to be *p_atom
-  int temporal_layer;     
+  int random_access; // random access point (IDR or Intra-coded picture that precludes future pictures in display order to reference pictures decoded prior to this picture)
+  int atom_idx;      // index in the prediction structure pointed to be *p_atom
+  int temporal_layer;
 #if (MVC_EXTENSION_ENABLE)
   int view_id;
 #endif
@@ -120,10 +120,10 @@ typedef struct seq_struct
   int last_idr_disp;
   int last_intra_disp;
   int last_sp_disp;
-  int last_bl_frm_disposable; // check whether the last frame with layer == 0 (highest priority) 
-  
+  int last_bl_frm_disposable; // check whether the last frame with layer == 0 (highest priority)
+
   int curr_num_to_populate; // number of future frames in coding order to populate with each iteration of function populate_frm_struct (note that there are cases that fewer than "num_to_populate" frames may be populated
-  int pop_start_frame; // frame index (in coding order) from which frame structure population commences
+  int pop_start_frame;      // frame index (in coding order) from which frame structure population commences
 
   int max_num_slices;
   int pop_flag;
@@ -133,10 +133,10 @@ typedef struct seq_struct
   FrameUnitStruct *p_frm_mvc; // frame struct store for num_views > 1
 #endif
 
-  FrameUnitStruct *p_frm;  
+  FrameUnitStruct *p_frm;
 
-  PredStructAtom *p_prd; // regular prediction structure
-  PredStructAtom *p_gop; // IDR GOPs
+  PredStructAtom *p_prd;       // regular prediction structure
+  PredStructAtom *p_gop;       // IDR GOPs
   PredStructAtom *p_intra_gop; // Intra GOPs
 } SeqStructure;
 

@@ -18,6 +18,6 @@
 #ifndef _IMG_CHROMA_H_
 #define _IMG_CHROMA_H_
 
-extern void getSubImagesChroma(  VideoParameters *p_Vid, StorablePicture *s );
+extern void getSubImagesChroma(VideoParameters *p_Vid, StorablePicture *s);
 
 #endif // _IMG_CHROMA_H_

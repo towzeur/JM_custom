@@ -15,15 +15,13 @@
  **************************************************************************
  */
 
-
 #ifndef _ME_EPZS_INT_H_
 #define _ME_EPZS_INT_H_
 
 #include "me_epzs.h"
 
 // Functions
-extern distblk  EPZS_integer_motion_estimation        (Macroblock *, MotionVector *, MEBlock *, distblk, int);
-extern distblk  EPZS_integer_subMB_motion_estimation  (Macroblock *, MotionVector *, MEBlock *, distblk, int);
-extern distblk  EPZS_integer_bipred_motion_estimation (Macroblock *, int, MotionVector *, MotionVector *, MotionVector *, MotionVector *, MEBlock *, int, distblk, int);
+extern distblk EPZS_integer_motion_estimation(Macroblock *, MotionVector *, MEBlock *, distblk, int);
+extern distblk EPZS_integer_subMB_motion_estimation(Macroblock *, MotionVector *, MEBlock *, distblk, int);
+extern distblk EPZS_integer_bipred_motion_estimation(Macroblock *, int, MotionVector *, MotionVector *, MotionVector *, MotionVector *, MEBlock *, int, distblk, int);
 #endif
-

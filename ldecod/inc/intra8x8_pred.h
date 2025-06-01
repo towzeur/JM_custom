@@ -6,7 +6,7 @@
  *    definitions for intra 8x8 prediction
  *
  * \author
- *      Main contributors (see contributors.h for copyright, 
+ *      Main contributors (see contributors.h for copyright,
  *                         address and affiliation details)
  *      - Alexis Michael Tourapis  <alexismt@ieee.org>
  *
@@ -23,4 +23,3 @@ extern int intra_pred_8x8_normal(Macroblock *currMB, ColorPlane pl, int ioff, in
 extern int intra_pred_8x8_mbaff(Macroblock *currMB, ColorPlane pl, int ioff, int joff);
 
 #endif
-

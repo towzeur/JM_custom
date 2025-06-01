@@ -19,8 +19,7 @@
 
 extern void EstimateWPPSliceRandom(Slice *currSlice, int offset);
 extern void EstimateWPBSliceRandom(Slice *currSlice);
-extern int  TestWPPSliceRandom    (Slice *currSlice, int offset);
-extern int  TestWPBSliceRandom    (Slice *currSlice, int method);
+extern int TestWPPSliceRandom(Slice *currSlice, int offset);
+extern int TestWPBSliceRandom(Slice *currSlice, int method);
 
 #endif
-

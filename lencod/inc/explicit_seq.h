@@ -33,7 +33,7 @@ typedef struct exp_seq_info
   ExpFrameInfo *info;
 } ExpSeqInfo;
 
-extern void ReadExplicitSeqFile    (ExpSeqInfo *seq_info, FILE *exp_file, int coding_index);
-extern void OpenExplicitSeqFile    (VideoParameters *p_Vid, InputParameters *p_Inp);
-extern void CloseExplicitSeqFile   (VideoParameters *p_Vid);
+extern void ReadExplicitSeqFile(ExpSeqInfo *seq_info, FILE *exp_file, int coding_index);
+extern void OpenExplicitSeqFile(VideoParameters *p_Vid, InputParameters *p_Inp);
+extern void CloseExplicitSeqFile(VideoParameters *p_Vid);
 #endif

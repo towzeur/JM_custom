@@ -1,11 +1,11 @@
 /*!
  **************************************************************************
  *  \file lagrangian.h
- *  \brief  
+ *  \brief
  *     Distortion data header file
  *  \date 2.23.2009,
  *
- *  \author 
+ *  \author
  *   Alexis Michael Tourapis        <alexismt@ieee.org>
  *
  **************************************************************************
@@ -16,10 +16,9 @@
 
 typedef struct lambda_params
 {
-  double md;     //!< Mode decision Lambda
-  double me[3];  //!< Motion Estimation Lambda
-  int    mf[3];  //!< Integer formatted Motion Estimation Lambda
+  double md;    //!< Mode decision Lambda
+  double me[3]; //!< Motion Estimation Lambda
+  int mf[3];    //!< Integer formatted Motion Estimation Lambda
 } LambdaParams;
 
 #endif
-

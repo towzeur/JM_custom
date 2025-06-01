@@ -27,6 +27,6 @@ extern void hm50_ref_management_frame_pic(DecodedPictureBuffer *p_Dpb, int curre
 extern void low_delay_ref_management_frame_pic(DecodedPictureBuffer *p_Dpb, int current_pic_num);
 #endif
 extern void poc_based_ref_management_field_pic(DecodedPictureBuffer *p_Dpb, int current_pic_num);
-extern void tlyr_based_ref_management_frame_pic(VideoParameters *p_Vid, int current_pic_num); 
+extern void tlyr_based_ref_management_frame_pic(VideoParameters *p_Vid, int current_pic_num);
 
-#endif 
+#endif

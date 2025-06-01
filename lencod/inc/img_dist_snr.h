@@ -21,4 +21,3 @@
 extern void find_snr(VideoParameters *p_Vid, ImageStructure *imgREF, ImageStructure *imgSRC, DistMetric metricSSE[3], DistMetric metricPSNR[3]);
 
 #endif
-

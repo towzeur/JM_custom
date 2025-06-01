@@ -16,8 +16,8 @@
 #define _EXPLICIT_GOP_H_
 
 // GOP Hierarchy
-extern void init_gop_structure     (VideoParameters *p_Vid, InputParameters *p_Inp);
+extern void init_gop_structure(VideoParameters *p_Vid, InputParameters *p_Inp);
 extern void interpret_gop_structure(VideoParameters *p_Vid, InputParameters *p_Inp);
-extern void clear_gop_structure    (VideoParameters *p_Vid);
+extern void clear_gop_structure(VideoParameters *p_Vid);
 
 #endif

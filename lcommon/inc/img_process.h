@@ -1,5 +1,5 @@
 /*!
- ************************************************************************  
+ ************************************************************************
  * \file img_process.h
  *
  * \brief
@@ -15,11 +15,8 @@
 #ifndef _IMG_PROCESS_H_
 #define _IMG_PROCESS_H_
 
-
-extern int  init_process_image ( VideoParameters *p_Vid, InputParameters *p_Inp );
-extern void clear_process_image( VideoParameters *p_Vid, InputParameters *p_Inp);
-extern void process_image      ( VideoParameters *p_Vid, InputParameters *p_Inp );
-
-
+extern int init_process_image(VideoParameters *p_Vid, InputParameters *p_Inp);
+extern void clear_process_image(VideoParameters *p_Vid, InputParameters *p_Inp);
+extern void process_image(VideoParameters *p_Vid, InputParameters *p_Inp);
 
 #endif

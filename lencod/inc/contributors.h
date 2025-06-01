@@ -32,13 +32,13 @@
    \verbatim
 
       Lowell Winger                   <lwinger@videolocus.com><lwinger@uwaterloo.ca><lwinger@lsil.com>
-      Guy Côté                        <gcote@videolocus.com>
+      Guy Cï¿½tï¿½                        <gcote@videolocus.com>
       Michael Gallant                 <mgallant@videolocus.com>
       VideoLocus Inc.
       97 Randall Dr.
       Waterloo, ON, Canada  N2V1C5
 
-      Inge Lille-Langøy               <inge.lille-langoy@telenor.com>
+      Inge Lille-Langï¿½y               <inge.lille-langoy@telenor.com>
       Telenor Broadband Services
       P.O.Box 6914 St.Olavs plass
       N-0130 Oslo, Norway
@@ -120,7 +120,7 @@
 
       Mathias Wien                    <wien@ient.rwth-aachen.de>
       Achim Dahlhoff                  <dahlhoff@ient.rwth-aachen.de>
-      Institut und Lehrstuhl für Nachrichtentechnik
+      Institut und Lehrstuhl fï¿½r Nachrichtentechnik
       RWTH Aachen University
       52072 Aachen
       Germany
@@ -170,7 +170,7 @@
       Corporate Research
       Thomson Inc
       101 West 103rd Street
-      Indianapolis, IN 46290  
+      Indianapolis, IN 46290
 
       Siwei Ma                        <swma@jdl.ac.cn>
       Institute of Computing Technology
@@ -189,7 +189,7 @@
       Alexis Michael Tourapis         <alexismt@ieee.org><atour@dolby.com>
       Athanasios Leontaris            <aleon@dolby.com>
       Peshala Pahalawatta             <ppaha@dolby.com>
-      Yuwen He                        <yhe@dolby.com>  
+      Yuwen He                        <yhe@dolby.com>
       Yan Ye                          <yye@dolby.com>
       Dolby Laboratories Inc.
       3601 West Alameda Ave.
@@ -202,16 +202,15 @@
       Santa Clara, CA 95053
 
       Shun-ichi Sekiguchi             <Sekiguchi.Shunichi@eb.MitsubishiElectric.co.jp>
-      Information Technology R&D Center, 
+      Information Technology R&D Center,
       Mitsubishi Electric Corporation
       5-1-1, Ofuna, Kamakura, Japan
 
       Yung-Lyul Lee                   <yllee@sejong.ac.kr>
       Ki-Hun Han                      <khhan@dms.sejong.ac.kr>
-      Department of Computer Engineering, 
+      Department of Computer Engineering,
       Sejong University
       98 Kunja-Dong, Kwangjin-Gu, Seoul 143-747, Korea
 
    \endverbatim
  */
-

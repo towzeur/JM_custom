@@ -8,11 +8,9 @@
  *****************************************************************************************
  */
 
-
 #ifndef _ME_FULLFAST_OTF_H_
 #define _ME_FULLFAST_OTF_H_
 
-void SetupFastFullPelSearch_otf (Macroblock *, MEBlock *, int ) ;
+void SetupFastFullPelSearch_otf(Macroblock *, MEBlock *, int);
 
 #endif
-

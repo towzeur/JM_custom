@@ -1,5 +1,5 @@
 /*!
- ************************************************************************  
+ ************************************************************************
  * \file img_process_types.h
  *
  * \brief
@@ -16,9 +16,9 @@
 #ifndef _IMG_PROCESS_TYPES_H_
 #define _IMG_PROCESS_TYPES_H_
 
-#define DEMUX_META_DEBUG     1
+#define DEMUX_META_DEBUG 1
 #define MAX_NUM_PARTITIONS 512
-#define NUM_VIEWS            2
-#define NUM_COMPONENTS       3
+#define NUM_VIEWS 2
+#define NUM_COMPONENTS 3
 
 #endif

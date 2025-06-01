@@ -19,12 +19,12 @@
 #define _IMG_LUMA_H_
 
 static const int ONE_FOURTH_TAP[2][3] =
-{
-  {20, -5, 1},  // AVC Interpolation taps
-  {20,-4, 0},   // Experimental - not valid
+    {
+        {20, -5, 1}, // AVC Interpolation taps
+        {20, -4, 0}, // Experimental - not valid
 };
 
-extern void getSubImagesLuma       ( VideoParameters *p_Vid, StorablePicture *s );
+extern void getSubImagesLuma(VideoParameters *p_Vid, StorablePicture *s);
 /*
 extern void getSubImageInteger     ( StorablePicture *s, imgpel **dstImg, imgpel **srcImg);
 extern void getSubImageInteger_s   ( StorablePicture *s, imgpel **dstImg, imgpel **srcImg);

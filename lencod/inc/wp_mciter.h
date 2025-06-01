@@ -17,13 +17,11 @@
 #ifndef _WP_MCITERM_H_
 #define _WP_MCITERM_H_
 
-
 extern void EstimateWPBSliceAlg2(Slice *currSlice);
 extern void EstimateWPPSliceAlg2(Slice *currSlice, int offset);
-extern int  TestWPPSliceAlg2    (Slice *currSlice, int offset);
-extern int  TestWPBSliceAlg2    (Slice *currSlice, int method);
+extern int TestWPPSliceAlg2(Slice *currSlice, int offset);
+extern int TestWPBSliceAlg2(Slice *currSlice, int method);
 
-extern void compute_offset      (Slice *currSlice);
+extern void compute_offset(Slice *currSlice);
 
 #endif
-

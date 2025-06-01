@@ -20,33 +20,30 @@
 
 typedef struct
 {
-  int PicNum;              // PicNum/FrameNum
-  int POCNum;              // POC
-}
-WeightedPredRefX;
+  int PicNum; // PicNum/FrameNum
+  int POCNum; // POC
+} WeightedPredRefX;
 
 typedef struct
 {
   int algorithm;
-}
-WPXPass;
+} WPXPass;
 
 typedef struct wpx_object
 {
-  int               num_wp_ref_list[2];         // num of elements in each of the above matrices [LIST]
-  WeightedPredRefX *wp_ref_list[2];             // structure with reordering and WP information for ref frames [LIST]
-  WPXPass          *curr_wp_rd_pass;
-  WPXPass           wp_rd_passes[3];            // frame_picture [0...4] (MultiRefWeightedPred == 2)
-}
-WPXObject;
+  int num_wp_ref_list[2];           // num of elements in each of the above matrices [LIST]
+  WeightedPredRefX *wp_ref_list[2]; // structure with reordering and WP information for ref frames [LIST]
+  WPXPass *curr_wp_rd_pass;
+  WPXPass wp_rd_passes[3]; // frame_picture [0...4] (MultiRefWeightedPred == 2)
+} WPXObject;
 
-extern void   wpxInitWPXObject( VideoParameters *p_Vid );
-extern void   wpxFreeWPXObject( VideoParameters *p_Vid );
-extern void   wpxInitWPXPasses( VideoParameters *p_Vid, InputParameters *p_Inp );
-extern void   wpxModifyRefPicList( Slice *currSlice );
-// Note that at some point, InputParameters p_Inp contents should be copied into VideoParameters *p_Vid. 
+extern void wpxInitWPXObject(VideoParameters *p_Vid);
+extern void wpxFreeWPXObject(VideoParameters *p_Vid);
+extern void wpxInitWPXPasses(VideoParameters *p_Vid, InputParameters *p_Inp);
+extern void wpxModifyRefPicList(Slice *currSlice);
+// Note that at some point, InputParameters p_Inp contents should be copied into VideoParameters *p_Vid.
 // This would eliminate need of having to use both structures
-extern int    wpxDetermineWP( Slice *currSlice, int clist, int n );
-extern void   wpxAdaptRefNum( Slice *currSlice );
+extern int wpxDetermineWP(Slice *currSlice, int clist, int n);
+extern void wpxAdaptRefNum(Slice *currSlice);
 
 #endif
