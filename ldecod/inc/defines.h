@@ -235,7 +235,10 @@ typedef enum
 } I8x8PredModes;
 
 // Color components
-enum
+/* COFFEE_EDIT_START */
+// enum
+/* COFFEE_EDIT_END */
+typedef enum
 {
   Y_COMP = 0, // Y Component
   U_COMP = 1, // U Component

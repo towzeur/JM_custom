@@ -244,6 +244,9 @@ typedef struct macroblock_dec
   CBPStructure s_cbp[3];
 
   int i16mode;
+  /* COFFEE_EDIT_START */
+  int b8submbtype[4];
+  /* COFFEE_EDIT_END */
   char b8mode[4];
   char b8pdir[4];
   char ipmode_DPCM;
@@ -963,7 +966,10 @@ typedef struct inp_par
   char infile[FILE_NAME_SIZE];  //!< H.264 inputfile
   char outfile[FILE_NAME_SIZE]; //!< Decoded YUV 4:2:0 output
   char reffile[FILE_NAME_SIZE]; //!< Optional YUV 4:2:0 reference file for SNR measurement
-
+  /* COFFEE_EDIT_START */
+  char xmlfile[FILE_NAME_SIZE]; //!< XML to output parsed data
+  int xml_log_level;            //!< XML log level [0-4]
+  /* COFFEE_EDIT_END */
   int FileFormat; //!< File format of the Input file, PAR_OF_ANNEXB or PAR_OF_RTP
   int ref_offset;
   int poc_scale;

@@ -30,6 +30,9 @@
 
 #include <math.h>
 #include <limits.h>
+/* COFFEE_EDIT_START */
+#include <stdio.h>
+/* COFFEE_EDIT_END */
 
 #include "global.h"
 #include "image.h"
@@ -60,8 +63,16 @@
 #include "fast_memory.h"
 
 #include "mc_prediction.h"
+/* COFFEE_EDIT_START */
+#include "xmltracefile.h"
+#include "tracehelper.h"
+/* COFFEE_EDIT_END */
 extern int testEndian(void);
 void reorder_lists(Slice *currSlice);
+
+/* COFFEE_EDIT_START */
+extern FILE *fh;
+/* COFFEE_EDIT_END */
 
 static inline void reset_mbs(Macroblock *currMB)
 {
@@ -866,6 +877,68 @@ int decode_one_frame(DecoderParams *pDecoder)
 
     // error tracking of primary and redundant slices.
     Error_tracking(p_Vid, currSlice);
+
+    /* COFFEE_EDIT_START */
+    if (xml_gen_trace_file())
+    {
+      // Check if new picture is being decoded
+      if (is_new_picture(p_Vid->dec_picture, currSlice, p_Vid->old_slice))
+      {
+        // Check whether this is really a new picture (or just a new field, in case of interlaced content)
+        if (p_Vid->structure == FRAME || p_Vid->structure == TOP_FIELD ||
+            (p_Vid->structure == BOTTOM_FIELD && currSlice->p_Dpb->last_picture->top_field == NULL))
+        {
+          // Check if the previous tag must be closed
+          binary_check_and_write_end_element("SubPicture", 0x02);
+          binary_check_and_write_end_element("Picture", 0xFF);
+          binary_write_start_element("Picture");
+
+          p_Vid->dec_picture->frame_id = getNewFrameID();
+          // xml_write_int_attribute("id", p_Vid->dec_picture->frame_id);
+          fwrite(&(p_Vid->dec_picture->frame_id), 4, 1, fh);
+          // xml_write_int_attribute("poc", currSlice->ThisPOC);
+          fwrite(&currSlice->ThisPOC, 4, 1, fh);
+
+          if (currSlice->ThisPOC == 0)
+          {
+            incrementGOP();
+            setDisplayNumberOffset(p_Vid->dec_picture->frame_id);
+          }
+          // xml_write_start_element("GOPNr");
+          unsigned int GOPnr = getGOPNumber();
+          fwrite(&GOPnr, 4, 1, fh);
+          /*xml_write_int(getGOPNumber());
+          xml_write_end_element();*/
+        }
+
+        if (p_Vid->structure == BOTTOM_FIELD && currSlice->p_Dpb->last_picture->top_field != NULL)
+          p_Vid->dec_picture->frame_id = currSlice->p_Dpb->last_picture->top_field->frame_id;
+
+        binary_check_and_write_end_element("SubPicture", 0x02);
+        binary_write_start_element("SubPicture");
+
+        unsigned char marker = 0;
+        fwrite(&marker, 1, 1, fh);
+        unsigned char structure_type = p_Vid->structure;
+
+        switch (p_Vid->structure)
+        {
+        case FRAME:
+          structure_type = 'F';
+          break; // xml_write_int_attribute("structure", 0);
+        case TOP_FIELD:
+          structure_type = 'T';
+          break; // xml_write_int_attribute("structure", 1);
+        case BOTTOM_FIELD:
+          structure_type = 'B';
+          break; // xml_write_int_attribute("structure", 2);
+        }
+
+        fwrite(&structure_type, 1, 1, fh);
+      }
+    }
+    /* COFFEE_EDIT_END */
+
     // If primary and redundant are received and primary is correct, discard the redundant
     // else, primary slice will be replaced with redundant slice.
     if (currSlice->frame_num == p_Vid->previous_frame_num && currSlice->redundant_pic_cnt != 0 && p_Vid->Is_primary_correct != 0 && current_header != EOS)
@@ -950,6 +1023,13 @@ int decode_one_frame(DecoderParams *pDecoder)
   else if (p_Vid->dec_picture->structure == BOTTOM_FIELD)
     p_Vid->last_dec_poc = p_Vid->dec_picture->bottom_poc;
   exit_picture(p_Vid, &p_Vid->dec_picture);
+  /* COFFEE_EDIT_START */
+  if (xml_gen_trace_file())
+  {
+    binary_check_and_write_end_element("SubPicture", 0x02);
+    binary_check_and_write_end_element("Picture", 0xFF);
+  }
+  /* COFFEE_EDIT_END */
   p_Vid->previous_frame_num = ppSliceList[0]->frame_num;
   return (iRet);
 }
@@ -1393,10 +1473,16 @@ int read_new_slice(Slice *currSlice)
 #endif
 
   process_nalu:
+    /* COFFEE_EDIT_START */
+    clearNALInfo();
+    /* COFFEE_EDIT_END */
     switch (nalu->nal_unit_type)
     {
     case NALU_TYPE_SLICE:
     case NALU_TYPE_IDR:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
 
       if (p_Vid->recovery_point || nalu->nal_unit_type == NALU_TYPE_IDR)
       {
@@ -1549,7 +1635,9 @@ int read_new_slice(Slice *currSlice)
     case NALU_TYPE_DPA:
       if (p_Vid->recovery_point_found == 0)
         break;
-
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       // read DP_A
       currSlice->dpB_NotPresent = 1;
       currSlice->dpC_NotPresent = 1;
@@ -1627,6 +1715,10 @@ int read_new_slice(Slice *currSlice)
         currStream->ei_flag = 0;
         currStream->frame_bitoffset = currStream->read_len = 0;
 
+        /* COFFEE_EDIT_START */
+        setDPBNAL(nalu);
+        /* COFFEE_EDIT_END */
+
         memcpy(currStream->streamBuffer, &nalu->buf[1], nalu->len - 1);
         currStream->code_len = currStream->bitstream_length = RBSPtoSODB(currStream->streamBuffer, nalu->len - 1);
 
@@ -1661,6 +1753,10 @@ int read_new_slice(Slice *currSlice)
         currStream = currSlice->partArr[2].bitstream;
         currStream->ei_flag = 0;
         currStream->frame_bitoffset = currStream->read_len = 0;
+
+        /* COFFEE_EDIT_START */
+        setDPCNAL(nalu);
+        /* COFFEE_EDIT_END */
 
         memcpy(currStream->streamBuffer, &nalu->buf[1], nalu->len - 1);
         currStream->code_len = currStream->bitstream_length = RBSPtoSODB(currStream->streamBuffer, nalu->len - 1);
@@ -1697,40 +1793,67 @@ int read_new_slice(Slice *currSlice)
       return current_header;
       break;
     case NALU_TYPE_DPB:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       if (p_Inp->silent == FALSE)
       {
         printf("found data partition B without matching DP A, discarding\n");
       }
       break;
     case NALU_TYPE_DPC:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       if (p_Inp->silent == FALSE)
       {
         printf("found data partition C without matching DP A, discarding\n");
       }
       break;
     case NALU_TYPE_SEI:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       // printf ("read_new_slice: Found NALU_TYPE_SEI, len %d\n", nalu->len);
       InterpretSEIMessage(nalu->buf, nalu->len, p_Vid, currSlice);
       break;
     case NALU_TYPE_PPS:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       // printf ("Found NALU_TYPE_PPS\n");
       ProcessPPS(p_Vid, nalu);
       break;
     case NALU_TYPE_SPS:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       // printf ("Found NALU_TYPE_SPS\n");
       ProcessSPS(p_Vid, nalu);
       break;
     case NALU_TYPE_AUD:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       // printf ("Found NALU_TYPE_AUD\n");
       //         printf ("read_new_slice: Found 'Access Unit Delimiter' NAL unit, len %d, ignored\n", nalu->len);
       break;
     case NALU_TYPE_EOSEQ:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       //        printf ("read_new_slice: Found 'End of Sequence' NAL unit, len %d, ignored\n", nalu->len);
       break;
     case NALU_TYPE_EOSTREAM:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       //        printf ("read_new_slice: Found 'End of Stream' NAL unit, len %d, ignored\n", nalu->len);
       break;
     case NALU_TYPE_FILL:
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       if (p_Inp->silent == FALSE)
       {
         // printf ("read_new_slice: Found NALU_TYPE_FILL, len %d\n", (int) nalu->len);
@@ -1767,11 +1890,21 @@ int read_new_slice(Slice *currSlice)
 #endif
     default:
     {
+      /* COFFEE_EDIT_START */
+      setNAL(nalu);
+      /* COFFEE_EDIT_END */
       if (p_Inp->silent == FALSE)
         printf("Found NALU type %d, len %d undefined, ignore NALU, moving on\n", (int)nalu->nal_unit_type, (int)nalu->len);
     }
     break;
     }
+    /* COFFEE_EDIT_START */
+    if (xml_gen_trace_file())
+    {
+      if (nalu->nal_unit_type > 5)
+        writeNALInfo(currSlice);
+    }
+    /* COFFEE_EDIT_END */
   }
 }
 
@@ -2467,6 +2600,53 @@ void decode_one_slice(Slice *currSlice)
   Macroblock *currMB = NULL;
   currSlice->cod_counter = -1;
 
+  /* COFFEE_EDIT_START */
+  if (xml_gen_trace_file())
+  {
+    if (p_Vid->type == I_SLICE)
+    {
+      xml_trace_setIsIntra(1);
+    }
+    else
+    {
+      xml_trace_setIsIntra(0);
+    }
+    binary_write_start_element("Slice");
+    unsigned char marker = 0;
+    fwrite(&marker, 1, 1, fh);
+    fwrite(&currSlice->current_slice_nr, 2, 1, fh);
+    // xml_write_int_attribute("num", currSlice->current_slice_nr);
+
+    /*xml_write_start_element("Type");
+    xml_write_int(p_Vid->type);
+    xml_write_end_element();
+    xml_write_start_element("TypeString");*/
+
+    unsigned char slice_type;
+
+    switch (p_Vid->type)
+    {
+    case B_SLICE:
+      slice_type = 'B';
+      break;
+    case I_SLICE:
+      slice_type = 'I';
+      break;
+    case P_SLICE:
+      slice_type = 'P';
+      break;
+    case SI_SLICE:
+      slice_type = 'L';
+      break;
+    case SP_SLICE:
+      slice_type = 'Q';
+      break;
+    }
+
+    fwrite(&slice_type, 1, 1, fh);
+  }
+  /* COFFEE_EDIT_END */
+
   if ((p_Vid->separate_colour_plane_flag != 0))
   {
     change_plane_JV(p_Vid, currSlice->colour_plane_id, currSlice);
@@ -2497,10 +2677,74 @@ void decode_one_slice(Slice *currSlice)
     fprintf(p_Dec->p_trace, "\n*********** POC: %i (I/P) MB: %i Slice: %i Type %d **********\n", currSlice->ThisPOC, currSlice->current_mb_nr, currSlice->current_slice_nr, currSlice->slice_type);
 #endif
 
+    /* COFFEE_EDIT_START */
+    if (xml_gen_trace_file() && xml_get_log_level() >= 1)
+    {
+      binary_write_start_element("MacroBlock");
+      unsigned char marker = 0;
+      fwrite(&marker, 1, 1, fh);
+      fwrite(&currSlice->current_mb_nr, 4, 1, fh);
+      // xml_write_int_attribute("num", currSlice->current_mb_nr);
+    }
+
+    int isIntraFrame = 0;
+    if (p_Vid->type == I_SLICE)
+    {
+      isIntraFrame = 1;
+    }
+    /* COFFEE_EDIT_END */
+
     // Initializes the current macroblock
     start_macroblock(currSlice, &currMB);
     // Get the syntax elements from the NAL
     currSlice->read_one_macroblock(currMB);
+    /* COFFEE_EDIT_START */
+    // computeHistogramToJson(currMB, currSlice, isIntraFrame);
+
+    if (xml_gen_trace_file() && xml_get_log_level() >= 1)
+    {
+      unsigned char marker = 0x04; // end MotionVector
+      fwrite(&marker, 1, 1, fh);
+
+      unsigned int macroblock_x = currMB->block_x * MB_BLOCK_SIZE;
+      fwrite(&macroblock_x, 4, 1, fh);
+      // xml_write_start_element("Position");
+      // xml_write_start_element("X");
+      // xml_write_int(currMB->block_x * MB_BLOCK_SIZE);
+      // xml_write_end_element();
+      unsigned int macroblock_y = currMB->block_y * MB_BLOCK_SIZE;
+      fwrite(&macroblock_y, 4, 1, fh);
+      // xml_write_start_element("Y");
+      // xml_write_int(currMB->block_y * MB_BLOCK_SIZE);
+      // xml_write_end_element();
+      // xml_write_end_element();
+
+      unsigned char qp = currMB->qp;
+      fwrite(&qp, 1, 1, fh);
+
+      char qpc_cb = currMB->qpc[0];
+      fwrite(&qpc_cb, 1, 1, fh);
+
+      char qpc_cr = currMB->qpc[1];
+      fwrite(&qpc_cr, 1, 1, fh);
+
+      // xml_write_start_element("QP_Y");
+      // xml_write_int(currMB->qp);
+      // xml_write_end_element();
+      //      xml_write_start_element("QP_U");
+      //      xml_write_int(currMB->qpc[0]);
+      //      xml_write_end_element();
+      //      xml_write_start_element("QP_V");
+      //      xml_write_int(currMB->qpc[1]);
+      //      xml_write_end_element();
+
+      writeMBInfo(currMB, currSlice);
+
+      //      //if (xml_get_log_level() >= 4) addCoeffsToTrace(currMB, currSlice);
+
+      binaryAddCoeffsToTrace(currMB, currSlice);
+    }
+    /* COFFEE_EDIT_END */
     decode_one_macroblock(currMB, currSlice->dec_picture);
 
     if (currSlice->mb_aff_frame_flag && currMB->mb_field)
@@ -2514,7 +2758,23 @@ void decode_one_slice(Slice *currSlice)
 #endif
 
     end_of_slice = exit_macroblock(currSlice, (!currSlice->mb_aff_frame_flag || currSlice->current_mb_nr % 2));
+
+    /* COFFEE_EDIT_START */
+    if (xml_gen_trace_file() && xml_get_log_level() >= 1)
+    {
+      binary_check_and_write_end_element("MacroBlock", 0x04);
+      // binary_write_end_element(); //close Macroblock;
+    }
+    /* COFFEE_EDIT_END */
   }
+
+  /* COFFEE_EDIT_START */
+  if (xml_gen_trace_file())
+  {
+    binary_check_and_write_end_element("Slice", 0x03); // close Slice
+  }
+  /* COFFEE_EDIT_END */
+
   // reset_ec_flags(p_Vid);
 }
 

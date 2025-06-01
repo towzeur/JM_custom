@@ -45,6 +45,9 @@
 #include "fast_memory.h"
 #include "filehandle.h"
 
+/* COFFEE_EDIT_START */
+#include "tracehelper.h"
+/* COFFEE_EDIT_END */
 #if TRACE
 #define TRACE_STRING(s) strncpy(currSE.tracestring, s, TRACESTRING_SIZE)
 #define TRACE_DECBITS(i) dectracebitcnt(1)
@@ -735,6 +738,9 @@ static inline void SetB8Mode(Macroblock *currMB, int value, int i)
     currMB->b8mode[i] = p_v2b8[value];
     currMB->b8pdir[i] = p_v2pd[value];
   }
+  /* COFFEE_EDIT_START */
+  currMB->b8submbtype[i] = value;
+  /* COFFEE_EDIT_END */
 }
 
 static inline void reset_coeffs(Macroblock *currMB)
@@ -1179,6 +1185,10 @@ static void read_one_macroblock_i_slice_cavlc(Macroblock *currMB)
 
   currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
 
+  /* COFFEE_EDIT_START */
+  setCurrentMBType(currMB->mb_type);
+  /* COFFEE_EDIT_END */
+
   currSlice->interpret_mb_mode(currMB);
 
   // init NoMbPartLessThan8x8Flag
@@ -1261,6 +1271,10 @@ static void read_one_macroblock_i_slice_cabac(Macroblock *currMB)
   currMB->block_y_aff = ((currSlice->mb_aff_frame_flag) && (currMB->mb_field)) ? (mb_nr & 0x01) ? (currMB->block_y - 4) >> 1 : currMB->block_y >> 1 : currMB->block_y;
 
   currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
+
+  /* COFFEE_EDIT_START */
+  setCurrentMBType(currMB->mb_type);
+  /* COFFEE_EDIT_END */
 
   currSlice->interpret_mb_mode(currMB);
 
@@ -1390,6 +1404,10 @@ static void read_one_macroblock_p_slice_cavlc(Macroblock *currMB)
 
     currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
 
+    /* COFFEE_EDIT_START */
+    setCurrentMBType(currMB->mb_type);
+    /* COFFEE_EDIT_END */
+
     currSlice->interpret_mb_mode(currMB);
   }
   else
@@ -1493,6 +1511,10 @@ static void read_one_macroblock_p_slice_cavlc(Macroblock *currMB)
 
     currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
 
+    /* COFFEE_EDIT_START */
+    setCurrentMBType(currMB->mb_type);
+    /* COFFEE_EDIT_END */
+
     currSlice->interpret_mb_mode(currMB);
 
     if (currMB->mb_field)
@@ -1592,6 +1614,11 @@ static void read_one_macroblock_p_slice_cabac(Macroblock *currMB)
     motion->mb_field[mb_nr] = (byte)FALSE;
     currMB->block_y_aff = currMB->block_y;
     currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
+
+    /* COFFEE_EDIT_START */
+    setCurrentMBType(currMB->mb_type);
+    /* COFFEE_EDIT_END */
+
     currSlice->interpret_mb_mode(currMB);
   }
   else
@@ -1680,6 +1707,10 @@ static void read_one_macroblock_p_slice_cabac(Macroblock *currMB)
     currMB->block_y_aff = (currMB->mb_field) ? (mb_nr & 0x01) ? (currMB->block_y - 4) >> 1 : currMB->block_y >> 1 : currMB->block_y;
 
     currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
+
+    /* COFFEE_EDIT_START */
+    setCurrentMBType(currMB->mb_type);
+    /* COFFEE_EDIT_END */
 
     currSlice->interpret_mb_mode(currMB);
 
@@ -1789,6 +1820,10 @@ static void read_one_macroblock_b_slice_cavlc(Macroblock *currMB)
     currMB->block_y_aff = currMB->block_y;
     currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
 
+    /* COFFEE_EDIT_START */
+    setCurrentMBType(currMB->mb_type);
+    /* COFFEE_EDIT_END */
+
     currSlice->interpret_mb_mode(currMB);
   }
   else
@@ -1886,6 +1921,10 @@ static void read_one_macroblock_b_slice_cavlc(Macroblock *currMB)
     currMB->block_y_aff = (currMB->mb_field) ? (mb_nr & 0x01) ? (currMB->block_y - 4) >> 1 : currMB->block_y >> 1 : currMB->block_y;
 
     currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
+
+    /* COFFEE_EDIT_START */
+    setCurrentMBType(currMB->mb_type);
+    /* COFFEE_EDIT_END */
 
     currSlice->interpret_mb_mode(currMB);
 
@@ -2015,6 +2054,11 @@ static void read_one_macroblock_b_slice_cabac(Macroblock *currMB)
     motion->mb_field[mb_nr] = (byte)FALSE;
     currMB->block_y_aff = currMB->block_y;
     currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
+
+    /* COFFEE_EDIT_START */
+    setCurrentMBType(currMB->mb_type);
+    /* COFFEE_EDIT_END */
+
     currSlice->interpret_mb_mode(currMB);
   }
   else
@@ -2107,6 +2151,10 @@ static void read_one_macroblock_b_slice_cabac(Macroblock *currMB)
     currMB->block_y_aff = (currMB->mb_field) ? (mb_nr & 0x01) ? (currMB->block_y - 4) >> 1 : currMB->block_y >> 1 : currMB->block_y;
 
     currSlice->siblock[currMB->mb.y][currMB->mb.x] = 0;
+
+    /* COFFEE_EDIT_START */
+    setCurrentMBType(currMB->mb_type);
+    /* COFFEE_EDIT_END */
 
     currSlice->interpret_mb_mode(currMB);
 

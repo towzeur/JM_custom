@@ -17,7 +17,9 @@
 // #define PROFILE_IDC     88
 // #define LEVEL_IDC       21
 
-InputParameters cfgparams;
+/* COFFEE_EDIT_START */
+extern InputParameters cfgparams;
+/* COFFEE_EDIT_END */
 
 #ifdef INCLUDED_BY_CONFIGFILE_C
 // Mapping_Map Syntax:
@@ -56,6 +58,27 @@ Mapping Map[] = {
         0.0,
         FILE_NAME_SIZE,
     },
+    /* COFFEE_EDIT_START */
+    {
+        "XMLFile",
+        &cfgparams.xmlfile,
+        1,
+        0.0,
+        0,
+        0.0,
+        0.0,
+        FILE_NAME_SIZE,
+    },
+    {
+        "XMLLogLevel",
+        &cfgparams.xml_log_level,
+        0,
+        2.0,
+        1,
+        0.0,
+        5.0,
+    },
+    /* COFFEE_EDIT_END */
     {
         "WriteUV",
         &cfgparams.write_uv,

@@ -189,10 +189,20 @@ static inline unsigned int rshift_rnd_us_sf(unsigned int x, unsigned int a)
 
 static inline int iClip1(int high, int x)
 {
-  x = imax(x, 0);
-  x = imin(x, high);
-
-  return x;
+  /* COFFEE_EDIT_START */
+  if (x < 0)
+  {
+    return 0;
+  }
+  else if (x > high)
+  {
+    return high;
+  }
+  else
+  {
+    return x;
+  }
+  /* COFFEE_EDIT_END */
 }
 
 static inline int iClip3(int low, int high, int x)

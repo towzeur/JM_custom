@@ -44,6 +44,11 @@
 #include "mb_prediction.h"
 #include "fast_memory.h"
 #include "filehandle.h"
+/* COFFEE_EDIT_START */
+#include <stdint.h>
+#include "xmltracefile.h"
+#include "tracehelper.h"
+/* COFFEE_EDIT_END */
 
 #if TRACE
 #define TRACE_STRING(s) strncpy(currSE.tracestring, s, TRACESTRING_SIZE)
@@ -56,6 +61,9 @@
 #define TRACE_PRINTF(s)
 #define TRACE_STRING_P(s)
 #endif
+/* COFFEE_EDIT_START */
+extern FILE *fh;
+/* COFFEE_EDIT_END */
 
 //! look up tables for FRExt_chroma support
 void dectracebitcnt(int count);
@@ -398,6 +406,73 @@ static void readMBMotionVectors(SyntaxElement *currSE, DataPartition *dP, Macrob
       curr_mv.mv_x = (short)(curr_mvd[0] + pred_mv.mv_x); // compute motion vector x
       curr_mv.mv_y = (short)(curr_mvd[1] + pred_mv.mv_y); // compute motion vector y
 
+      /* COFFEE_EDIT_START */
+      unsigned char marker = 0x00;
+      unsigned char list_num;
+
+      if (xml_gen_trace_file() && xml_get_log_level() >= 3)
+      {
+        fwrite(&marker, 1, 1, fh);
+
+        if (list == LIST_0)
+
+          list_num = 0;
+        else
+
+          list_num = 1;
+        fwrite(&list_num, 1, 1, fh);
+
+        // 2023-07-26: aggiunta scrittura ref_frame_id
+        char cur_ref_idx = mv_info[j4][i4].ref_idx[list];
+        fwrite(&cur_ref_idx, 1, 1, fh);
+
+        int16_t ref_frame_id = 0;
+        if (cur_ref_idx >= 0)
+        {
+          ref_frame_id = currMB->p_Slice->listX[list][cur_ref_idx]->frame_id;
+        }
+        else
+        {
+          ref_frame_id = -1;
+        }
+        fwrite(&ref_frame_id, 2, 1, fh);
+
+        fwrite(&curr_mvd[0], 2, 1, fh);
+
+        fwrite(&curr_mvd[1], 2, 1, fh);
+
+        fwrite(&curr_mv.mv_x, 2, 1, fh);
+
+        fwrite(&curr_mv.mv_y, 2, 1, fh);
+
+        /*xml_write_start_element("MotionVector");
+        if (list == LIST_0)
+          xml_write_int_attribute("list", 0);
+        else
+          xml_write_int_attribute("list", 1);
+        xml_write_start_element("RefIdx");
+        xml_write_int(mv_info[j4][i4].ref_idx[list]);
+        xml_write_end_element();
+        xml_write_start_element("Difference");
+        xml_write_start_element("X");
+        xml_write_int(curr_mvd[0]);
+        xml_write_end_element();
+        xml_write_start_element("Y");
+        xml_write_int(curr_mvd[1]);
+        xml_write_end_element();
+        xml_write_end_element();
+        xml_write_start_element("Absolute");
+        xml_write_start_element("X");
+        xml_write_int(curr_mv.mv_x);
+        xml_write_end_element();
+        xml_write_start_element("Y");
+        xml_write_int(curr_mv.mv_y);
+        xml_write_end_element();
+        xml_write_end_element();
+        xml_write_end_element();*/
+      }
+      /* COFFEE_EDIT_END */
+
       for (jj = j4; jj < j4 + step_v0; ++jj)
       {
         PicMotionParams *mvinfo = mv_info[jj] + i4;
@@ -476,6 +551,60 @@ static void readMBMotionVectors(SyntaxElement *currSE, DataPartition *dP, Macrob
 
               curr_mv.mv_x = (short)(curr_mvd[0] + pred_mv.mv_x); // compute motion vector
               curr_mv.mv_y = (short)(curr_mvd[1] + pred_mv.mv_y); // compute motion vector
+
+              /* COFFEE_EDIT_START */
+              unsigned char list_num;
+              unsigned char marker = 0x00;
+              if (xml_gen_trace_file() && xml_get_log_level() >= 3)
+              {
+                fwrite(&marker, 1, 1, fh);
+
+                // xml_write_start_element("MotionVector");
+                if (list == LIST_0)
+                  // xml_write_int_attribute("list", 0);
+                  list_num = 0;
+                else
+                  // xml_write_int_attribute("list", 1);
+                  list_num = 1;
+                fwrite(&list_num, 1, 1, fh);
+                // xml_write_start_element("RefIdx");
+                // xml_write_int(cur_ref_idx);
+                fwrite(&cur_ref_idx, 1, 1, fh);
+                // 2023-07-24: Aggiunto Frame ID del motion vector
+                int16_t ref_frame_id = 0;
+                if (cur_ref_idx >= 0)
+                {
+                  ref_frame_id = currMB->p_Slice->listX[list][cur_ref_idx]->frame_id;
+                }
+                else
+                {
+                  ref_frame_id = -1;
+                }
+                fwrite(&ref_frame_id, 2, 1, fh);
+                // xml_write_end_element();
+                /*xml_write_start_element("Difference");
+                xml_write_start_element("X");*/
+                fwrite(&curr_mvd[0], 2, 1, fh);
+                /*xml_write_int(curr_mvd[0]);
+                xml_write_end_element();
+                xml_write_start_element("Y");*/
+                fwrite(&curr_mvd[1], 2, 1, fh);
+                /*xml_write_int(curr_mvd[1]);
+                xml_write_end_element();
+                xml_write_end_element();
+                xml_write_start_element("Absolute");
+                xml_write_start_element("X");*/
+                fwrite(&curr_mv.mv_x, 2, 1, fh);
+                /* xml_write_int(curr_mv.mv_x);
+                xml_write_end_element();
+                xml_write_start_element("Y");*/
+                fwrite(&curr_mv.mv_y, 2, 1, fh);
+                /* xml_write_int(curr_mv.mv_y);
+                xml_write_end_element();
+                xml_write_end_element();
+                xml_write_end_element();*/
+              }
+              /* COFFEE_EDIT_END */
 
               for (jj = j4; jj < j4 + step_v; ++jj)
               {
@@ -1084,6 +1213,10 @@ static void read_motion_info_from_NAL_p_slice(Macroblock *currMB)
   // LIST_0 Motion vectors
   readMBMotionVectors(&currSE, dP, currMB, LIST_0, step_h0, step_v0);
 
+  /* COFFEE_EDIT_START */
+  // if (xml_gen_trace_file() && xml_get_log_level() >= 2) addMVInfoToTrace(currMB);
+  /* COFFEE_EDIT_END */
+
   // record reference picture Ids for deblocking decisions
   for (j4 = 0; j4 < 4; ++j4)
   {
@@ -1151,6 +1284,10 @@ static void read_motion_info_from_NAL_b_slice(Macroblock *currMB)
   readMBMotionVectors(&currSE, dP, currMB, LIST_0, step_h0, step_v0);
   // LIST_1 Motion vectors
   readMBMotionVectors(&currSE, dP, currMB, LIST_1, step_h0, step_v0);
+
+  /* COFFEE_EDIT_START */
+  // if (xml_gen_trace_file() && xml_get_log_level() >= 2) addMVInfoToTrace(currMB);
+  /* COFFEE_EDIT_END */
 
   // record reference picture Ids for deblocking decisions
 

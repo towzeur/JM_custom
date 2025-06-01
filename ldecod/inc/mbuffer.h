@@ -45,6 +45,10 @@ typedef struct storable_picture
 {
   PictureStructure structure;
 
+  /* COFFEE_EDIT_START */
+  int frame_id;
+  /* COFFEE_EDIT_END */
+
   int poc;
   int top_poc;
   int bottom_poc;

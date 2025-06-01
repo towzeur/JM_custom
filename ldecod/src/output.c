@@ -21,6 +21,9 @@
 #include "sei.h"
 #include "input.h"
 #include "fast_memory.h"
+/* COFFEE_EDIT_START */
+#include "xmltracefile.h"
+/* COFFEE_EDIT_END */
 
 static void write_out_picture(VideoParameters *p_Vid, StorablePicture *p, int p_out);
 static void img2buf_byte(imgpel **imgX, unsigned char *buf, int size_x, int size_y, int symbol_size_in_bytes, int crop_left, int crop_right, int crop_top, int crop_bottom, int iOutStride);
@@ -643,6 +646,20 @@ static void write_out_picture(VideoParameters *p_Vid, StorablePicture *p, int p_
   // free(buf);
   if (p_out >= 0)
     pDecPic->bValid = 0;
+
+  /* COFFEE_EDIT_START */
+  if (xml_gen_trace_file())
+  {
+    if (p->concealed_pic == 1)
+    {
+      xml_output_frame_order(-1);
+    }
+    else
+    {
+      xml_output_frame_order(p->frame_id);
+    }
+  }
+  /* COFFEE_EDIT_END */
 
   //  fsync(p_out);
 }
