@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "crtdefs.h": "c",
+        "global.h": "c",
+        "win32.h": "c"
+    }
+}

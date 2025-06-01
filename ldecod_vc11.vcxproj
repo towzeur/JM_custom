@@ -27,22 +27,22 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <CharacterSet>MultiByte</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -332,8 +332,10 @@
     <ClInclude Include="ldecod\inc\quant.h" />
     <ClInclude Include="ldecod\inc\rtp.h" />
     <ClInclude Include="ldecod\inc\sei.h" />
+    <ClInclude Include="ldecod\inc\tracehelper.h" />
     <ClInclude Include="ldecod\inc\transform8x8.h" />
     <ClInclude Include="ldecod\inc\vlc.h" />
+    <ClInclude Include="ldecod\inc\xmltracefile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lcommon\src\blk_prediction.c" />
@@ -400,8 +402,10 @@
     <ClCompile Include="ldecod\src\read_comp_cavlc.c" />
     <ClCompile Include="ldecod\src\rtp.c" />
     <ClCompile Include="ldecod\src\sei.c" />
+    <ClCompile Include="ldecod\src\tracehelper.c" />
     <ClCompile Include="ldecod\src\transform8x8.c" />
     <ClCompile Include="ldecod\src\vlc.c" />
+    <ClCompile Include="ldecod\src\xmltracefile.c" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

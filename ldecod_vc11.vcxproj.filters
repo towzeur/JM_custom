@@ -225,6 +225,12 @@
     <ClInclude Include="ldecod\inc\vlc.h">
       <Filter>Project Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ldecod\inc\tracehelper.h">
+      <Filter>Project Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ldecod\inc\xmltracefile.h">
+      <Filter>Project Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="lcommon\src\blk_prediction.c">
@@ -423,6 +429,12 @@
       <Filter>Project Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ldecod\src\vlc.c">
+      <Filter>Project Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ldecod\src\tracehelper.c">
+      <Filter>Project Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ldecod\src\xmltracefile.c">
       <Filter>Project Source Files</Filter>
     </ClCompile>
   </ItemGroup>
