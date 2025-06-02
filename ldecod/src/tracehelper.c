@@ -493,6 +493,177 @@ void getSubMbTypeName_B_Slice(int submb_type, char *typestring)
     }
 }
 
+// =========================================================================== //
+
+typedef enum
+{
+    // I-Slice Types
+    MB_I_4x4 = 0,
+    MB_I_8x8 = 1,
+    MB_I_16x16_0_0_0 = 2,
+    MB_I_16x16_1_0_0 = 3,
+    MB_I_16x16_2_0_0 = 4,
+    MB_I_16x16_3_0_0 = 5,
+    MB_I_16x16_0_1_0 = 6,
+    MB_I_16x16_1_1_0 = 7,
+    MB_I_16x16_2_1_0 = 8,
+    MB_I_16x16_3_1_0 = 9,
+    MB_I_16x16_0_2_0 = 10,
+    MB_I_16x16_1_2_0 = 11,
+    MB_I_16x16_2_2_0 = 12,
+    MB_I_16x16_3_2_0 = 13,
+    MB_I_16x16_0_0_1 = 14,
+    MB_I_16x16_1_0_1 = 15,
+    MB_I_16x16_2_0_1 = 16,
+    MB_I_16x16_3_0_1 = 17,
+    MB_I_16x16_0_1_1 = 18,
+    MB_I_16x16_1_1_1 = 19,
+    MB_I_16x16_2_1_1 = 20,
+    MB_I_16x16_3_1_1 = 21,
+    MB_I_16x16_0_2_1 = 22,
+    MB_I_16x16_1_2_1 = 23,
+    MB_I_16x16_2_2_1 = 24,
+    MB_I_16x16_3_2_1 = 25,
+    MB_I_PCM = 26,
+
+    // SI-Slice Type
+    MB_SI = 27, // Provenant de "0 SI Intra_4x4..."
+
+    // P-Slice Types
+    MB_P_L0_16x16 = 28,
+    MB_P_L0_L0_16x8 = 29,
+    MB_P_L0_L0_8x16 = 30,
+    MB_P_8x8 = 31,
+    MB_P_8x8ref0 = 32,
+    MB_P_Skip = 33, // Provenant de "inferred P_Skip..."
+
+    // B-Slice Types
+    MB_B_Direct_16x16 = 34,
+    MB_B_L0_16x16 = 35,
+    MB_B_L1_16x16 = 36,
+    MB_B_Bi_16x16 = 37,
+    MB_B_L0_L0_16x8 = 38,
+    MB_B_L0_L0_8x16 = 39,
+    MB_B_L1_L1_16x8 = 40,
+    MB_B_L1_L1_8x16 = 41,
+    MB_B_L0_L1_16x8 = 42,
+    MB_B_L0_L1_8x16 = 43,
+    MB_B_L1_L0_16x8 = 44,
+    MB_B_L1_L0_8x16 = 45,
+    MB_B_L0_Bi_16x8 = 46,
+    MB_B_L0_Bi_8x16 = 47,
+    MB_B_L1_Bi_16x8 = 48,
+    MB_B_L1_Bi_8x16 = 49,
+    MB_B_Bi_L0_16x8 = 50,
+    MB_B_Bi_L0_8x16 = 51,
+    MB_B_Bi_L1_16x8 = 52,
+    MB_B_Bi_L1_8x16 = 53,
+    MB_B_Bi_Bi_16x8 = 54,
+    MB_B_Bi_Bi_8x16 = 55,
+    MB_B_8x8 = 56,
+    MB_B_Skip = 57 // Provenant de "inferred B_Skip..."
+} MacroblockType;
+
+MacroblockType DetermineNameOfMacroblockType_I(int mb_type, Macroblock *currMB)
+{
+    if (mb_type == 0)
+    {
+        if (currMB->luma_transform_size_8x8_flag == 0)
+            return MB_I_4x4;
+        else
+            return MB_I_8x8;
+    }
+    else if (mb_type >= 1 && mb_type <= 25)
+    {
+        return (MacroblockType)(MB_I_16x16_0_0_0 + mb_type - 1);
+    }
+    else if (mb_type == 26)
+    {
+        return MB_I_PCM;
+    }
+    else
+    {
+        fprintf(stderr, "Error: Unknown I-slice macroblock type %d\n", mb_type);
+        exit(EXIT_FAILURE);
+    }
+}
+
+MacroblockType DetermineNameOfMacroblockType_P(int mb_type, Macroblock *currMB)
+{
+
+    if (currMB->skip_flag == 1)
+        return MB_P_Skip;
+
+    if (mb_type >= 0 && mb_type <= 4)
+    {
+        return (MacroblockType)(MB_P_L0_16x16 + mb_type);
+    }
+    else if (mb_type >= 5 && mb_type <= 30)
+    {
+        return DetermineNameOfMacroblockType_I(mb_type - 5, currMB);
+    }
+    else
+    {
+        fprintf(stderr, "Error: Unknown P-slice macroblock type %d\n", mb_type);
+        exit(EXIT_FAILURE);
+    }
+}
+
+MacroblockType DetermineNameOfMacroblockType_B(int mb_type, Macroblock *currMB)
+{
+
+    if (currMB->skip_flag == 1)
+        return MB_B_Skip;
+
+    if (mb_type >= 0 && mb_type <= 22)
+    {
+        return (MacroblockType)(MB_B_Direct_16x16 + mb_type);
+    }
+    else if (mb_type >= 23 && mb_type <= 48)
+    {
+        return DetermineNameOfMacroblockType_I(mb_type - 23, currMB);
+    }
+    else
+    {
+        fprintf(stderr, "Error: Unknown B-slice macroblock type %d\n", mb_type);
+        exit(EXIT_FAILURE);
+    }
+}
+
+MacroblockType DetermineNameOfMacroblockType_SI(int mb_type, Macroblock *currMB)
+{
+    if (mb_type == 0)
+    {
+        return MB_SI;
+    }
+    else
+    {
+        return DetermineNameOfMacroblockType_I(mb_type - 1, currMB);
+    }
+}
+
+MacroblockType DetermineNameOfMacroblockType(int slice_type, int mb_type, Macroblock *currMB)
+{
+    switch (slice_type)
+    {
+    case P_SLICE:
+        return DetermineNameOfMacroblockType_P(mb_type, currMB);
+    case B_SLICE:
+        return DetermineNameOfMacroblockType_B(mb_type, currMB);
+    case I_SLICE:
+        return DetermineNameOfMacroblockType_I(mb_type, currMB);
+    case SP_SLICE:
+        return DetermineNameOfMacroblockType_P(mb_type, currMB);
+    case SI_SLICE:
+        return DetermineNameOfMacroblockType_SI(mb_type, currMB);
+    default:
+        fprintf(stderr, "Error: Unknown slice type %d\n", slice_type);
+        exit(EXIT_FAILURE);
+    }
+}
+
+// =========================================================================== //
+
 // MV for P_8x8
 // void addMVInfoToTrace(Macroblock *currMB)
 //{
@@ -1503,84 +1674,92 @@ void addCoeffsToTraceAndGenHistogram(Macroblock *currMB, Slice *currSlice, int i
 
 void writeMBInfo(Macroblock *currMB, Slice *currSlice)
 {
-    char typestring[255];
-    char predmodstring[255];
-    switch (currSlice->slice_type)
-    {
-    case P_SLICE:
-        getMbTypeName_P_SP_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
-        break;
-    case SP_SLICE:
-        getMbTypeName_P_SP_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
-        break;
-    case B_SLICE:
-        getMbTypeName_B_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
-        break;
-    case I_SLICE:
-        getMbTypeName_I_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
-        break;
-    case SI_SLICE:
-        getMbTypeName_SI_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
-        break;
-    }
-    // xml_write_start_element("Type");
+    unsigned char mt;
+    mt = (unsigned char)iCurr_mb_type;
+    fwrite(&mt, 1, 1, fh);
 
-    unsigned char macroblock_type;
+    unsigned char nmbt;
+    nmbt = (unsigned char)DetermineNameOfMacroblockType(currSlice->slice_type, iCurr_mb_type, currMB);
+    fwrite(&nmbt, 1, 1, fh);
 
-    switch (currSlice->slice_type)
-    {
-    case P_SLICE:
-    case SP_SLICE:
-        if (currMB->skip_flag == 1)
-            macroblock_type = 50;
-        // xml_write_int(-1);
-        else
-        {
-            if (iCurr_mb_type != 0)
-                macroblock_type = iCurr_mb_type - 1;
-            // xml_write_int(iCurr_mb_type-1);
-            else if (iCurr_mb_type == 5)
-            {
-                if (currMB->luma_transform_size_8x8_flag == 0)
-                    macroblock_type = 48; // I_4x4
-                else
-                    macroblock_type = 49; // I_8x8
-            }
-            else
-                macroblock_type = iCurr_mb_type;
-            // xml_write_int(iCurr_mb_type);
-        }
-        break;
-    case B_SLICE:
-        if (currMB->skip_flag == 1)
-            // xml_write_int(-1);
-            macroblock_type = 53;
-        else if (iCurr_mb_type == 23)
-        {
-            if (currMB->luma_transform_size_8x8_flag == 0)
-                macroblock_type = 51; // I_4x4
-            else
-                macroblock_type = 52; // I_8x8
-        }
-        else
-            macroblock_type = iCurr_mb_type;
-        // xml_write_int(iCurr_mb_type);
-        break;
-    case I_SLICE:
-    case SI_SLICE:
-        macroblock_type = iCurr_mb_type;
-        if (iCurr_mb_type == 0)
-        {
-            if (currMB->luma_transform_size_8x8_flag == 0)
-                macroblock_type = 48; // I_4x4
-            else
-                macroblock_type = 49; // I_8x8
-        }
-        // xml_write_int(iCurr_mb_type);
-        break;
-    }
+    // char typestring[255];
+    // char predmodstring[255];
+    // switch (currSlice->slice_type)
+    // {
+    // case P_SLICE:
+    //     getMbTypeName_P_SP_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
+    //     break;
+    // case SP_SLICE:
+    //     getMbTypeName_P_SP_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
+    //     break;
+    // case B_SLICE:
+    //     getMbTypeName_B_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
+    //     break;
+    // case I_SLICE:
+    //     getMbTypeName_I_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
+    //     break;
+    // case SI_SLICE:
+    //     getMbTypeName_SI_Slice(iCurr_mb_type, currMB, typestring, predmodstring, 0);
+    //     break;
+    // }
+    // // xml_write_start_element("Type");
 
-    fwrite(&macroblock_type, 1, 1, fh);
+    // unsigned char macroblock_type;
+
+    // switch (currSlice->slice_type)
+    // {
+    // case P_SLICE:
+    // case SP_SLICE:
+    //     if (currMB->skip_flag == 1)
+    //         macroblock_type = 50;
+    //     // xml_write_int(-1);
+    //     else
+    //     {
+    //         if (iCurr_mb_type != 0)
+    //             macroblock_type = iCurr_mb_type - 1;
+    //         // xml_write_int(iCurr_mb_type-1);
+    //         else if (iCurr_mb_type == 5)
+    //         {
+    //             if (currMB->luma_transform_size_8x8_flag == 0)
+    //                 macroblock_type = 48; // I_4x4
+    //             else
+    //                 macroblock_type = 49; // I_8x8
+    //         }
+    //         else
+    //             macroblock_type = iCurr_mb_type;
+    //         // xml_write_int(iCurr_mb_type);
+    //     }
+    //     break;
+    // case B_SLICE:
+    //     if (currMB->skip_flag == 1)
+    //         // xml_write_int(-1);
+    //         macroblock_type = 53;
+    //     else if (iCurr_mb_type == 23)
+    //     {
+    //         if (currMB->luma_transform_size_8x8_flag == 0)
+    //             macroblock_type = 51; // I_4x4
+    //         else
+    //             macroblock_type = 52; // I_8x8
+    //     }
+    //     else
+    //         macroblock_type = iCurr_mb_type;
+    //     // xml_write_int(iCurr_mb_type);
+    //     break;
+    // case I_SLICE:
+    // case SI_SLICE:
+    //     macroblock_type = iCurr_mb_type;
+    //     if (iCurr_mb_type == 0)
+    //     {
+    //         if (currMB->luma_transform_size_8x8_flag == 0)
+    //             macroblock_type = 48; // I_4x4
+    //         else
+    //             macroblock_type = 49; // I_8x8
+    //     }
+    //     // xml_write_int(iCurr_mb_type);
+    //     break;
+    // }
+
+    // fwrite(&macroblock_type, 1, 1, fh);
 
     /*xml_write_end_element();
     xml_write_start_element("TypeString");
