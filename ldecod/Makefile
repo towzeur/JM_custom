@@ -93,7 +93,14 @@ OBJSUF= .o$(SUFFIX)
 SRC=    $(wildcard $(SRCDIR)/*.c) 
 ADDSRC= $(wildcard $(ADDSRCDIR)/*.c)
 OBJ=    $(SRC:$(SRCDIR)/%.c=$(OBJDIR)/%.o$(SUFFIX)) $(ADDSRC:$(ADDSRCDIR)/%.c=$(OBJDIR)/%.o$(SUFFIX)) 
-BIN=    $(BINDIR)/$(NAME)$(SUFFIX).exe
+# Adjust binary name based on OS
+ifeq ($(OS_TYPE),Windows)
+    BIN_EXT = .exe
+else
+    BIN_EXT =
+endif
+BIN=    $(BINDIR)/$(NAME)$(SUFFIX)$(BIN_EXT)
+
 
 .PHONY: default distclean clean tags depend
 
